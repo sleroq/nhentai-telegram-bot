@@ -6,8 +6,6 @@ const { TelegraphUploadByUrls } = require("../telegraph.js");
 module.exports.textHandler = async function(ctx) {
   let message_text = ctx.message.text,
     match = message_text.match(/\d+/gm);
-  console.log(message_text);
-  console.log(match);
   if (match && match[0]) {
     for (let i = 0; i < match.length; i++) {
       
