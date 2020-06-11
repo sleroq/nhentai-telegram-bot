@@ -1,7 +1,7 @@
 const { Telegraf } = require('telegraf')
 const bot = new Telegraf(process.env.BOT_TOKEN)
-
-bot.telegram.setWebhook("https://kipeeng-alive.herokuapp.com/secret-path");
+const webhook = process.env.PORT ? 'https://kipeeng-alive.herokuapp.com/secret-path' : 'https://nhentai-thing.glitch.me/secret-path'
+bot.telegram.setWebhook(webhook);
 
 const express = require("express");
 const expressApp = express();
@@ -16,7 +16,7 @@ const { randomCommand } = require('./bot/commands/random.js')
 
 const { qb_query } = require('./bot/buttons/index.js')
 const { inlineSearch } = require('./bot/inline_search.js')
-
+const { textHandler } = require('./bot/commands/textHandler.js')
 //
 
 bot.start(async (ctx) => {
@@ -41,6 +41,9 @@ bot.on("callback_query", async (ctx, next) => {
 bot.on("inline_query", async ctx => {
   await inlineSearch(ctx);
 });
+bot.on('text', async (ctx, next) => {
+  await textHandler(ctx);
+})
 const PORT = process.env.PORT || 3000;
 expressApp.get("/", (req, res) => {
   res.send("Hello, love <3");

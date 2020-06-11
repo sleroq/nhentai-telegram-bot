@@ -1,4 +1,5 @@
 const nhentai = require("nhentai-js");
+const moment = require('moment');
 const { uploadByUrl } = require("telegraph-uploader");
 
 const { telegraphCreatePage } = require("../telegraph.js");
@@ -26,7 +27,7 @@ module.exports.fixInstantView = async function(ctx) {
       ]
     ]
   });
-  
+  let start_time = moment();
   console.log("start uploading doujin");
   let pages = manga.pages,
     telegrapf_urls = [],
@@ -81,6 +82,11 @@ module.exports.fixInstantView = async function(ctx) {
     console.log("page was NOT created");
     return
   }
+  let finish_time = moment(),
+      difference_format = manga.details.pages[0]<20 ? 'seconds' : 'minutes',
+      difference_division = manga.details.pages[0]<20 ? 1000 : 60000,
+      difference = finish_time.diff(start_time)
+  console.log(`it took ${difference/difference_division} ${difference_format}`)
   await db.updateManga(manga_id, newPage.url)
   
   let messageText = getMangaMessage(manga, newPage.url),

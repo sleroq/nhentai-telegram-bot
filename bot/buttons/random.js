@@ -21,7 +21,7 @@ module.exports.randomButton = async function(ctx, next) {
       inline_keyboard: [
         [{ text: "Fix", callback_data: 'fix_' + manga_id }, { text: "Telegra.ph", url: telegrapfLink }],
         [{ text: "Search", switch_inline_query_current_chat: "" }],
-        [{ text: "Next", callback_data: "r_prev" + manga.id }]
+        [{ text: "Next", callback_data: "r_prev" + manga_id }]
       ]
     }
   });

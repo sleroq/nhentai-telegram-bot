@@ -16,7 +16,8 @@
     "telegraf": "^3.38.0",
     "telegraph-uploader": "^2.0.0",
     "telegra.ph": "^1.0.1",
-    "better-sqlite3": "^7.0.1"
+    "better-sqlite3": "^7.0.1",
+    "moment": "^2.26.0"
   },
   "engines": {
     "node": "12.x"

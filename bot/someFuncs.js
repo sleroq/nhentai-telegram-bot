@@ -1,17 +1,18 @@
-const nhentai = require('nhentai-js')
+const nhentai = require("nhentai-js");
 
-async function doujinExists(id){
-    const val = await nhentai.exists(id)
-    return val
+async function doujinExists(id) {
+  const val = await nhentai.exists(id);
+  return val;
 }
 
-async function getDoujin(id){
-    try{ // try/catch is the equivalent of Promise.catch() in async/await
-        const val = await nhentai.getDoujin(id)
-        return val
-    }catch(err){
-        console.error(err);
-    }
+async function getDoujin(id) {
+  try {
+    // try/catch is the equivalent of Promise.catch() in async/await
+    const val = await nhentai.getDoujin(id);
+    return val;
+  } catch (err) {
+    console.error(err);
+  }
 }
 async function getRandomManga() {
   let homepage = await nhentai.getHomepage(),
@@ -26,23 +27,30 @@ async function getRandomManga() {
 }
 function getMangaMessage(manga, telegraphLink) {
   let title = () => {
-    if (manga.title.pretty) {
-      return manga.title.pretty.replace(/[\(\)\[\]_\*~`]/g, " ");
-    } else {
-      return manga.title.replace(/[\(\)\[\]_\*~`]/g, " ");
+      if (manga.title.pretty) {
+        return manga.title.pretty.replace(/[\(\)\[\]_\*~`]/g, " ");
+      } else {
+        return manga.title.replace(/[\(\)\[\]_\*~`]/g, " ");
+      }
+    },
+    tags = "",
+    tagsArray = manga.details.tags[0]
+      .replace(/\d+K/gm, 123)  // replace number of doujins with number
+      .replace(/-+/gm, "\\_")  // replace all dashes
+      .replace(/\s+/gm, "\\_") // replace all spaces
+      .split(/\d+/gm);         // split by number of doujins
+  for (let i = 0; i < tagsArray.length; i++) {
+    if (tagsArray && tagsArray[i]) {
+      let replacedSpace = tagsArray[i];
+      tags += "#" + replacedSpace;
     }
-  },
-  tagsString = "";
-    // tagsString += "\nTags: ";
-    // for (let i = 0; i < manga.tags.length; i++) {
-    //   let tag = manga.tags[i].name.replace(/\-+/g, "\\_"),
-    //     tagName = tag.replace(/\s+/g, "\\_");
-    //   tagsString += "#" + tagName;
-    //   if (i != manga.tags.length - 1) {
-    //     tagsString += ", ";
-    //   }
-    // }
-  let caption = `[${title()}](${telegraphLink}) (${manga.details.pages[0]} pages)\n[link](${manga.link})${tagsString}\n`;
+    if (i != tagsArray.length - 1 && tagsArray[i + 1] != "") {
+      tags += ", ";
+    }
+  }
+  let caption = `[${title()}](${telegraphLink}) (${
+    manga.details.pages[0]
+  } pages)\n[link](${manga.link})\nTags: ${tags}\n`;
   return caption;
 }
 function sliceByHalf(s) {
@@ -58,20 +66,18 @@ function sliceByHalf(s) {
 
   let s1 = s.substr(0, middle);
   let s2 = s.substr(middle + 1);
-  // console.log(s1);
-  // console.log(s2);
   return s2;
 }
 function getMangaDescription(manga) {
-    let title = () => {
+  let title = () => {
     if (manga.title.pretty) {
       return manga.title.pretty.replace(/[\(\)\[\]_\*~`]/g, " ");
     } else {
       return manga.title.replace(/[\(\)\[\]_\*~`]/g, " ");
     }
-  }
-    let link = 'https://nhentai.net/g/' + manga.id + '/'
-    let caption = `[${title()}](${link})`;
+  };
+  let link = "https://nhentai.net/g/" + manga.id + "/";
+  let caption = `[${title()}](${link})`;
   return caption;
 }
 function searchDescription(manga) {
@@ -94,4 +100,4 @@ module.exports = {
   getMangaDescription,
   sliceByHalf,
   searchDescription
-}
+};
