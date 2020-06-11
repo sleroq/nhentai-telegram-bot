@@ -89,7 +89,8 @@ module.exports.inlineSearch = async function (ctx){
     // console.log(searchResults)
     if (searchResults && searchResults.length) {
       for (let i = 0; i < searchResults.length; i++) {
-        searchResults[i].message_text = await getMangaDescription(searchResults[i], true);
+        // if (i == 0) { console.log(searchResults[i])}
+        searchResults[i].message_text = await getMangaDescription(searchResults[i]);
         searchResults[i].description = await searchDescription(searchResults[i]);
       }
       const results = searchResults.map(manga => ({
@@ -106,7 +107,7 @@ module.exports.inlineSearch = async function (ctx){
           inline_keyboard: [
             [
               {
-                text: "Open in telegraph",
+                text: "Tap to open",
                 callback_data: "open_" + manga.id
               }
             ]

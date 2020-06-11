@@ -1,5 +1,6 @@
 const { randomButton } = require('./random.js')
 const { openiInTelegraph } = require('./open_in_telegraph.js')
+const { fixInstantView } = require('./fix_instant_view.js')
 
 
 module.exports.qb_query = async function(ctx, next) {
@@ -11,9 +12,9 @@ module.exports.qb_query = async function(ctx, next) {
     await randomButton(ctx);
   } else if (query_data.match("open")) {
     await openiInTelegraph(ctx);
-  } /* else if (query_data.match("fixInstantView_")) {
+  }  else if (query_data.match("fix_")) {
     await fixInstantView(ctx);
-  } else if (query_data.match("prevManga")) {
+  } /*else if (query_data.match("prevManga")) {
     await previousManga(ctx);
   } */
 };

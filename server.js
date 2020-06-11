@@ -1,15 +1,11 @@
 const { Telegraf } = require('telegraf')
 const bot = new Telegraf(process.env.BOT_TOKEN)
 
-bot.telegram.setWebhook("https://kipeeng-alive.herokuapp.com/secret-path");
+bot.telegram.setWebhook("https://nhentai-thing.glitch.me/secret-path");
 
 const express = require("express");
 const expressApp = express();
 expressApp.use(bot.webhookCallback("/secret-path"));
-
-
-
-
 
 const db = require("./db/dbhandler.js");
 
@@ -45,10 +41,10 @@ bot.on("callback_query", async (ctx, next) => {
 bot.on("inline_query", async ctx => {
   await inlineSearch(ctx);
 });
-const PORT = process.env.PORT || 3000
+
 expressApp.get("/", (req, res) => {
   res.send("Hello, love <3");
 });
-expressApp.listen(PORT, () => {
-  console.log("App listening on port "+PORT+"!");
+expressApp.listen(3000, () => {
+  console.log("App listening on port 3000!");
 });
