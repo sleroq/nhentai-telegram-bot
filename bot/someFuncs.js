@@ -50,7 +50,7 @@ function getMangaMessage(manga, telegraphLink) {
   }
   let caption = `[${title()}](${telegraphLink}) (${
     manga.details.pages[0]
-  } pages)\n[link](${manga.link})\nTags: ${tags}\n`;
+  } pages)\nTags: ${tags}\n[nHentai page](manga.link)`;
   return caption;
 }
 function sliceByHalf(s) {

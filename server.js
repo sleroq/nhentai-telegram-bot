@@ -1,6 +1,6 @@
 const { Telegraf } = require('telegraf')
 const bot = new Telegraf(process.env.BOT_TOKEN)
-const webhook = process.env.PORT ? 'https://kipeeng-alive.herokuapp.com/secret-path' : 'https://nhentai-thing.glitch.me/secret-path'
+const webhook = 'https://nhentai-thing.glitch.me/secret-path'//process.env.PORT ? 'https://kipeeng-alive.herokuapp.com/secret-path' : 'https://nhentai-thing.glitch.me/secret-path'
 // bot.telegram.setWebhook(webhook);
 
 const express = require("express");
