@@ -41,10 +41,10 @@ bot.on("callback_query", async (ctx, next) => {
 bot.on("inline_query", async ctx => {
   await inlineSearch(ctx);
 });
-
+const PORT = process.env.PORT || 3000;
 expressApp.get("/", (req, res) => {
   res.send("Hello, love <3");
 });
-expressApp.listen(3000, () => {
-  console.log("App listening on port 3000!");
+expressApp.listen(PORT, () => {
+   console.log(`Our app is running on port ${ PORT }`);
 });
