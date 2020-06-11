@@ -1,37 +1,13 @@
-const nhentai = require("nhentai-js");
-const { doujinExists, getDoujin, getMangaMessage } = require("../someFuncs.js");
+const nHentaiAPI = require("nhentai-api-js");
+const nHentai = new nHentaiAPI();
 
-function sliceByHalf(s) {
-  let middle = Math.floor(s.length / 2);
-  let before = s.lastIndexOf(" ", middle);
-  let after = s.indexOf(" ", middle + 1);
+const { getMangaDescription } = require("./someFuncs.js");
+const { sliceByHalf } = require("./someFuncs.js");
+const { searchDescription } = require("./someFuncs.js");
 
-  if (before == -1 || (after != -1 && middle - before >= after - middle)) {
-    middle = after;
-  } else {
-    middle = before;
-  }
-  let s1 = s.substr(0, middle);
-  let s2 = s.substr(middle + 1);
-  console.log(s1);
-  console.log(s2);
-  return s2;
-}
-function searchDescription(manga) {
-  let title = manga.title;
-  if (title.match(/ch/gi)) {
-    if (title.split(/ch.\s/i)[1]) {
-      return "Ch. " + title.split(/ch.\s/i)[1];
-    } else {
-      return sliceByHalf(title);
-    }
-  } else {
-    return title;
-  }
-}
 
-module.exports.inlineSearch = async function(ctx) {
-  console.log(
+module.exports.inlineSearch = async function (ctx){
+    console.log(
     ctx.inlineQuery.query +
       "\n" +
       ctx.inlineQuery.from.id +
@@ -39,67 +15,82 @@ module.exports.inlineSearch = async function(ctx) {
       ctx.inlineQuery.from.username
   );
   if (ctx.inlineQuery.query) {
-    let inlineQuery = ctx.inlineQuery.query,
-      isPageModified = false,
-      isSortModefied = false,
-      pageNum = getpagenum(inlineQuery),
-      sortParametr = getSort(inlineQuery);
-
-    function getpagenum(inlineQuery) {
+    let inlineQuery = ctx.inlineQuery.query;
+    function getpagenum() {
       if (inlineQuery.match(/\(p[0-9]+\)/)) {
-        isPageModified = true
         let page_num = inlineQuery.split(/\(p/)[1].split(/\)/)[0];
         return page_num;
       } else {
         return 1;
       }
     }
-    function getSort(inlineQuery) {
+    function getUserTag() {
+      if (inlineQuery.match(/\(p[0-9]+\)/)) {
+        let userTag = inlineQuery
+          .split(/\(p/)[1]
+          .split(/\)/)[1]
+          .slice(1);
+        if (userTag.match(/\(s[pn]+\)/)) {
+          let utag = userTag.split(/[np]\)/)[1].slice(1);
+          return utag;
+        } else if (inlineQuery.match(/\(s[pn]+\)/)) {
+          let utag = inlineQuery.split(/[np]\)/)[1].slice(1);
+          if (utag.match(/\(p[0-9]+\)/)) {
+            let ifp = inlineQuery
+              .split(/\(p/)[1]
+              .split(/\)/)[1]
+              .slice(1);
+            return ifp;
+          } else {
+            return utag;
+          }
+        } else {
+          return userTag;
+        }
+      } else if (inlineQuery.match(/\(s[pn]+\)/)) {
+        let utag = inlineQuery.split(/[np]\)/)[1].slice(1);
+        if (utag.match(/(p[0-9]+)/)) {
+          let ifp = inlineQuery
+            .split(/\(p/)[1]
+            .split(/\)/)[1]
+            .slice(1);
+          // console.log("triggered");
+          return ifp;
+        } else {
+          // console.log("triggered utag");
+          return utag;
+        }
+      } else {
+        return ctx.inlineQuery.query;
+      }
+    }
+    function getSort() {
       if (inlineQuery.match(/\(s[pn]+\)/)) {
-        isSortModefied = true
         if (inlineQuery.split(/\(s/)[1].split(/\)/)[0] == "p") {
           return "popular";
         } else {
-          return "date";
+          return;
         }
       } else {
-        return "date";
+        return;
       }
-    }
-    let searchQuery = () =>{
-      let result
-      if(isSortModefied){
-        result = inlineQuery.slice(4)
-      }else{
-        result = inlineQuery
-      }
-      if(isPageModified){
-        let sliceLength = 3 + pageNum.length
-        result = result.slice(sliceLength)
-      }
-        return result
     }
     console.log(
       'user tag: "' +
-        searchQuery() +
+        getUserTag() +
         '" page number: ' +
-        pageNum +
+        getpagenum() +
         '" sorting parametr: ' +
-        sortParametr
+        getSort()
     );
-    const search = await nhentai.search(searchQuery(), pageNum, sortParametr),
+    const search = await nHentai.search(getUserTag(), getpagenum(), getSort()),
       searchResults = search.results,
-      inline = "true";
-    console.log(searchResults)
+          inline = 'true'
+    // console.log(searchResults)
     if (searchResults && searchResults.length) {
       for (let i = 0; i < searchResults.length; i++) {
-        searchResults[i].message_text = await getMangaDescription(
-          searchResults[i],
-          true
-        );
-        searchResults[i].description = await searchDescription(
-          searchResults[i]
-        );
+        searchResults[i].message_text = await getMangaDescription(searchResults[i], true);
+        searchResults[i].description = await searchDescription(searchResults[i]);
       }
       const results = searchResults.map(manga => ({
         id: manga.id,
@@ -116,7 +107,7 @@ module.exports.inlineSearch = async function(ctx) {
             [
               {
                 text: "Open in telegraph",
-                callback_data: "openintelegraph_" + manga.id
+                callback_data: "open_" + manga.id
               }
             ]
           ]
@@ -129,4 +120,4 @@ module.exports.inlineSearch = async function(ctx) {
       ctx.answerInlineQuery([]);
     }
   }
-};
+}

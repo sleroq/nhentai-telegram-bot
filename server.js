@@ -1,7 +1,7 @@
 const { Telegraf } = require('telegraf')
 const bot = new Telegraf(process.env.BOT_TOKEN)
 
-bot.telegram.setWebhook("https://nhentai-thing.glitch.me/secret-path");
+// bot.telegram.setWebhook("https://nhentai-thing.glitch.me/secret-path");
 
 const express = require("express");
 const expressApp = express();
@@ -13,6 +13,9 @@ const db = require("./db/dbhandler.js");
 
 const { getbycode } = require('./bot/commands/getbycode.js')
 const { randomCommand } = require('./bot/commands/random.js')
+
+const { qb_query } = require('./bot/buttons/index.js')
+const { inlineSearch } = require('./bot/inline_search.js')
 
 //
 
@@ -30,7 +33,14 @@ bot.start(async (ctx) => {
 })
 
 bot.command('code', async (ctx)=>{ await getbycode(ctx) })
-bot.command('rand', async (ctx)=>{ await randomCommand(ctx) })
+bot.command('rand', async (ctx)=>{ await randomCommand(ctx)})
+
+bot.on("callback_query", async (ctx, next) => {
+  await qb_query(ctx);
+});
+bot.on("inline_query", async ctx => {
+  await inlineSearch(ctx);
+});
 
 expressApp.get("/", (req, res) => {
   res.send("Hello, love <3");
