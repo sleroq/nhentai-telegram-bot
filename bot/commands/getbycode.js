@@ -5,8 +5,8 @@ const { TelegraphUploadByUrls } = require("../telegraph.js");
 
 module.exports.getbycode = async function(ctx) {
   let msg = ctx.message.text,
-    mangaId = msg.split(" ")[1].trim(),
-    exists = await doujinExists(mangaId);
+    mangaId = msg.split(" ")[1] ? msg.split(" ")[1].trim() : return;
+   let exists = await doujinExists(mangaId);
   if (exists) {
     let manga = await getDoujin(mangaId);
     if (!manga) {return;}
