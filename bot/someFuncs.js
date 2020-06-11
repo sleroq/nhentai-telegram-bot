@@ -42,8 +42,25 @@ function getMangaMessage(manga, telegraphLink) {
     //     tagsString += ", ";
     //   }
     // }
-  let caption = `[${title()}](${telegraphLink}) (${manga.details.pages[0]} pages)${tagsString}\n`;
+  let caption = `[${title()}](${telegraphLink}) (${manga.details.pages[0]} pages)\n[link](${manga.link})${tagsString}\n`;
   return caption;
+}
+function sliceByHalf(s) {
+  let middle = Math.floor(s.length / 2);
+  let before = s.lastIndexOf(" ", middle);
+  let after = s.indexOf(" ", middle + 1);
+
+  if (before == -1 || (after != -1 && middle - before >= after - middle)) {
+    middle = after;
+  } else {
+    middle = before;
+  }
+
+  let s1 = s.substr(0, middle);
+  let s2 = s.substr(middle + 1);
+  // console.log(s1);
+  // console.log(s2);
+  return s2;
 }
 function getMangaDescription(manga) {
     let title = () => {
@@ -53,11 +70,28 @@ function getMangaDescription(manga) {
       return manga.title.replace(/[\(\)\[\]_\*~`]/g, " ");
     }
   }
-    let caption = `[${title()}](${manga.link})`;
+    let link = 'https://nhentai.net/g/' + manga.id + '/'
+    let caption = `[${title()}](${link})`;
+  return caption;
+}
+function searchDescription(manga) {
+  let title = manga.title;
+  if (title.match(/ch/gi)) {
+    if (title.split(/ch.\s/i)[1]) {
+      return "Ch. " + title.split(/ch.\s/i)[1];
+    } else {
+      return sliceByHalf(title);
+    }
+  } else {
+    return title;
+  }
 }
 module.exports = {
   doujinExists,
   getDoujin,
   getRandomManga,
-  getMangaMessage
+  getMangaMessage,
+  getMangaDescription,
+  sliceByHalf,
+  searchDescription
 }
