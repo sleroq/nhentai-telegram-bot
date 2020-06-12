@@ -14,7 +14,9 @@ module.exports.qb_query = async function(ctx, next) {
     await openiInTelegraph(ctx);
   }  else if (query_data.match("fix_")) {
     await fixInstantView(ctx);
-  } /*else if (query_data.match("prevManga")) {
+  } else if (query_data.match("fixing")) {
+    await ctx.answerCbQuery('Please wait.', true);
+  }/*else if (query_data.match("prevManga")) {
     await previousManga(ctx);
   } */
 };

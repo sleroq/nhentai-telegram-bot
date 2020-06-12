@@ -16,7 +16,7 @@ module.exports.randomButton = async function(ctx, next) {
     messageText = getMangaMessage(manga, telegrapfLink),
     manga_id = manga.link.slice(22, -1)
   await ctx.editMessageText(messageText, {
-    parse_mode: "Markdown",
+    parse_mode: "HTML",
     reply_markup: {
       inline_keyboard: [
         [{ text: "Fix", callback_data: 'fix_' + manga_id }, { text: "Telegra.ph", url: telegrapfLink }],

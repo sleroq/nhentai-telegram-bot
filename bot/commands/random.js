@@ -13,7 +13,7 @@ module.exports.randomCommand = async function(ctx) {
     manga_id = manga.link.slice(22, -1);
   // console.log(manga)
   await ctx.reply(messageText, {
-    parse_mode: "Markdown",
+    parse_mode: "HTML",
     reply_markup: {
       inline_keyboard: [
         [{ text: "Fix", callback_data: 'fix_' + manga_id }, { text: "Telegra.ph", url: telegrapfLink }],

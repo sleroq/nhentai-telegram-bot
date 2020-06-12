@@ -18,7 +18,7 @@ module.exports.textHandler = async function(ctx) {
           let telegrapfLink = await TelegraphUploadByUrls(manga),
             messageText = getMangaMessage(manga, telegrapfLink);
           await ctx.reply(messageText, {
-            parse_mode: "Markdown",
+            parse_mode: "HTML",
             reply_markup: {
               inline_keyboard: [
                 [

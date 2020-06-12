@@ -1,7 +1,7 @@
 const { API, } = require('nhentai-api');
 const api = new API();
 
-const { getMangaMessageInline } = require("./someFuncs.js");
+const { tagStringInline, getMessageInline, getTitle } = require("./someFuncs.js");
 
 function sliceByHalf(s) {
   let middle = Math.floor(s.length / 2);
@@ -15,21 +15,7 @@ function sliceByHalf(s) {
   }
   let s1 = s.substr(0, middle);
   let s2 = s.substr(middle + 1);
-  console.log(s1);
-  console.log(s2);
   return s2;
-}
-function searchDescription(manga) {
-  let title = manga.title;
-  if (title.match(/ch/gi)) {
-    if (title.split(/ch.\s/i)[1]) {
-      return "Ch. " + title.split(/ch.\s/i)[1];
-    } else {
-      return sliceByHalf(title);
-    }
-  } else {
-    return title;
-  }
 }
 
 module.exports.inlineSearch = async function(ctx) {
@@ -43,7 +29,7 @@ module.exports.inlineSearch = async function(ctx) {
   );
   if (ctx.inlineQuery.query) {
     let inlineQuery = ctx.inlineQuery.query,
-        pageNumber = 0
+        pageNumber = 1
     
     let PageMatch = inlineQuery.match(/\/p\d+/g) ? inlineQuery.match(/\/p\d+/g)[0] : undefined
     if(PageMatch){
@@ -57,46 +43,51 @@ module.exports.inlineSearch = async function(ctx) {
     //   inlineQuery = inlineQuery.slice(3).trim()
     // }
     console.log('search query="' + inlineQuery + '" page=' + pageNumber)
-    const search = await api.search(inlineQuery, pageNumber);
+    const search = await api.search(inlineQuery, pageNumber).catch(err=>{
+      console.log(err);
+    });
+    if(!search){return}
     let books = search.books;
     
     console.log(books[0])
-    /*
+    
     if (books && books.length) {
       for (let i = 0; i < books.length; i++) {
-        books[i].message_text = await getMangaDescription(
-          books[i]
+      let tags = tagStringInline(books[i])
+        books[i].message_text = getMessageInline(
+          books[i], tags
         );
-        books[i].description = await searchDescription(
-          books[i]
-        );
+        books[i].description = tags;
       }
+      let searchType = "article"
+      
       const results = books.map(manga => ({
         id: manga.id,
-        type: "article",
-        title: manga.title,
+        type: searchType,
+        title: getTitle(manga),
         description: manga.description,
-        thumb_url: manga.thumbnail.s,
+        thumb_url: 'https://t5.nhentai.net/galleries/' + manga.id + '/thumb.jpg',// + manga.cover.type.extension,
         input_message_content: {
           message_text: manga.message_text,
-          parse_mode: "Markdown"
+          parse_mode: "HTML"
         },
         reply_markup: {
           inline_keyboard: [
             [
               {
                 text: "Open in telegraph",
-                callback_data: "openintelegraph_" + manga.id
+                callback_data: "open_" + manga.id
               }
             ]
           ]
         }
       }));
 
-      // console.log(results)
+      console.log(results[0])
       ctx.answerInlineQuery(results);
+      
     } else {
-      ctx.answerInlineQuery([]);
-    */
+      // ctx.answerInlineQuery([]);
   }
 };
+}

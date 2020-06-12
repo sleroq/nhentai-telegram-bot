@@ -13,9 +13,10 @@ const db = require("./db/dbhandler.js");
 
 // const { getbycode } = require('./bot/commands/getbycode.js')
 const { randomCommand } = require('./bot/commands/random.js')
+const { dlzip } = require('./bot/commands/dlzip.js')
 
 const { qb_query } = require('./bot/buttons/index.js')
-const { inlineSearch } = require('./bot/inline_search.js')
+const { inlineSearch } = require('./bot/inline_search1.js')
 const { textHandler } = require('./bot/commands/textHandler.js')
 //
 
@@ -34,6 +35,7 @@ bot.start(async (ctx) => {
 
 // bot.command('code', async (ctx)=>{ await getbycode(ctx) })
 bot.command('rand', async (ctx)=>{ await randomCommand(ctx)})
+bot.command('zip', async (ctx)=>{ await dlzip(ctx)})
 
 bot.on("callback_query", async (ctx, next) => {
   await qb_query(ctx);

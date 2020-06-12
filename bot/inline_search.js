@@ -86,6 +86,7 @@ module.exports.inlineSearch = async function (ctx){
     const search = await nHentai.search(getUserTag(), getpagenum(), getSort()),
       searchResults = search.results,
           inline = 'true'
+    console.log(searchResults[0].thumbnail) 
     // console.log(searchResults)
     if (searchResults && searchResults.length) {
       for (let i = 0; i < searchResults.length; i++) {

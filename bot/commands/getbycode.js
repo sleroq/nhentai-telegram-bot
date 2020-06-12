@@ -10,7 +10,7 @@ module.exports.getbycode = async function(ctx) {
   
   if (!exists) {
     ctx.reply("`" + mangaId + "` does not exist :/", {
-      parse_mode: "Markdown"
+      parse_mode: "HTML"
     });
     return;
   }
