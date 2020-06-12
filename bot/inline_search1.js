@@ -44,7 +44,7 @@ module.exports.inlineSearch = async function(ctx) {
     }
     let books = search.results;
 
-    console.log(books[0]);
+    // console.log(books[0]);
 
     if (books && books.length) {
       for (let i = 0; i < books.length; i++) {
@@ -77,7 +77,7 @@ module.exports.inlineSearch = async function(ctx) {
         }
       }));
 
-      console.log(results[0]);
+      // console.log(results[0]);
       ctx.answerInlineQuery(results);
     } else {
       // ctx.answerInlineQuery([]);
