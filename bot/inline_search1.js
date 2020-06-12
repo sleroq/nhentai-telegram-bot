@@ -20,20 +20,31 @@ module.exports.inlineSearch = async function(ctx) {
 
     let PageMatch = inlineQuery.match(/\/p\d+/g)
       ? inlineQuery.match(/\/p\d+/g)[0]
-      : undefined;
+      : undefined,
+        isPageModified = false;
     if (PageMatch) {
+      isPageModified = true;
       pageNumber = PageMatch.slice(2);
-      inlineQuery = inlineQuery.replace(PageMatch, '').trim();
+      inlineQuery = inlineQuery.replace(PageMatch, "").trim();
     }
-    let sortingParametr = "date";
-    let SortMatch = inlineQuery.match(/\/s[pn]/)
+    let sortingParametr = "date",
+        SortMatch = inlineQuery.match(/\/s[pn]/)
       ? inlineQuery.match(/\/s[pn]/)[0]
-      : undefined;
+      : undefined,
+        isSearchModified = false;
     if (SortMatch) {
+      isSearchModified = true
       sortingParametr = SortMatch.slice(2) == "p" ? "popular" : "date";
-      inlineQuery = inlineQuery.replace(SortMatch, '').trim();
+      inlineQuery = inlineQuery.replace(SortMatch, "").trim();
     }
-    console.log('search query="' + inlineQuery + '" page=' + pageNumber + ' sorting by ' + sortingParametr);
+    console.log(
+      'search query="' +
+        inlineQuery +
+        '" page=' +
+        pageNumber +
+        " sorting by " +
+        sortingParametr
+    );
     const search = await api
       .search(inlineQuery, pageNumber, sortingParametr)
       .catch(err => {
@@ -76,8 +87,63 @@ module.exports.inlineSearch = async function(ctx) {
           ]
         }
       }));
-
-      // console.log(results[0]);
+      let reverseSortingWord =
+        sortingParametr == "popular" ? "new" : "popularity",
+          reverseSortingParametr = reverseSortingWord.charAt(0),
+          searchSortingSwitch = isPageModified ? `/p${pageNumber} /s${reverseSortingParametr} ${inlineQuery}` : `/s${reverseSortingParametr} ${inlineQuery}`;
+      results.push({
+        id: 43210,
+        type: searchType,
+        title: "To sort results by " + reverseSortingWord,
+        description: `Just add "/s${reverseSortingParametr}" to search qerry: (@nhentai_mangabot ${searchSortingSwitch})`,
+        thumb_url:
+          "https://cdn.glitch.com/project-avatar/37fdc347-68f3-41ad-8166-f97f2fbc8ebf.png",
+        input_message_content: {
+          message_text:
+            "To sort search results by " +
+            reverseSortingWord +
+            " you can *add /s" +
+            reverseSortingParametr + '*',
+          parse_mode: "Markdown"
+        },
+        reply_markup: {
+          inline_keyboard: [
+            [
+              {
+                text: "Sort by " + reverseSortingWord,
+                switch_inline_query_current_chat: searchSortingSwitch
+              }
+            ]
+          ]
+        }
+      });
+      let sortingParametrLetter = sortingParametr == "popular" ? "p" : "n",
+          nextPageSwitch = isSearchModified ? `/p${+pageNumber+1} /s${sortingParametrLetter} ${inlineQuery}` : `/p${+pageNumber+1} ${inlineQuery}`;
+      results.push({
+        id: 4321,
+        type: searchType,
+        title: "Next page",
+        description: `Just add "/p${+pageNumber +
+          1}" to search qerry: (@nhentai_mangabot ${nextPageSwitch})`,
+        thumb_url:
+          "https://cdn.glitch.com/project-avatar/37fdc347-68f3-41ad-8166-f97f2fbc8ebf.png",
+        input_message_content: {
+          message_text:
+            "To view specific page you can *add /p*`n` to the search query, where `n` is page number",
+          parse_mode: "Markdown"
+        },
+        reply_markup: {
+          inline_keyboard: [
+            [
+              {
+                text: "Next page",
+                switch_inline_query_current_chat: nextPageSwitch
+              }
+            ]
+          ]
+        }
+      });
+      // console.log(results[results.length-1]);
       ctx.answerInlineQuery(results);
     } else {
       // ctx.answerInlineQuery([]);
