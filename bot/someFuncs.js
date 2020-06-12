@@ -26,21 +26,22 @@ async function getRandomManga() {
 }
 function getMangaMessage(manga, telegraphLink) {
   let title = getTitle(manga),
-    tags = tagString(manga),
-    caption;
+    tags = manga.details.tags ? tagString(manga) : '',
+    caption,
+      mangaId = manga.link.match(/\d+/)[0]
   if (telegraphLink) {
     caption = `<a href="${telegraphLink}">${title}</a> (${
       manga.details.pages[0]
-    } pages)\nTags: ${tags}\n<a href="${manga.link}">nHentai page</a>`;
+    } pages)\n${tags}\n<a href="${manga.link}">nhentai.net</a> | <code>${mangaId}</code>`;
   } else {
     caption = `<a href="${manga.link}">${title}</a> (${
       manga.details.pages[0]
-    } pages)\nTags: ${tags}\n<a href="${manga.link}">nHentai page</a>`;
+    } pages)\n${tags}\n<a href="${manga.link}">nhentai.net</a> | <code>${mangaId}</code>`;
   }
   return caption;
 }
 function tagString(manga) {
-  let tags = "",
+  let tags = "Tags: ",
     tagsArray = manga.details.tags[0]
       .replace(/\d+K/gm, 123) // replace number of doujins with number
       .replace(/-+/gm, "_") // replace all dashes
@@ -56,19 +57,19 @@ function tagString(manga) {
   }
   return tags;
 }
-function tagStringInline(manga) {
-  let tags = "";
-  for (let i = 0; i < manga.tags.length; i++) {
-    if (manga.tags && manga.tags[i]) {
-      tags +=
-        "#" + manga.tags[i].name.replace(/-+/gm, "_").replace(/\s+/gm, "_");
-    }
-    if (i != manga.tags.length - 1) {
-      tags += ", ";
-    }
-  }
-  return tags;
-}
+// function tagStringInline(manga) {
+//   let tags = "";
+//   for (let i = 0; i < manga.tags.length; i++) {
+//     if (manga.tags && manga.tags[i]) {
+//       tags +=
+//         "#" + manga.tags[i].name.replace(/-+/gm, "_").replace(/\s+/gm, "_");
+//     }
+//     if (i != manga.tags.length - 1) {
+//       tags += ", ";
+//     }
+//   }
+//   return tags;
+// }
 function sliceByHalf(s) {
   let middle = Math.floor(s.length / 2);
   let before = s.lastIndexOf(" ", middle);
@@ -84,13 +85,13 @@ function sliceByHalf(s) {
   let s2 = s.substr(middle + 1);
   return s2;
 }
-function getMessageInline(manga, tags) {
-  let title = getTitle(manga);
+// function getMessageInline(manga, tags) {
+//   let title = getTitle(manga);
 
-  let link = "https://nhentai.net/g/" + manga.id + "/",
-    message_text = `<a href="${link}">${title}</a> (${manga.pages.length} pages)\nTags: ${tags})`;
-  return message_text;
-}
+//   let link = "https://nhentai.net/g/" + manga.id + "/",
+//     message_text = `<a href="${link}">${title}</a> (${manga.pages.length} pages)\nTags: ${tags})`;
+//   return message_text;
+// }
 function getMessageInline1(manga) {
   let title = getTitle(manga),
       link = "https://nhentai.net/g/" + manga.id + "/",
@@ -119,10 +120,10 @@ module.exports = {
   getDoujin,
   getRandomManga,
   getMangaMessage,
-  getMessageInline,
+  // getMessageInline,
   getMessageInline1,
   getTitle,
   sliceByHalf,
   tagString,
-  tagStringInline
+  // tagStringInline
 };
