@@ -11,7 +11,7 @@ const db = require("./db/dbhandler.js");
 
 //modules
 
-const { getbycode } = require('./bot/commands/getbycode.js')
+// const { getbycode } = require('./bot/commands/getbycode.js')
 const { randomCommand } = require('./bot/commands/random.js')
 
 const { qb_query } = require('./bot/buttons/index.js')
@@ -32,7 +32,7 @@ bot.start(async (ctx) => {
   await db.addUser(ctx.from)
 })
 
-bot.command('code', async (ctx)=>{ await getbycode(ctx) })
+// bot.command('code', async (ctx)=>{ await getbycode(ctx) })
 bot.command('rand', async (ctx)=>{ await randomCommand(ctx)})
 
 bot.on("callback_query", async (ctx, next) => {

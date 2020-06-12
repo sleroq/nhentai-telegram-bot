@@ -13,6 +13,7 @@
     "express": "^4.17.1",
     "nhentai-js": "^3.3.0",
     "nhentai-api-js": "^1.1.4",
+    "nhentai-api": "^3.0.2",
     "telegraf": "^3.38.0",
     "telegraph-uploader": "^2.0.0",
     "telegra.ph": "^1.0.1",
