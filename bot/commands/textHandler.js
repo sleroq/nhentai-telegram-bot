@@ -4,17 +4,22 @@ const { doujinExists, getDoujin, getMangaMessage } = require("../someFuncs.js");
 const { TelegraphUploadByUrls } = require("../telegraph.js");
 
 module.exports.textHandler = async function(ctx) {
+  if (
+    ctx.message.via_bot &&
+    (ctx.message.via_bot.username == "nhentai_mangabot" ||
+      ctx.message.via_bot.username == "nhentai_searchbot")
+  ) {
+    return;
+  }
   let message_text = ctx.message.text,
     match = message_text.match(/\d+/gm);
   if (match && match[0]) {
     for (let i = 0; i < match.length; i++) {
-      
       let mangaId = match[i],
         exists = await doujinExists(match[0]);
       if (exists) {
         let manga = await getDoujin(mangaId);
         if (manga) {
-          
           let telegrapfLink = await TelegraphUploadByUrls(manga),
             messageText = getMangaMessage(manga, telegrapfLink);
           await ctx.reply(messageText, {
@@ -30,7 +35,6 @@ module.exports.textHandler = async function(ctx) {
               ]
             }
           });
-          
         } else {
           ctx.reply("Failed to get doujin `" + mangaId + "` :/", {
             parse_mode: "Markdown"
@@ -38,8 +42,8 @@ module.exports.textHandler = async function(ctx) {
         }
       } else {
         ctx.reply("`" + mangaId + "` does not exist :/", {
-            parse_mode: "Markdown"
-          });
+          parse_mode: "Markdown"
+        });
       }
     }
   }
