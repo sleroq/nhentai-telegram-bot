@@ -6,12 +6,11 @@ async function doujinExists(id) {
 }
 
 async function getDoujin(id) {
-    // try/catch is the equivalent of Promise.catch() in async/await
-    const val = await nhentai.getDoujin(id).catch(err=>{
-      console.log(err)
-    });
-    return val;
-
+  // try/catch is the equivalent of Promise.catch() in async/await
+  const val = await nhentai.getDoujin(id).catch(err => {
+    console.log(err);
+  });
+  return val;
 }
 async function getRandomManga() {
   let homepage = await nhentai.getHomepage(),
@@ -26,17 +25,21 @@ async function getRandomManga() {
 }
 function getMangaMessage(manga, telegraphLink) {
   let title = getTitle(manga),
-    tags = manga.details.tags ? tagString(manga) : '',
+    tags = manga.details.tags ? tagString(manga) : "",
     caption,
-      mangaId = manga.link.match(/\d+/)[0]
+    mangaId = manga.link.match(/\d+/)[0];
   if (telegraphLink) {
     caption = `<a href="${telegraphLink}">${title}</a> (${
       manga.details.pages[0]
-    } pages)\n${tags}\n<a href="${manga.link}">nhentai.net</a> | <code>${mangaId}</code>`;
+    } pages)\n${tags}\n<a href="${
+      manga.link
+    }">nhentai.net</a> | <code>${mangaId}</code>`;
   } else {
     caption = `<a href="${manga.link}">${title}</a> (${
       manga.details.pages[0]
-    } pages)\n${tags}\n<a href="${manga.link}">nhentai.net</a> | <code>${mangaId}</code>`;
+    } pages)\n${tags}\n<a href="${
+      manga.link
+    }">nhentai.net</a> | <code>${mangaId}</code>`;
   }
   return caption;
 }
@@ -94,8 +97,8 @@ function sliceByHalf(s) {
 // }
 function getMessageInline1(manga) {
   let title = getTitle(manga),
-      link = "https://nhentai.net/g/" + manga.id + "/",
-      message_text = `<a href="${link}">${title}</a>`;
+    link = "https://nhentai.net/g/" + manga.id + "/",
+    message_text = `<a href="${link}">${title}</a>`;
   return message_text;
 }
 function getTitle(manga) {
@@ -124,6 +127,6 @@ module.exports = {
   getMessageInline1,
   getTitle,
   sliceByHalf,
-  tagString,
+  tagString
   // tagStringInline
 };
