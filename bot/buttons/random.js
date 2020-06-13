@@ -36,7 +36,9 @@ module.exports.randomButton = async function(ctx, next) {
     reply_markup: {
       inline_keyboard: inline_keyboard
     }
-  });
+  }).catch(err=>{
+    console.log(err)
+  });;
   // const search = await nhentai.search('yuri');
   // console.log(search)
 };

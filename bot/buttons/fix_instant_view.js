@@ -27,6 +27,8 @@ module.exports.fixInstantView = async function(ctx) {
         }
       ]
     ]
+  }).catch(err=>{
+    console.log(err)
   });
   let start_time = moment();
   console.log("start uploading doujin");
@@ -46,7 +48,9 @@ module.exports.fixInstantView = async function(ctx) {
             }
           ]
         ]
-      });
+      }).catch(err=>{
+    console.log(err)
+  });
       return;
     }
     await uploadByUrl(pages[i])
@@ -74,10 +78,9 @@ module.exports.fixInstantView = async function(ctx) {
             }
           ]
         ]
-      })
-      .catch(err => {
-        return;
-      });
+      }).catch(err=>{
+    console.log(err)
+  });
   }
   console.log("finish uploading images");
   let newPage = await telegraphCreatePage(manga, telegrapf_urls);
@@ -110,7 +113,9 @@ module.exports.fixInstantView = async function(ctx) {
       reply_markup: {
         inline_keyboard: inline_keyboard
       }
-    });
+    }).catch(err=>{
+    console.log(err)
+  });
   } else {
     inline_keyboard.push([
       { text: "Search", switch_inline_query_current_chat: "" }
@@ -123,6 +128,8 @@ module.exports.fixInstantView = async function(ctx) {
       reply_markup: {
         inline_keyboard: inline_keyboard
       }
-    });
+    }).catch(err=>{
+    console.log(err)
+  });
   }
 };

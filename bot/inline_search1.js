@@ -57,8 +57,9 @@ module.exports.inlineSearch = async function(ctx) {
       return;
     }
     let books = search.results;
-
-    // console.log(books[0]);
+    // console.log(books);
+    let results = [],
+      searchType = "article";
 
     if (books && books.length) {
       for (let i = 0; i < books.length; i++) {
@@ -67,9 +68,8 @@ module.exports.inlineSearch = async function(ctx) {
           ? books[i].language
           : sliceByHalf(books[i].title);
       }
-      let searchType = "article";
 
-      const results = books.map(manga => ({
+      results = books.map(manga => ({
         id: manga.id,
         type: searchType,
         title: getTitle(manga),
@@ -152,9 +152,27 @@ module.exports.inlineSearch = async function(ctx) {
         }
       });
       // console.log(results[results.length-1]);
-      ctx.answerInlineQuery(results);
     } else {
-      // ctx.answerInlineQuery([]);
+      results.push({
+        id: 4321,
+        type: searchType,
+        title: "Nothing is found",
+        description: ``,
+        thumb_url:
+          "https://cdn.glitch.com/project-avatar/37fdc347-68f3-41ad-8166-f97f2fbc8ebf.png",
+        input_message_content: {
+          message_text:
+            "• To open a specific doujin just send me nhentai's link or nuclear code\n" +
+            "• Also you can download images in .zip file with /zip command. For example: `/zip 234638`",
+          parse_mode: "Markdown"
+        },
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: "Search tips", callback_data: "searchtips" }]
+          ]
+        }
+      });
     }
+    await ctx.answerInlineQuery(results);
   }
 };
