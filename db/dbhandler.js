@@ -24,25 +24,22 @@ db.prepare(
 ).run();
 
 let botStageStart = JSON.stringify({ zipLoaded: false, doujinsFixing: 0 });
-// /*
 
 db.prepare(
   `INSERT OR IGNORE INTO users
   (user_id, stage) VALUES (?, ?);`
 ).run("696969696969", botStageStart);
 
-// */
-// getBotStage();
+// getBotStage()
 async function getBotStage() {
   let id = 696969696969,
     stageString = await db
       .prepare(`SELECT * FROM users WHERE user_id=${id}`)
       .get(),
     stage = JSON.parse(stageString.stage);
-  console.log(stage);
+  console.log(stage)
   return stage;
 }
-// updateBotStage('zipLoaded', false)
 async function updateBotStage(property, val) {
   if (!property || val == undefined) {
     return;
@@ -53,7 +50,6 @@ async function updateBotStage(property, val) {
     oldStage[property] = val;
   }
   let newStageString = JSON.stringify(oldStage);
-  // console.log(newStageString)
   await db
     .prepare(
       `UPDATE users SET
@@ -84,13 +80,11 @@ async function saveManga(manga, telegraphUrl) {
     .run(manga_id, manga.link, mangaName, telegraphUrl, 0);
   console.log("manga: " + mangaName + " - remembered  ");
 }
-// getManga(163240)
 async function getManga(manga_id) {
   let id = typeof manga_id == "string" ? manga_id.toString() : manga_id;
   let manga = await db
     .prepare(`SELECT * FROM telegraphposts WHERE manga_id=${id}`)
     .get();
-  // console.log(manga)
   return manga;
 }
 async function updateManga(manga_id, newTelegraphUrl) {
