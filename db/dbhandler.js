@@ -1,5 +1,5 @@
 const Database = require("better-sqlite3");
-const db = new Database("./db/memory.db"); //, { verbose: console.log });
+const db = new Database("./db/memory.db", { verbose: console.log });
 
 db.prepare(
   `CREATE TABLE IF NOT EXISTS users (
@@ -23,6 +23,45 @@ db.prepare(
   );`
 ).run();
 
+let botStageStart = JSON.stringify({ zipLoaded: false, doujinsFixing: 0 });
+// /*
+
+db.prepare(
+  `INSERT OR IGNORE INTO users
+  (user_id, stage) VALUES (?, ?);`
+).run("696969696969", botStageStart);
+
+// */
+// getBotStage();
+async function getBotStage() {
+  let id = 696969696969,
+    stageString = await db
+      .prepare(`SELECT * FROM users WHERE user_id=${id}`)
+      .get(),
+    stage = JSON.parse(stageString.stage);
+  console.log(stage);
+  return stage;
+}
+// updateBotStage('zipLoaded', false)
+async function updateBotStage(property, val) {
+  if (!property || val == undefined) {
+    return;
+  }
+  let id = 696969696969,
+    oldStage = await getBotStage();
+  if (oldStage[property] != undefined) {
+    oldStage[property] = val;
+  }
+  let newStageString = JSON.stringify(oldStage);
+  // console.log(newStageString)
+  await db
+    .prepare(
+      `UPDATE users SET
+  stage = ?
+  WHERE user_id=${id}`
+    )
+    .run(newStageString);
+}
 async function addUser(from) {
   let uid = from.id;
   let fromString = JSON.stringify(from);
@@ -69,5 +108,7 @@ module.exports = {
   saveManga,
   updateManga,
   getManga,
+  updateBotStage,
+  getBotStage,
   addUser
 };

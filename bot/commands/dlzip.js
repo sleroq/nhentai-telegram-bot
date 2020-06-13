@@ -1,6 +1,11 @@
 const { doujinExists, getDoujin, getMangaMessage } = require("../someFuncs.js");
 const fs = require("fs");
 const nhdl = require("nhentaidownloader");
+const db = require("../../db/dbhandler.js");
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 module.exports.dlzip = async function(ctx) {
   let msg = ctx.message.text,
@@ -32,7 +37,31 @@ module.exports.dlzip = async function(ctx) {
     });
     return;
   }
-  await ctx.reply("wait a bit..");
+  await ctx.reply("wait a bit");
+  let isBotBusy = await db.getBotStage();
+  
+  for (let i = 0; isBotBusy.zipLoaded; i++) {
+    let messageText;
+    if (i % 2 == 0) {
+      messageText = "you are in a queue, wait a bit.";
+    } else if (i % 3 == 0) {
+      messageText = "you are in a queue, wait a bit...";
+    } else {
+      messageText = "you are in a queue, wait a bit..";
+    }
+    await ctx.telegram
+      .editMessageText(
+        ctx.from.id,
+        ctx.message.message_id + 1,
+        ctx.message.message_id + 1,
+        messageText
+      )
+      .catch(err => console.log(err));
+    isBotBusy = await db.getBotStage()
+    await sleep(2000);
+  }
+  await db.updateBotStage("zipLoaded", true);
+
   let messageText = getMangaMessage(manga);
 
   await nhdl(mangaId).then(buffer => {
@@ -42,7 +71,9 @@ module.exports.dlzip = async function(ctx) {
     fileSizeB = stats["size"],
     fileSizeMB = fileSizeB / 1000000.0;
   console.log(fileSizeMB);
-  await ctx.telegram.deleteMessage(ctx.from.id, ctx.message.message_id + 1);
+  await ctx.telegram
+    .deleteMessage(ctx.from.id, ctx.message.message_id + 1)
+    .catch(err => console.log(err));
   if (fileSizeMB > 50) {
     await ctx.reply(
       "Sorry, file is too big, for bots telegram allow " +
@@ -78,4 +109,5 @@ module.exports.dlzip = async function(ctx) {
       console.log(`File ${mangaId}.zip deleted!`);
     }
   });
+  await db.updateBotStage("zipLoaded", false);
 };
