@@ -54,22 +54,22 @@ module.exports.dlzip = async function(ctx) {
       }
     );
     return;
-  }else{
+  } else {
     await ctx.telegram
-    .sendDocument(
-      ctx.from.id,
-      {
-        source: fs.readFileSync(`./${mangaId}.zip`),
-        filename: `./${mangaId}.zip`
-      },
-      {
-        caption: messageText,
-        parse_mode: "HTML"
-      }
-    )
-    .catch(err => {
-      console.log("reply with file failed :( ", err);
-    });
+      .sendDocument(
+        ctx.from.id,
+        {
+          source: fs.readFileSync(`./${mangaId}.zip`),
+          filename: `./${mangaId}.zip`
+        },
+        {
+          caption: messageText,
+          parse_mode: "HTML"
+        }
+      )
+      .catch(err => {
+        console.log("reply with file failed :( ", err);
+      });
   }
   await fs.unlink(`./${mangaId}.zip`, function(err) {
     if (err) {

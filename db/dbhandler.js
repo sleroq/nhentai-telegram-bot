@@ -1,5 +1,5 @@
 const Database = require("better-sqlite3");
-const db = new Database("./db/memory.db")//, { verbose: console.log });
+const db = new Database("./db/memory.db"); //, { verbose: console.log });
 
 db.prepare(
   `CREATE TABLE IF NOT EXISTS users (
@@ -47,7 +47,7 @@ async function saveManga(manga, telegraphUrl) {
 }
 // getManga(163240)
 async function getManga(manga_id) {
-  let id = typeof manga_id == 'string' ? manga_id.toString() : manga_id;
+  let id = typeof manga_id == "string" ? manga_id.toString() : manga_id;
   let manga = await db
     .prepare(`SELECT * FROM telegraphposts WHERE manga_id=${id}`)
     .get();
@@ -55,15 +55,15 @@ async function getManga(manga_id) {
   return manga;
 }
 async function updateManga(manga_id, newTelegraphUrl) {
-    await db
-      .prepare(
-        `UPDATE telegraphposts SET
+  await db
+    .prepare(
+      `UPDATE telegraphposts SET
   fixed = 1,
   telegraphUrl = ?
   WHERE manga_id=?`
-      )
-      .run(newTelegraphUrl, manga_id);
-    console.log("updated link for " + manga_id);
+    )
+    .run(newTelegraphUrl, manga_id);
+  console.log("updated link for " + manga_id);
 }
 module.exports = {
   saveManga,

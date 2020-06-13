@@ -1,7 +1,7 @@
 const { Telegraf } = require("telegraf");
 const bot = new Telegraf(process.env.BOT_TOKEN);
 const webhook = "https://nhentai-thing.glitch.me/secret-path"; //process.env.PORT ? 'https://kipeeng-alive.herokuapp.com/secret-path' : 'https://nhentai-thing.glitch.me/secret-path'
-bot.telegram.setWebhook(webhook);
+// bot.telegram.setWebhook(webhook);
 
 const express = require("express");
 const expressApp = express();
@@ -17,7 +17,7 @@ const { dlzip } = require("./bot/commands/dlzip.js");
 const { help } = require("./bot/commands/help.js");
 
 const { qb_query } = require("./bot/buttons/index.js");
-const { inlineSearch } = require("./bot/inline_search1.js");
+const { inlineSearch } = require("./bot/inline_search.js");
 const { textHandler } = require("./bot/commands/textHandler.js");
 //
 

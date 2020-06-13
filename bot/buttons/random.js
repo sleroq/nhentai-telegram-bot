@@ -31,14 +31,16 @@ module.exports.randomButton = async function(ctx, next) {
       callback_data: "fix_" + manga_id
     });
   }
-  await ctx.editMessageText(messageText, {
-    parse_mode: "HTML",
-    reply_markup: {
-      inline_keyboard: inline_keyboard
-    }
-  }).catch(err=>{
-    console.log(err)
-  });;
+  await ctx
+    .editMessageText(messageText, {
+      parse_mode: "HTML",
+      reply_markup: {
+        inline_keyboard: inline_keyboard
+      }
+    })
+    .catch(err => {
+      console.log(err);
+    });
   // const search = await nhentai.search('yuri');
   // console.log(search)
 };

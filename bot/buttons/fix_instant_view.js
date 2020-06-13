@@ -16,20 +16,22 @@ module.exports.fixInstantView = async function(ctx) {
   let dbMangaRecord = await db.getManga(manga_id),
     messageText = getMangaMessage(manga, dbMangaRecord.telegraphUrl);
 
-  await ctx.editMessageReplyMarkup({
-    inline_keyboard: [
-      [
-        { text: "Wait ", callback_data: "wait" },
+  await ctx
+    .editMessageReplyMarkup({
+      inline_keyboard: [
+        [
+          { text: "Wait ", callback_data: "wait" },
 
-        {
-          text: "Telegra.ph",
-          url: dbMangaRecord.telegraphUrl
-        }
+          {
+            text: "Telegra.ph",
+            url: dbMangaRecord.telegraphUrl
+          }
+        ]
       ]
-    ]
-  }).catch(err=>{
-    console.log(err)
-  });
+    })
+    .catch(err => {
+      console.log(err);
+    });
   let start_time = moment();
   console.log("start uploading doujin");
   let pages = manga.pages,
@@ -38,19 +40,21 @@ module.exports.fixInstantView = async function(ctx) {
   // uploading images
   for (let i = 0; i < pages.length; i++) {
     if (attempts_counter > 10) {
-      await ctx.editMessageReplyMarkup({
-        inline_keyboard: [
-          [
-            { text: "try again later :(", callback_data: "tryLater" },
-            {
-              text: "Telegra.ph",
-              url: dbMangaRecord.telegraphUrl
-            }
+      await ctx
+        .editMessageReplyMarkup({
+          inline_keyboard: [
+            [
+              { text: "try again later :(", callback_data: "tryLater" },
+              {
+                text: "Telegra.ph",
+                url: dbMangaRecord.telegraphUrl
+              }
+            ]
           ]
-        ]
-      }).catch(err=>{
-    console.log(err)
-  });
+        })
+        .catch(err => {
+          console.log(err);
+        });
       return;
     }
     await uploadByUrl(pages[i])
@@ -78,9 +82,10 @@ module.exports.fixInstantView = async function(ctx) {
             }
           ]
         ]
-      }).catch(err=>{
-    console.log(err)
-  });
+      })
+      .catch(err => {
+        console.log(err);
+      });
   }
   console.log("finish uploading images");
   let newPage = await telegraphCreatePage(manga, telegrapf_urls);
@@ -108,14 +113,16 @@ module.exports.fixInstantView = async function(ctx) {
     ]
   ];
   if (!ctx.update.callback_query.message) {
-    await ctx.editMessageText(messageText, {
-      parse_mode: "HTML",
-      reply_markup: {
-        inline_keyboard: inline_keyboard
-      }
-    }).catch(err=>{
-    console.log(err)
-  });
+    await ctx
+      .editMessageText(messageText, {
+        parse_mode: "HTML",
+        reply_markup: {
+          inline_keyboard: inline_keyboard
+        }
+      })
+      .catch(err => {
+        console.log(err);
+      });
   } else {
     inline_keyboard.push([
       { text: "Search", switch_inline_query_current_chat: "" }
@@ -123,13 +130,15 @@ module.exports.fixInstantView = async function(ctx) {
     inline_keyboard.push([
       { text: "Next", callback_data: "r_prev" + manga.id }
     ]);
-    await ctx.editMessageText(messageText, {
-      parse_mode: "HTML",
-      reply_markup: {
-        inline_keyboard: inline_keyboard
-      }
-    }).catch(err=>{
-    console.log(err)
-  });
+    await ctx
+      .editMessageText(messageText, {
+        parse_mode: "HTML",
+        reply_markup: {
+          inline_keyboard: inline_keyboard
+        }
+      })
+      .catch(err => {
+        console.log(err);
+      });
   }
 };
