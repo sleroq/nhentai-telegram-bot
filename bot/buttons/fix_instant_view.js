@@ -6,15 +6,53 @@ const { telegraphCreatePage } = require("../telegraph.js");
 const { doujinExists, getDoujin, getMangaMessage } = require("../someFuncs.js");
 
 const db = require("../../db/dbhandler.js");
+
 module.exports.fixInstantView = async function(ctx) {
   let query_data = ctx.update.callback_query.data,
-    manga_id = query_data.split("_")[1],
-    manga = await getDoujin(manga_id);
+    manga_id = query_data.split("_")[1];
+  if(!manga_id){
+    return
+  }
+    let manga = await getDoujin(manga_id);
   if (!manga) {
     return;
   }
-  let dbMangaRecord = await db.getManga(manga_id),
-    messageText = getMangaMessage(manga, dbMangaRecord.telegraphUrl);
+  let botLoadStatus = await db.getBotStage(),
+      dbMangaRecord = await db.getManga(manga_id);
+  console.log(botLoadStatus.doujinsFixing + ' enter')
+  for (let i = 0; botLoadStatus.doujinsFixing > 3; i++) {
+    console.log(botLoadStatus.doujinsFixing + ' loop ' + i)
+    let messageText;
+    if (i % 2 == 0) {
+      messageText = "wait a bit.";
+    } else if (i % 3 == 0) {
+      messageText = "wait a bit...";
+    } else {
+      messageText = "wait a bit..";
+    }
+
+    await ctx
+      .editMessageReplyMarkup({
+        inline_keyboard: [
+          [
+            { text: messageText, callback_data: "wait" },
+
+            {
+              text: "Telegra.ph",
+              url: dbMangaRecord.telegraphUrl
+            }
+          ]
+        ]
+      })
+      .catch(err => {
+        console.log(err);
+      });
+
+    botLoadStatus = await db.getBotStage();
+    await sleep(2000);
+  }
+  await db.updateBotStage("doujinsFixing", botLoadStatus.doujinsFixing+1)
+  let messageText = getMangaMessage(manga, dbMangaRecord.telegraphUrl);
 
   await ctx
     .editMessageReplyMarkup({
@@ -44,7 +82,7 @@ module.exports.fixInstantView = async function(ctx) {
         .editMessageReplyMarkup({
           inline_keyboard: [
             [
-              { text: "try again later :(", callback_data: "tryLater" },
+              { text: "try again later :(", callback_data: "tryLater_" + manga.id },
               {
                 text: "Telegra.ph",
                 url: dbMangaRecord.telegraphUrl
@@ -103,6 +141,7 @@ module.exports.fixInstantView = async function(ctx) {
     `it took ${difference / difference_division} ${difference_format}`
   );
   await db.updateManga(manga_id, newPage.url);
+  await db.updateBotStage("doujinsFixing", botLoadStatus.doujinsFixing-1)
   messageText = getMangaMessage(manga, newPage.url);
   let inline_keyboard = [
     [
@@ -142,3 +181,6 @@ module.exports.fixInstantView = async function(ctx) {
       });
   }
 };
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}

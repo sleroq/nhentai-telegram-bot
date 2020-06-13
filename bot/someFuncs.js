@@ -6,7 +6,6 @@ async function doujinExists(id) {
 }
 
 async function getDoujin(id) {
-  // try/catch is the equivalent of Promise.catch() in async/await
   const val = await nhentai.getDoujin(id).catch(err => {
     console.log(err);
   });
@@ -60,19 +59,6 @@ function tagString(manga) {
   }
   return tags;
 }
-// function tagStringInline(manga) {
-//   let tags = "";
-//   for (let i = 0; i < manga.tags.length; i++) {
-//     if (manga.tags && manga.tags[i]) {
-//       tags +=
-//         "#" + manga.tags[i].name.replace(/-+/gm, "_").replace(/\s+/gm, "_");
-//     }
-//     if (i != manga.tags.length - 1) {
-//       tags += ", ";
-//     }
-//   }
-//   return tags;
-// }
 function sliceByHalf(s) {
   let middle = Math.floor(s.length / 2);
   let before = s.lastIndexOf(" ", middle);
@@ -88,13 +74,6 @@ function sliceByHalf(s) {
   let s2 = s.substr(middle + 1);
   return s2;
 }
-// function getMessageInline(manga, tags) {
-//   let title = getTitle(manga);
-
-//   let link = "https://nhentai.net/g/" + manga.id + "/",
-//     message_text = `<a href="${link}">${title}</a> (${manga.pages.length} pages)\nTags: ${tags})`;
-//   return message_text;
-// }
 function getMessageInline1(manga) {
   let title = getTitle(manga),
     link = "https://nhentai.net/g/" + manga.id + "/",
@@ -123,10 +102,8 @@ module.exports = {
   getDoujin,
   getRandomManga,
   getMangaMessage,
-  // getMessageInline,
   getMessageInline1,
   getTitle,
   sliceByHalf,
   tagString
-  // tagStringInline
 };

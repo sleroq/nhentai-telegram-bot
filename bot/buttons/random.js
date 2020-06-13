@@ -1,14 +1,13 @@
 const nhentai = require("nhentai-js");
 const db = require("../../db/dbhandler.js");
 
+const { TelegraphUploadByUrls } = require("../telegraph.js");
 const {
   doujinExists,
   getDoujin,
   getRandomManga,
   getMangaMessage
 } = require("../someFuncs.js");
-const { TelegraphUploadByUrls } = require("../telegraph.js");
-
 
 module.exports.randomButton = async function(ctx, next) {
   let query_data = ctx.update.callback_query;
