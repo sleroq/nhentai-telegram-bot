@@ -1,19 +1,21 @@
 const nhentai = require("nhentai-js");
+const moment = require("moment");
 const { uploadByUrl } = require("telegraph-uploader");
 
 const { telegraphCreatePage } = require("../telegraph.js");
 const { doujinExists, getDoujin, getMangaMessage } = require("../someFuncs.js");
 
 const db = require("../../db/dbhandler.js");
-
 module.exports.fixInstantView = async function(ctx) {
   let query_data = ctx.update.callback_query.data,
     manga_id = query_data.split("_")[1],
-    manga = await getDoujin(manga_id),
-    dbMangaRecord = await db.getManga(manga_id);
+    manga = await getDoujin(manga_id);
   if (!manga) {
     return;
   }
+  let dbMangaRecord = await db.getManga(manga_id),
+    messageText = getMangaMessage(manga, dbMangaRecord.telegraphUrl);
+
   await ctx.editMessageReplyMarkup({
     inline_keyboard: [
       [
@@ -25,8 +27,10 @@ module.exports.fixInstantView = async function(ctx) {
         }
       ]
     ]
+  }).catch(err=>{
+    console.log(err)
   });
-  
+  let start_time = moment();
   console.log("start uploading doujin");
   let pages = manga.pages,
     telegrapf_urls = [],
@@ -44,7 +48,9 @@ module.exports.fixInstantView = async function(ctx) {
             }
           ]
         ]
-      });
+      }).catch(err=>{
+    console.log(err)
+  });
       return;
     }
     await uploadByUrl(pages[i])
@@ -58,33 +64,42 @@ module.exports.fixInstantView = async function(ctx) {
         );
         attempts_counter += 1;
       });
-    await ctx.editMessageReplyMarkup({
-      inline_keyboard: [
-        [
-          {
-            text: i + 1 + "/" + pages.length + " pages fixed",
-            callback_data: "fixing"
-          },
-          {
-            text: "Telegra.ph",
-            url: dbMangaRecord.telegraphUrl
-          }
+    await ctx
+      .editMessageReplyMarkup({
+        inline_keyboard: [
+          [
+            {
+              text: i + 1 + "/" + pages.length + " pages fixed",
+              callback_data: "fixing"
+            },
+            {
+              text: "Telegra.ph",
+              url: dbMangaRecord.telegraphUrl
+            }
+          ]
         ]
-      ]
-    });
+      }).catch(err=>{
+    console.log(err)
+  });
   }
   console.log("finish uploading images");
   let newPage = await telegraphCreatePage(manga, telegrapf_urls);
-  if(newPage.url){
+  if (newPage.url) {
     console.log("page created");
-  }else{
+  } else {
     console.log("page was NOT created");
-    return
+    return;
   }
-  await db.updateManga(manga_id, newPage.url)
-  
-  let messageText = getMangaMessage(manga, newPage.url),
-      inline_keyboard = [
+  let finish_time = moment(),
+    difference_format = manga.details.pages[0] < 20 ? "seconds" : "minutes",
+    difference = finish_time.diff(start_time),
+    difference_division = difference > 60000 ? 1000 : 60000;
+  console.log(
+    `it took ${difference / difference_division} ${difference_format}`
+  );
+  await db.updateManga(manga_id, newPage.url);
+  messageText = getMangaMessage(manga, newPage.url);
+  let inline_keyboard = [
     [
       {
         text: "Telegra.ph",
@@ -92,21 +107,29 @@ module.exports.fixInstantView = async function(ctx) {
       }
     ]
   ];
-  if(!ctx.update.callback_query.message){
+  if (!ctx.update.callback_query.message) {
     await ctx.editMessageText(messageText, {
-      parse_mode: "Markdown",
+      parse_mode: "HTML",
       reply_markup: {
         inline_keyboard: inline_keyboard
       }
-    });
+    }).catch(err=>{
+    console.log(err)
+  });
   } else {
-    inline_keyboard.push([{ text: "Search", switch_inline_query_current_chat: "" }])
-    inline_keyboard.push([{ text: "Next", callback_data: "r_prev" + manga.id }])
+    inline_keyboard.push([
+      { text: "Search", switch_inline_query_current_chat: "" }
+    ]);
+    inline_keyboard.push([
+      { text: "Next", callback_data: "r_prev" + manga.id }
+    ]);
     await ctx.editMessageText(messageText, {
-      parse_mode: "Markdown",
+      parse_mode: "HTML",
       reply_markup: {
         inline_keyboard: inline_keyboard
       }
-    });
+    }).catch(err=>{
+    console.log(err)
+  });
   }
 };

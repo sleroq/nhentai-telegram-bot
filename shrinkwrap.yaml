@@ -1,8 +1,11 @@
 dependencies:
-  better-sqlite3: 7.0.1
+  better-sqlite3: 7.1.0
   express: 4.17.1
+  moment: 2.26.0
+  nhentai-api: 3.0.2
   nhentai-api-js: 1.1.4
   nhentai-js: 3.3.0
+  nhentaidownloader: 1.1.5
   telegra.ph: 1.0.1
   telegraf: 3.38.0
   telegraph-uploader: 2.0.0
@@ -20,6 +23,12 @@ packages:
       node: '>= 0.6'
     resolution:
       integrity: sha512-Il80Qs2WjYlJIBNzNkK6KYqlVMTbZLXgHx2oT0pU/fjRHyEp+PEfEPY0R3WCwAGVOtauxh1hOxNgIf5bv7dQpA==
+  /adm-zip/0.4.14:
+    dev: false
+    engines:
+      node: '>=0.3.0'
+    resolution:
+      integrity: sha512-/9aQCnQHF+0IiCl0qhXoK7qs//SwYE7zX8lsr/DNk1BRAHYxeLZPL4pguwK29gUEqasYQjqPtEpDRSWEkdHn9g==
   /ansi-regex/2.1.1:
     dev: false
     engines:
@@ -55,6 +64,12 @@ packages:
     dev: false
     resolution:
       integrity: sha1-x57Zf380y48robyXkLzDZkdLS3k=
+  /axios-retry/3.1.8:
+    dependencies:
+      is-retry-allowed: 1.2.0
+    dev: false
+    resolution:
+      integrity: sha512-yPw5Y4Bg6Dgmhm35KaJFtlh23s1TecW0HsUerK4/IS1UKl0gtN2aJqdEKtVomiOS/bDo5w4P3sqgki/M10eF8Q==
   /axios/0.19.2:
     dependencies:
       follow-redirects: 1.5.10
@@ -65,7 +80,7 @@ packages:
     dev: false
     resolution:
       integrity: sha512-mLQ4i2QO1ytvGWFWmcngKO//JXAQueZvwEKtjgQFM4jIK0kU+ytMfplL8j+n5mspOfjHwoAg+9yhb7BwAHm36g==
-  /better-sqlite3/7.0.1:
+  /better-sqlite3/7.1.0:
     dependencies:
       bindings: 1.5.0
       prebuild-install: 5.3.4
@@ -73,7 +88,7 @@ packages:
     dev: false
     requiresBuild: true
     resolution:
-      integrity: sha512-fsVcoGXxnseNajbfFbth0BKnDWebPY6x77UWfrBHApCKq1yo41DlWnFsffOsLpjkQ4VKgDU5C3aUtiw3wGGU0Q==
+      integrity: sha512-FV/snQ8F/kyqhdxsevzbojVtMowDWOfe1A5N3lYu1KJwoho2t7JgITmdlSc7DkOh3Zq65I+ZyeNWXQrkLEDFTg==
   /bindings/1.5.0:
     dependencies:
       file-uri-to-path: 1.0.0
@@ -558,6 +573,12 @@ packages:
       node: '>=4'
     resolution:
       integrity: sha1-o7MKXE8ZkYMWeqq5O+764937ZU8=
+  /is-retry-allowed/1.2.0:
+    dev: false
+    engines:
+      node: '>=0.10.0'
+    resolution:
+      integrity: sha512-RUbUeKwvm3XG2VYamhJL1xFktgjvPzL0Hq8C+6yrWIswDy3BIXGqCxhxkc30N9jqK311gVU137K8Ei55/zVJRg==
   /is-stream/1.1.0:
     dev: false
     engines:
@@ -679,6 +700,10 @@ packages:
     dev: false
     resolution:
       integrity: sha512-A/78XjoX2EmNvppVWEhM2oGk3x4lLxnkEA4jTbaK97QKSDjkIoOsKQlfylt/d3kKKi596Qy3NP5XrXJ6fZIC9Q==
+  /moment/2.26.0:
+    dev: false
+    resolution:
+      integrity: sha512-oIixUO+OamkUkwjhAVE18rAMfRJNsNe/Stid/gwHSOfHrOtw9EhAY2AHvdKZ/k/MggcYELFCJz/Sn2pL8b8JMw==
   /ms/2.0.0:
     dev: false
     resolution:
@@ -709,6 +734,12 @@ packages:
     dev: false
     resolution:
       integrity: sha512-93xiVCBCHCfPdOUUsycX6HyZelVxf15ez7gQENvl3/lYCMw81+u2JgWHqDaQ67PuJrMo2WSjOCid3LVzIP8TRQ==
+  /nhentai-api/3.0.2:
+    dev: false
+    engines:
+      node: '>=8.16.1'
+    resolution:
+      integrity: sha512-5Wz74DdmPMqDCpacEqzYH9pzIHXTUirxnAIRTQF/El7Ra0W3Ov004410TfzgJkrQpBbrryLBtcvkjOSk62RlGA==
   /nhentai-js/3.3.0:
     dependencies:
       cheerio: 1.0.0-rc.3
@@ -716,6 +747,14 @@ packages:
     dev: false
     resolution:
       integrity: sha512-YA6Q1DZEhYwAgSLGUQew8gcPiXUMevuDuuUNhdoAiOtKJCWP4rIIETPkEWmzH9vGjKlewR2bO2Glubs/944P/Q==
+  /nhentaidownloader/1.1.5:
+    dependencies:
+      adm-zip: 0.4.14
+      axios: 0.19.2
+      axios-retry: 3.1.8
+    dev: false
+    resolution:
+      integrity: sha512-1KuZiyJQ+8nAHGLoW4QY0A2MVdyQeZrHwbLWh/d8eHlfbx5uOlH8JdwJWtOUvB5SjZXW3B22/HmfTtBezvvhqA==
   /node-abi/2.18.0:
     dependencies:
       semver: 5.7.1
@@ -1197,10 +1236,13 @@ registry: 'https://registry.npmjs.org/'
 shrinkwrapMinorVersion: 9
 shrinkwrapVersion: 3
 specifiers:
-  better-sqlite3: ^7.0.1
+  better-sqlite3: ^7.1.0
   express: ^4.17.1
+  moment: ^2.26.0
+  nhentai-api: ^3.0.2
   nhentai-api-js: ^1.1.4
   nhentai-js: ^3.3.0
+  nhentaidownloader: ^1.1.5
   telegra.ph: ^1.0.1
   telegraf: ^3.38.0
   telegraph-uploader: ^2.0.0

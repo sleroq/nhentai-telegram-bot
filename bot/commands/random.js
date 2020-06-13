@@ -2,21 +2,45 @@ const nhentai = require("nhentai-js");
 // const nHentaiAPI = require("nhentai-api-js");
 // const nHentai = new nHentaiAPI();
 
-const { doujinExists, getDoujin, getRandomManga, getMangaMessage } = require("../someFuncs.js");
+const {
+  doujinExists,
+  getDoujin,
+  getRandomManga,
+  getMangaMessage
+} = require("../someFuncs.js");
 const { TelegraphUploadByUrls } = require("../telegraph.js");
+
+const db = require("../../db/dbhandler.js");
 
 module.exports.randomCommand = async function(ctx) {
   let manga = await getRandomManga();
-  if (!manga) {return;}
+  if (!manga) {
+    return;
+  }
   let telegrapfLink = await TelegraphUploadByUrls(manga),
     messageText = getMangaMessage(manga, telegrapfLink),
-    manga_id = manga.link.slice(22, -1);
+    manga_id = manga.link.slice(22, -1),
+    dbMangaRecord = await db.getManga(manga_id),
+    inline_keyboard = [
+      [{ text: "Telegra.ph", url: telegrapfLink }],
+      [{ text: "Search", switch_inline_query_current_chat: "" }],
+      [{ text: "Next", callback_data: "r_prev" + manga_id }]
+    ];
+  if (!dbMangaRecord || dbMangaRecord.fixed == 0) {
+    inline_keyboard[0].unshift({
+      text: "Fix",
+      callback_data: "fix_" + manga_id
+    });
+  }
   // console.log(manga)
   await ctx.reply(messageText, {
-    parse_mode: "Markdown",
+    parse_mode: "HTML",
     reply_markup: {
       inline_keyboard: [
-        [{ text: "Fix", callback_data: 'fix_' + manga_id }, { text: "Telegra.ph", url: telegrapfLink }],
+        [
+          { text: "Fix", callback_data: "fix_" + manga_id },
+          { text: "Telegra.ph", url: telegrapfLink }
+        ],
         [{ text: "Search", switch_inline_query_current_chat: "" }],
         [{ text: "Next", callback_data: "r_prev" + manga.id }]
       ]
