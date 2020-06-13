@@ -5,7 +5,9 @@ const nhdl = require("nhentaidownloader");
 module.exports.dlzip = async function(ctx) {
   let msg = ctx.message.text,
     mangaId = msg.match(/\d+/) ? msg.match(/\d+/)[0] : null;
-    if(!mangaId){return}
+  if (!mangaId) {
+    return;
+  }
   let exists = await doujinExists(mangaId);
 
   if (!exists) {

@@ -1,5 +1,5 @@
 const nhentai = require("nhentai-js");
-const moment = require('moment');
+const moment = require("moment");
 const { uploadByUrl } = require("telegraph-uploader");
 
 const { telegraphCreatePage } = require("../telegraph.js");
@@ -10,11 +10,11 @@ module.exports.fixInstantView = async function(ctx) {
   let query_data = ctx.update.callback_query.data,
     manga_id = query_data.split("_")[1],
     manga = await getDoujin(manga_id);
-    if (!manga) {
+  if (!manga) {
     return;
   }
-    let dbMangaRecord = await db.getManga(manga_id),
-    messageText = getMangaMessage(manga, dbMangaRecord.telegraphUrl)
+  let dbMangaRecord = await db.getManga(manga_id),
+    messageText = getMangaMessage(manga, dbMangaRecord.telegraphUrl);
 
   await ctx.editMessageReplyMarkup({
     inline_keyboard: [
@@ -60,36 +60,42 @@ module.exports.fixInstantView = async function(ctx) {
         );
         attempts_counter += 1;
       });
-    await ctx.editMessageReplyMarkup({
-      inline_keyboard: [
-        [
-          {
-            text: i + 1 + "/" + pages.length + " pages fixed",
-            callback_data: "fixing"
-          },
-          {
-            text: "Telegra.ph",
-            url: dbMangaRecord.telegraphUrl
-          }
+    await ctx
+      .editMessageReplyMarkup({
+        inline_keyboard: [
+          [
+            {
+              text: i + 1 + "/" + pages.length + " pages fixed",
+              callback_data: "fixing"
+            },
+            {
+              text: "Telegra.ph",
+              url: dbMangaRecord.telegraphUrl
+            }
+          ]
         ]
-      ]
-    }).catch(err=>{return});
+      })
+      .catch(err => {
+        return;
+      });
   }
   console.log("finish uploading images");
   let newPage = await telegraphCreatePage(manga, telegrapf_urls);
-  if(newPage.url){
+  if (newPage.url) {
     console.log("page created");
-  }else{
+  } else {
     console.log("page was NOT created");
-    return
+    return;
   }
   let finish_time = moment(),
-      difference_format = manga.details.pages[0]<20 ? 'seconds' : 'minutes',
-      difference = finish_time.diff(start_time),
-      difference_division = difference>60000 ? 1000 : 60000;
-  console.log(`it took ${difference/difference_division} ${difference_format}`)
-  await db.updateManga(manga_id, newPage.url)
-  messageText = getMangaMessage(manga, newPage.url)
+    difference_format = manga.details.pages[0] < 20 ? "seconds" : "minutes",
+    difference = finish_time.diff(start_time),
+    difference_division = difference > 60000 ? 1000 : 60000;
+  console.log(
+    `it took ${difference / difference_division} ${difference_format}`
+  );
+  await db.updateManga(manga_id, newPage.url);
+  messageText = getMangaMessage(manga, newPage.url);
   let inline_keyboard = [
     [
       {
@@ -98,7 +104,7 @@ module.exports.fixInstantView = async function(ctx) {
       }
     ]
   ];
-  if(!ctx.update.callback_query.message){
+  if (!ctx.update.callback_query.message) {
     await ctx.editMessageText(messageText, {
       parse_mode: "HTML",
       reply_markup: {
@@ -106,8 +112,12 @@ module.exports.fixInstantView = async function(ctx) {
       }
     });
   } else {
-    inline_keyboard.push([{ text: "Search", switch_inline_query_current_chat: "" }])
-    inline_keyboard.push([{ text: "Next", callback_data: "r_prev" + manga.id }])
+    inline_keyboard.push([
+      { text: "Search", switch_inline_query_current_chat: "" }
+    ]);
+    inline_keyboard.push([
+      { text: "Next", callback_data: "r_prev" + manga.id }
+    ]);
     await ctx.editMessageText(messageText, {
       parse_mode: "HTML",
       reply_markup: {

@@ -19,21 +19,21 @@ module.exports.inlineSearch = async function(ctx) {
       pageNumber = 1;
 
     let PageMatch = inlineQuery.match(/\/p\d+/g)
-      ? inlineQuery.match(/\/p\d+/g)[0]
-      : undefined,
-        isPageModified = false;
+        ? inlineQuery.match(/\/p\d+/g)[0]
+        : undefined,
+      isPageModified = false;
     if (PageMatch) {
       isPageModified = true;
       pageNumber = PageMatch.slice(2);
       inlineQuery = inlineQuery.replace(PageMatch, "").trim();
     }
     let sortingParametr = "date",
-        SortMatch = inlineQuery.match(/\/s[pn]/)
-      ? inlineQuery.match(/\/s[pn]/)[0]
-      : undefined,
-        isSearchModified = false;
+      SortMatch = inlineQuery.match(/\/s[pn]/)
+        ? inlineQuery.match(/\/s[pn]/)[0]
+        : undefined,
+      isSearchModified = false;
     if (SortMatch) {
-      isSearchModified = true
+      isSearchModified = true;
       sortingParametr = SortMatch.slice(2) == "p" ? "popular" : "date";
       inlineQuery = inlineQuery.replace(SortMatch, "").trim();
     }
@@ -45,6 +45,9 @@ module.exports.inlineSearch = async function(ctx) {
         " sorting by " +
         sortingParametr
     );
+    if (!inlineQuery) {
+      return;
+    }
     const search = await api
       .search(inlineQuery, pageNumber, sortingParametr)
       .catch(err => {
@@ -88,9 +91,11 @@ module.exports.inlineSearch = async function(ctx) {
         }
       }));
       let reverseSortingWord =
-        sortingParametr == "popular" ? "new" : "popularity",
-          reverseSortingParametr = reverseSortingWord.charAt(0),
-          searchSortingSwitch = isPageModified ? `/p${pageNumber} /s${reverseSortingParametr} ${inlineQuery}` : `/s${reverseSortingParametr} ${inlineQuery}`;
+          sortingParametr == "popular" ? "new" : "popularity",
+        reverseSortingParametr = reverseSortingWord.charAt(0),
+        searchSortingSwitch = isPageModified
+          ? `/p${pageNumber} /s${reverseSortingParametr} ${inlineQuery}`
+          : `/s${reverseSortingParametr} ${inlineQuery}`;
       results.push({
         id: 43210,
         type: searchType,
@@ -103,7 +108,8 @@ module.exports.inlineSearch = async function(ctx) {
             "To sort search results by " +
             reverseSortingWord +
             " you can *add /s" +
-            reverseSortingParametr + '*',
+            reverseSortingParametr +
+            "*",
           parse_mode: "Markdown"
         },
         reply_markup: {
@@ -118,7 +124,9 @@ module.exports.inlineSearch = async function(ctx) {
         }
       });
       let sortingParametrLetter = sortingParametr == "popular" ? "p" : "n",
-          nextPageSwitch = isSearchModified ? `/p${+pageNumber+1} /s${sortingParametrLetter} ${inlineQuery}` : `/p${+pageNumber+1} ${inlineQuery}`;
+        nextPageSwitch = isSearchModified
+          ? `/p${+pageNumber + 1} /s${sortingParametrLetter} ${inlineQuery}`
+          : `/p${+pageNumber + 1} ${inlineQuery}`;
       results.push({
         id: 4321,
         type: searchType,
