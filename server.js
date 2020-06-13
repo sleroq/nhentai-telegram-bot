@@ -10,8 +10,6 @@ expressApp.use(bot.webhookCallback("/secret-path"));
 const db = require("./db/dbhandler.js");
 
 //modules
-
-// const { getbycode } = require('./bot/commands/getbycode.js')
 const { randomCommand } = require("./bot/commands/random.js");
 const { dlzip } = require("./bot/commands/dlzip.js");
 const { help } = require("./bot/commands/help.js");
@@ -19,7 +17,6 @@ const { help } = require("./bot/commands/help.js");
 const { qb_query } = require("./bot/buttons/index.js");
 const { inlineSearch } = require("./bot/inline_search.js");
 const { textHandler } = require("./bot/commands/textHandler.js");
-//
 
 bot.start(async ctx => {
   ctx.reply(
