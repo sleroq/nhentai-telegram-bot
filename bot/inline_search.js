@@ -96,7 +96,7 @@ module.exports.inlineSearch = async function(ctx) {
         searchSortingSwitch = isPageModified
           ? `/p${pageNumber} /s${reverseSortingParametr} ${inlineQuery}`
           : `/s${reverseSortingParametr} ${inlineQuery}`;
-      results.push({
+      results.unshift({
         id: 43210,
         type: searchType,
         title: "To sort results by " + reverseSortingWord,
