@@ -1,6 +1,4 @@
 const nhentai = require("nhentai-js");
-// const nHentaiAPI = require("nhentai-api-js");
-// const nHentai = new nHentaiAPI();
 
 const {
   doujinExists,
@@ -32,7 +30,6 @@ module.exports.randomCommand = async function(ctx) {
       callback_data: "fix_" + manga_id
     });
   }
-  // console.log(manga)
   await ctx.reply(messageText, {
     parse_mode: "HTML",
     reply_markup: {

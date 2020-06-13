@@ -1,5 +1,5 @@
 const Database = require("better-sqlite3");
-const db = new Database("./db/memory.db", { verbose: console.log });
+const db = new Database("./db/memory.db")//, { verbose: console.log });
 
 db.prepare(
   `CREATE TABLE IF NOT EXISTS users (
@@ -37,7 +37,7 @@ async function getBotStage() {
       .prepare(`SELECT * FROM users WHERE user_id=${id}`)
       .get(),
     stage = JSON.parse(stageString.stage);
-  console.log(stage)
+  // console.log(stage)
   return stage;
 }
 async function updateBotStage(property, val) {

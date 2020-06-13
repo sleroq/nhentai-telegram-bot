@@ -39,7 +39,7 @@ module.exports.dlzip = async function(ctx) {
   }
   await ctx.reply("wait a bit");
   let isBotBusy = await db.getBotStage();
-  
+
   for (let i = 0; isBotBusy.zipLoaded; i++) {
     let messageText;
     if (i % 2 == 0) {
@@ -57,7 +57,7 @@ module.exports.dlzip = async function(ctx) {
         messageText
       )
       .catch(err => console.log(err));
-    isBotBusy = await db.getBotStage()
+    isBotBusy = await db.getBotStage();
     await sleep(2000);
   }
   await db.updateBotStage("zipLoaded", true);
