@@ -13,9 +13,9 @@ module.exports.qb_query = async function(ctx, next) {
     await randomButton(ctx);
   } else if (query_data.match("open")) {
     await openiInTelegraph(ctx);
-  } /*else if (query_data.match("fix_") || query_data.match("tryLater")) {
+  } else if (query_data.match("fix_")/* || query_data.match("tryLater")*/) {
     await fixInstantView(ctx);
-  } */else if (query_data.match("searchtips")) {
+  } else if (query_data.match("searchtips")) {
     await searchtips(ctx);
   } else if (query_data.match("helpsearchback")) {
     await help_back(ctx);
