@@ -6,14 +6,14 @@ const api = new nHentaiAPI();
 const { getMessageInline1, sliceByHalf, getTitle } = require("./someFuncs.js");
 
 module.exports.inlineSearch = async function(ctx) {
-  console.log(
-    "'" +
-      ctx.inlineQuery.query +
-      "'id: " +
-      ctx.inlineQuery.from.id +
-      " @" +
-      ctx.inlineQuery.from.username
-  );
+  // console.log(
+  //   "'" +
+  //     ctx.inlineQuery.query +
+  //     "'id: " +
+  //     ctx.inlineQuery.from.id +
+  //     " @" +
+  //     ctx.inlineQuery.from.username
+  // );
   if (ctx.inlineQuery.query) {
     let inlineQuery = ctx.inlineQuery.query,
       pageNumber = 1;
@@ -37,14 +37,14 @@ module.exports.inlineSearch = async function(ctx) {
       sortingParametr = SortMatch.slice(2) == "p" ? "popular" : "date";
       inlineQuery = inlineQuery.replace(SortMatch, "").trim();
     }
-    console.log(
-      'search query="' +
-        inlineQuery +
-        '" page=' +
-        pageNumber +
-        " sorting by " +
-        sortingParametr
-    );
+    // console.log(
+    //   'search query="' +
+    //     inlineQuery +
+    //     '" page=' +
+    //     pageNumber +
+    //     " sorting by " +
+    //     sortingParametr
+    // );
     if (!inlineQuery) {
       return;
     }
