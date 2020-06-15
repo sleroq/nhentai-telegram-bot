@@ -31,7 +31,9 @@ bot.start(async ctx => {
 bot.help(async ctx => {
   await help(ctx);
 });
-// bot.command('code', async (ctx)=>{ await getbycode(ctx) })
+bot.command('code', async (ctx)=>{ 
+	await ctx.reply("Just send me a code")
+})
 bot.command("rand", async ctx => {
   await randomCommand(ctx);
 });
