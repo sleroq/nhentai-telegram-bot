@@ -1,18 +1,46 @@
 const Database = require("better-sqlite3");
-const db = new Database("./db/memory.db")//, { verbose: console.log });
+const db = new Database("./db/memory.db", { verbose: console.log });
 
+// db.prepare(`DROP TABLE users;`).run()
 db.prepare(
   `CREATE TABLE IF NOT EXISTS users (
       user_id INTEGER NOT NULL UNIQUE,
       fromu TEXT,
-      lastRandom TEXT,
-      lastManga TEXT,
+      sort TEXT,
+      search_type TEXT,
       stage TEXT,
-      sort TEXT
       settings TEXT
   );`
 ).run();
-// db.prepare(`DROP TABLE users;`).run()
+migrateUsersTable()
+async function migrateUsersTable() {
+  let users = await db
+      .prepare(`SELECT * FROM users`)
+      .all()
+  await db.prepare(`DROP TABLE users;`).run()
+  await db.prepare(
+    `CREATE TABLE IF NOT EXISTS users (
+        user_id INTEGER NOT NULL UNIQUE,
+        fromu TEXT,
+        sort TEXT,
+        search_type TEXT,
+        stage TEXT,
+        settings TEXT
+    );`
+  ).run();
+  for(let i=0; i<users.length; i++){
+    let sort = 'date',
+        stage = users[i].stage || null
+    await db
+    .prepare(
+      `INSERT OR IGNORE INTO users
+          (user_id, fromu, sort, stage)
+          VALUES (?, ?, ?, ?);`
+    )
+    .run(users[i].user_id, users[i].fromu, sort, stage);
+  }
+  return
+}
 db.prepare(
   `CREATE TABLE IF NOT EXISTS telegraphposts (
       manga_id INT,
@@ -52,9 +80,7 @@ async function updateBotStage(property, val) {
   let newStageString = JSON.stringify(oldStage);
   await db
     .prepare(
-      `UPDATE users SET
-  stage = ?
-  WHERE user_id=${id}`
+      `UPDATE users SET stage = ? WHERE user_id=${id}`
     )
     .run(newStageString);
 }
@@ -64,7 +90,8 @@ async function addUser(from) {
   await db
     .prepare(
       `INSERT OR IGNORE INTO users
-  (user_id, fromu, sort) VALUES (?, ?, ?);`
+          (user_id, fromu, sort)
+          VALUES (?, ?, ?);`
     )
     .run(uid, fromString, "n");
 }
@@ -74,8 +101,13 @@ async function saveManga(manga, telegraphUrl) {
     mangaName = manga.title;
   await db
     .prepare(
-      `INSERT OR IGNORE INTO telegraphposts
-(manga_id, mangaUrl, mangaName, telegraphUrl, fixed) VALUES (?, ?, ?, ?, ?);`
+      `INSERT OR IGNORE INTO telegraphposts 
+            (manga_id,
+            mangaUrl,
+            mangaName,
+            telegraphUrl,
+            fixed)
+          VALUES (?, ?, ?, ?, ?);`
     )
     .run(manga_id, manga.link, mangaName, telegraphUrl, 0);
   console.log("manga: " + mangaName + " - remembered  ");
@@ -91,9 +123,9 @@ async function updateManga(manga_id, newTelegraphUrl) {
   await db
     .prepare(
       `UPDATE telegraphposts SET
-  fixed = 1,
-  telegraphUrl = ?
-  WHERE manga_id=?`
+          fixed = 1,
+          telegraphUrl = ?
+          WHERE manga_id=?`
     )
     .run(newTelegraphUrl, manga_id);
   console.log("updated link for " + manga_id);
