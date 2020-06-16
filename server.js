@@ -27,43 +27,43 @@ const { qb_query } = require("./bot/buttons/index.js");
 const { inlineSearch } = require("./bot/inline_search.js");
 const { textHandler } = require("./bot/commands/textHandler.js");
 
-// bot.start(async ctx => {
-//   ctx.reply(
-//     "*This bot have R-18 content, click this button only if you mature enough*",
-//     {
-//       parse_mode: "Markdown",
-//       reply_markup: {
-//         inline_keyboard: [[{ text: "Random manga", callback_data: "r" }]]
-//       }
-//     }
-//   );
-//   await db.addUser(ctx.from);
-// });
-// bot.help(async ctx => {
-//   await help(ctx);
-// });
-// bot.command("code", async ctx => {
-//   await ctx.reply("Just send me a code");
-// });
-// bot.command("rand", async ctx => {
-//   await randomCommand(ctx);
-// });
-// bot.command("zip", async ctx => {
-//   await dlzip(ctx);
-// });
-// bot.command("id", async ctx => {
-//   await ctx.reply("`" + ctx.from.id + "`");
-// });
+bot.start(async ctx => {
+  ctx.reply(
+    "*This bot have R-18 content, click this button only if you mature enough*",
+    {
+      parse_mode: "Markdown",
+      reply_markup: {
+        inline_keyboard: [[{ text: "Random manga", callback_data: "r" }]]
+      }
+    }
+  );
+  await db.addUser(ctx.from);
+});
+bot.help(async ctx => {
+  await help(ctx);
+});
+bot.command("code", async ctx => {
+  await ctx.reply("Just send me a code");
+});
+bot.command("rand", async ctx => {
+  await randomCommand(ctx);
+});
+bot.command("zip", async ctx => {
+  await dlzip(ctx);
+});
+bot.command("id", async ctx => {
+  await ctx.reply("`" + ctx.from.id + "`");
+});
 
-// bot.on("callback_query", async (ctx, next) => {
-//   await qb_query(ctx);
-// });
-// bot.on("inline_query", async ctx => {
-//   await inlineSearch(ctx);
-// });
-// bot.on("text", async (ctx, next) => {
-//   await textHandler(ctx);
-// });
+bot.on("callback_query", async (ctx, next) => {
+  await qb_query(ctx);
+});
+bot.on("inline_query", async ctx => {
+  await inlineSearch(ctx);
+});
+bot.on("text", async (ctx, next) => {
+  await textHandler(ctx);
+});
 if (webhook) {
   const PORT = process.env.PORT || 3000;
   expressApp.get("/", (req, res) => {

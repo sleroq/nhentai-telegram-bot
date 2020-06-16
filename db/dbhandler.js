@@ -12,7 +12,7 @@ db.prepare(
       settings TEXT
   );`
 ).run();
-migrateUsersTable()
+// migrateUsersTable()
 async function migrateUsersTable() {
   let users = await db
       .prepare(`SELECT * FROM users`)
