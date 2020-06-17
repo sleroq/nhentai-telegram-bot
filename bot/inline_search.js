@@ -1,5 +1,3 @@
-// const { API, } = require('nhentai-api');
-// const api = new API();
 const nHentaiAPI = require("nhentai-api-js");
 const api = new nHentaiAPI();
 

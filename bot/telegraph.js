@@ -1,6 +1,5 @@
 const Telegraph = require("telegra.ph");
 const client = new Telegraph(process.env.TELEGRAPH_TOKEN);
-const { uploadByUrl } = require("telegraph-uploader");
 const db = require("../db/dbhandler.js");
 
 async function telegraphCreatePage(
@@ -23,8 +22,8 @@ async function telegraphCreatePage(
           children: ["Thanks for reading this chapter!"]
         }
       ]),
-    "@nhentai_mangabot",
-    "https://t.me/nhentai_mangabot",
+    "@" + username,
+    "https://t.me/" + username,
     true
   );
 }

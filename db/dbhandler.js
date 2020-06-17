@@ -1,6 +1,6 @@
 const Database = require("better-sqlite3");
-const db = new Database("./db/memory.db")//, { verbose: console.log });
-
+const db = new Database("./db/memory.db"); //, { verbose: console.log });
+const { getDoujin, tagString } = require("../bot/someFuncs.js");
 // db.prepare(`DROP TABLE users;`).run()
 db.prepare(
   `CREATE TABLE IF NOT EXISTS users (
@@ -14,12 +14,11 @@ db.prepare(
 ).run();
 // migrateUsersTable()
 async function migrateUsersTable() {
-  let users = await db
-      .prepare(`SELECT * FROM users`)
-      .all()
-  await db.prepare(`DROP TABLE users;`).run()
-  await db.prepare(
-    `CREATE TABLE IF NOT EXISTS users (
+  let users = await db.prepare(`SELECT * FROM users`).all();
+  await db.prepare(`DROP TABLE users;`).run();
+  await db
+    .prepare(
+      `CREATE TABLE IF NOT EXISTS users (
         user_id INTEGER NOT NULL UNIQUE,
         fromu TEXT,
         sort TEXT,
@@ -27,30 +26,85 @@ async function migrateUsersTable() {
         stage TEXT,
         settings TEXT
     );`
-  ).run();
-  for(let i=0; i<users.length; i++){
-    let sort = 'date',
-        stage = users[i].stage || null
+    )
+    .run();
+  for (let i = 0; i < users.length; i++) {
+    let sort = "date",
+      stage = users[i].stage || null;
     await db
-    .prepare(
-      `INSERT OR IGNORE INTO users
+      .prepare(
+        `INSERT OR IGNORE INTO users
           (user_id, fromu, sort, stage)
           VALUES (?, ?, ?, ?);`
-    )
-    .run(users[i].user_id, users[i].fromu, sort, stage);
+      )
+      .run(users[i].user_id, users[i].fromu, sort, stage);
   }
-  return
+  return;
 }
 db.prepare(
   `CREATE TABLE IF NOT EXISTS telegraphposts (
-      manga_id INT,
+      manga_id INT UNIQUE,
       mangaUrl TEXT UNIQUE,
       mangaName TEXT,
+      mangaTags TEXT,
       telegraphUrl TEXT UNIQUE,
       fixed INT
   );`
 ).run();
-
+// db.prepare(`DROP TABLE users;`).run()
+db.prepare(
+  `CREATE TABLE IF NOT EXISTS users (
+      user_id INTEGER NOT NULL UNIQUE,
+      fromu TEXT,
+      sort TEXT,
+      search_type TEXT,
+      stage TEXT,
+      settings TEXT
+  );`
+).run();
+// migratePosts()
+async function migratePosts() {
+  let telegraphposts = await db.prepare(`SELECT * FROM telegraphposts`).all();
+  await db.prepare(`DROP TABLE telegraphposts;`).run();
+  db.prepare(
+    `CREATE TABLE IF NOT EXISTS telegraphposts (
+        manga_id INT UNIQUE,
+        mangaUrl TEXT UNIQUE,
+        mangaName TEXT,
+        mangaTags TEXT,
+        telegraphUrl TEXT UNIQUE,
+        fixed INT
+    );`
+  ).run();
+  for (let i = 0; i < telegraphposts.length; i++) {
+    let manga = await getDoujin(telegraphposts[i].manga_id);
+    let tags = tagString(manga);
+    await db
+      .prepare(
+        `INSERT OR IGNORE INTO telegraphposts
+          (manga_id, mangaUrl, mangaName, mangaTags, telegraphUrl, fixed)
+          VALUES (?, ?, ?, ?, ?, ?);`
+      )
+      .run(
+        telegraphposts[i].manga_id,
+        telegraphposts[i].mangaUrl,
+        telegraphposts[i].mangaName,
+        tags,
+        telegraphposts[i].telegraphUrl,
+        telegraphposts[i].fixed
+      );
+  }
+  return;
+}
+testRAM()
+function testRAM(){
+  let telegraphposts = await db.prepare(`SELECT * FROM telegraphposts`).all();
+  console.log(telegraphposts.length)
+  for(let i=0; i<telegraphposts.length; i++){
+    let x = 1+1
+  }
+  console.log('success')
+}
 let botStageStart = JSON.stringify({ zipLoaded: false, doujinsFixing: 0 });
 
 db.prepare(
@@ -79,9 +133,7 @@ async function updateBotStage(property, val) {
   }
   let newStageString = JSON.stringify(oldStage);
   await db
-    .prepare(
-      `UPDATE users SET stage = ? WHERE user_id=${id}`
-    )
+    .prepare(`UPDATE users SET stage = ? WHERE user_id=${id}`)
     .run(newStageString);
 }
 async function addUser(from) {
@@ -136,5 +188,5 @@ module.exports = {
   getManga,
   updateBotStage,
   getBotStage,
-  addUser
+  addUser,
 };
