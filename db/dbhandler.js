@@ -97,7 +97,7 @@ async function migratePosts() {
   return;
 }
 testRAM()
-function testRAM(){
+async function testRAM(){
   let telegraphposts = await db.prepare(`SELECT * FROM telegraphposts`).all();
   console.log(telegraphposts.length)
   for(let i=0; i<telegraphposts.length; i++){
