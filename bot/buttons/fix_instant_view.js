@@ -7,7 +7,7 @@ const { doujinExists, getDoujin, getMangaMessage } = require("../someFuncs.js");
 
 const db = require("../../db/dbhandler.js");
 
-module.exports.fixInstantView = async function(ctx) {
+module.exports.fixInstantView = async function (ctx) {
   let query_data = ctx.update.callback_query.data,
     manga_id = query_data.split("_")[1];
   if (!manga_id) {
@@ -17,41 +17,28 @@ module.exports.fixInstantView = async function(ctx) {
   if (!manga) {
     return;
   }
-  let botLoadStatus = await db.getBotStage(),
-    dbMangaRecord = await db.getManga(manga_id);
-  console.log(botLoadStatus.doujinsFixing + " enter");
-  for (let i = 0; botLoadStatus.doujinsFixing > 3; i++) {
-    console.log(botLoadStatus.doujinsFixing + " loop " + i);
-    let messageText;
-    if (i % 2 == 0) {
-      messageText = "wait a bit.";
-    } else if (i % 3 == 0) {
-      messageText = "wait a bit...";
-    } else {
-      messageText = "wait a bit..";
-    }
+  let dbMangaRecord = await db.getManga(manga_id);
 
+  if (manga.details.pages > 400) {
     await ctx
       .editMessageReplyMarkup({
         inline_keyboard: [
           [
-            { text: messageText, callback_data: "wait" },
+            { text: "too many pages", callback_data: "wait" },
 
             {
               text: "Telegra.ph",
-              url: dbMangaRecord.telegraphUrl
-            }
-          ]
-        ]
+              url: dbMangaRecord.telegraphUrl,
+            },
+          ],
+          [{ text: "Search", switch_inline_query_current_chat: "" }],
+          [{ text: "Next", callback_data: "r_prev" + manga.id }],
+        ],
       })
-      .catch(err => {
+      .catch((err) => {
         console.log(err);
       });
-
-    botLoadStatus = await db.getBotStage();
-    await sleep(2000);
   }
-  await db.updateBotStage("doujinsFixing", botLoadStatus.doujinsFixing + 1);
   let messageText = getMangaMessage(manga, dbMangaRecord.telegraphUrl);
 
   await ctx
@@ -62,12 +49,12 @@ module.exports.fixInstantView = async function(ctx) {
 
           {
             text: "Telegra.ph",
-            url: dbMangaRecord.telegraphUrl
-          }
-        ]
-      ]
+            url: dbMangaRecord.telegraphUrl,
+          },
+        ],
+      ],
     })
-    .catch(err => {
+    .catch((err) => {
       console.log(err);
     });
   let start_time = moment();
@@ -84,25 +71,25 @@ module.exports.fixInstantView = async function(ctx) {
             [
               {
                 text: "try again later :(",
-                callback_data: "tryLater_" + manga.id
+                callback_data: "tryLater_" + manga.id,
               },
               {
                 text: "Telegra.ph",
-                url: dbMangaRecord.telegraphUrl
-              }
-            ]
-          ]
+                url: dbMangaRecord.telegraphUrl,
+              },
+            ],
+          ],
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
         });
       return;
     }
     await uploadByUrl(pages[i])
-      .then(result => {
+      .then((result) => {
         telegrapf_urls.push(result.link);
       })
-      .catch(async err => {
+      .catch(async (err) => {
         i -= 1;
         console.log(
           "err in uploading image heppened on try number " + attempts_counter
@@ -115,16 +102,16 @@ module.exports.fixInstantView = async function(ctx) {
           [
             {
               text: i + 1 + "/" + pages.length + " pages fixed",
-              callback_data: "fixing"
+              callback_data: "fixing",
             },
             {
               text: "Telegra.ph",
-              url: dbMangaRecord.telegraphUrl
-            }
-          ]
-        ]
+              url: dbMangaRecord.telegraphUrl,
+            },
+          ],
+        ],
       })
-      .catch(err => {
+      .catch((err) => {
         console.log(err);
       });
   }
@@ -144,46 +131,42 @@ module.exports.fixInstantView = async function(ctx) {
     `it took ${difference / difference_division} ${difference_format}`
   );
   await db.updateManga(manga_id, newPage.url);
-  await db.updateBotStage("doujinsFixing", botLoadStatus.doujinsFixing - 1);
   messageText = getMangaMessage(manga, newPage.url);
   let inline_keyboard = [
     [
       {
         text: "Telegra.ph",
-        url: newPage.url
-      }
-    ]
+        url: newPage.url,
+      },
+    ],
   ];
   if (!ctx.update.callback_query.message) {
     await ctx
       .editMessageText(messageText, {
         parse_mode: "HTML",
         reply_markup: {
-          inline_keyboard: inline_keyboard
-        }
+          inline_keyboard: inline_keyboard,
+        },
       })
-      .catch(err => {
+      .catch((err) => {
         console.log(err);
       });
   } else {
     inline_keyboard.push([
-      { text: "Search", switch_inline_query_current_chat: "" }
+      { text: "Search", switch_inline_query_current_chat: "" },
     ]);
     inline_keyboard.push([
-      { text: "Next", callback_data: "r_prev" + manga.id }
+      { text: "Next", callback_data: "r_prev" + manga.id },
     ]);
     await ctx
       .editMessageText(messageText, {
         parse_mode: "HTML",
         reply_markup: {
-          inline_keyboard: inline_keyboard
-        }
+          inline_keyboard: inline_keyboard,
+        },
       })
-      .catch(err => {
+      .catch((err) => {
         console.log(err);
       });
   }
 };
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
