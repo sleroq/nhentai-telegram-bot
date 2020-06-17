@@ -152,11 +152,9 @@ module.exports.fixInstantView = async function (ctx) {
         console.log(err);
       });
   } else {
-    inline_keyboard.push([
-      { text: "Search", switch_inline_query_current_chat: "" },
-    ]);
-    inline_keyboard.push([
-      { text: "Next", callback_data: "r_prev" + manga.id },
+    inline_keyboard = inline_keyboard.concat([
+      [{ text: "Search", switch_inline_query_current_chat: "" }],
+      [{ text: "Next", callback_data: "r_prev" + manga.id }],
     ]);
     await ctx
       .editMessageText(messageText, {
