@@ -98,7 +98,7 @@ async function migratePosts() {
 }
 testRAM()
 async function testRAM(){
-  let telegraphposts = await db.prepare(`SELECT * FROM telegraphposts`).all();
+  let telegraphposts = await db.prepare(`SELECT COUNT(*) FROM telegraphposts`).all();
   console.log(telegraphposts.length)
   for(let i=0; i<telegraphposts.length; i++){
     let x = 1+1
