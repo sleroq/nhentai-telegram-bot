@@ -4,7 +4,7 @@ const { fixInstantView } = require("./fix_instant_view.js");
 const { searchtips } = require("./help_searchtips.js");
 const { help_back } = require("./help_back.js");
 
-module.exports.qb_query = async function(ctx, next) {
+module.exports.cb_query = async function(ctx, next) {
   await ctx.answerCbQuery();
   let query_data = ctx.update.callback_query.data;
   console.log(query_data);

@@ -23,7 +23,7 @@ const { randomCommand } = require("./bot/commands/random.js");
 const { dlzip } = require("./bot/commands/dlzip.js");
 const { help } = require("./bot/commands/help.js");
 
-const { qb_query } = require("./bot/buttons/index.js");
+const { cb_query } = require("./bot/buttons/index.js");
 const { inlineSearch } = require("./bot/inline_search.js");
 const { textHandler } = require("./bot/commands/textHandler.js");
 
@@ -56,7 +56,7 @@ bot.command("id", async ctx => {
 });
 
 bot.on("callback_query", async (ctx, next) => {
-  await qb_query(ctx);
+  await cb_query(ctx);
 });
 bot.on("inline_query", async ctx => {
   await inlineSearch(ctx);
