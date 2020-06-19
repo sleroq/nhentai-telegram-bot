@@ -30,7 +30,7 @@ module.exports.textHandler = async function(ctx) {
               [{ text: "Next", callback_data: "r_prev" + mangaId }]
             ];
           // console.log(dbMangaRecord);
-          if (!dbMangaRecord || dbMangaRecord.fixed == 0) {
+          if ((!dbMangaRecord || dbMangaRecord.fixed == 0)&& manga.details.pages[0]>=40) {
             inline_keyboard[0].unshift({
               text: "Fix",
               callback_data: "fix_" + mangaId

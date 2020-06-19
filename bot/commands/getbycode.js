@@ -32,7 +32,7 @@ module.exports.getbycode = async function(ctx) {
       [{ text: "Search", switch_inline_query_current_chat: "" }],
       [{ text: "Next", callback_data: "r_prev" + mangaId }]
     ];
-  if (dbMangaRecord && dbMangaRecord.fixed == 0) {
+    if ((!dbMangaRecord || dbMangaRecord.fixed == 0)&& manga.details.pages[0]>=40) {
     inline_keyboard[0].unshift({
       text: "Fix",
       callback_data: "fix_" + mangaId

@@ -14,7 +14,7 @@ module.exports.openiInTelegraph = async function(ctx) {
     telegrapfLink = await TelegraphUploadByUrls(manga),
     inline_keyboard = [[{ text: "Telegra.ph", url: telegrapfLink }]],
     messageText = getMangaMessage(manga, telegrapfLink);
-  if (!dbMangaRecord || dbMangaRecord.fixed == 0) {
+    if ((!dbMangaRecord || dbMangaRecord.fixed == 0)&& manga.details.pages[0]>=40) {
     inline_keyboard[0].unshift({
       text: "Fix",
       callback_data: "fix_" + mangaId
