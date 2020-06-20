@@ -1,10 +1,7 @@
 {
-  "//1": "describes your app and its dependencies",
-  "//2": "https://docs.npmjs.com/files/package.json",
-  "//3": "updating this file will download and update your packages",
-  "name": "hello-express",
+  "name": "nhentai-telegram-bot",
   "version": "0.0.1",
-  "description": "A simple Node app built on Express, instantly up and running.",
+  "description": "A simple Nodejs telegram app built on millions broken api, instantly up and running (not always).",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
@@ -26,12 +23,12 @@
     "node": "12.x"
   },
   "repository": {
-    "url": "https://glitch.com/edit/#!/hello-express"
+    "url": "https://github.com/iamdowner/nhentai-telegram-bot"
   },
   "license": "MIT",
   "keywords": [
-    "node",
-    "glitch",
-    "express"
+    "nhentai",
+    "telegram",
+    "bot"
   ]
 }
