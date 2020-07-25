@@ -171,6 +171,6 @@ module.exports.inlineSearch = async function(ctx) {
         }
       });
     }
-    await ctx.answerInlineQuery(results);
+    await ctx.answerInlineQuery(results).catch(err=>console.log(err));
   }
 };

@@ -22,7 +22,7 @@ module.exports.textHandler = async function(ctx) {
         let manga = await getDoujin(mangaId);
         if (manga) {
           let dbMangaRecord = await db.getManga(mangaId),
-            telegrapfLink = await TelegraphUploadByUrls(manga),
+            telegrapfLink = await TelegraphUploadByUrls(manga).catch(err=>console.log(err)),
             messageText = getMangaMessage(manga, telegrapfLink),
             inline_keyboard = [
               [{ text: "Telegra.ph", url: telegrapfLink }],
@@ -41,16 +41,16 @@ module.exports.textHandler = async function(ctx) {
             reply_markup: {
               inline_keyboard: inline_keyboard
             }
-          });
+          }).catch(err=>console.log(err));
         } else {
           ctx.reply("Failed to get doujin `" + mangaId + "` :/", {
             parse_mode: "Markdown"
-          });
+          }).catch(err=>console.log(err));
         }
       } else {
         ctx.reply("`" + mangaId + "` does not exist :/", {
           parse_mode: "Markdown"
-        });
+        }).catch(err=>console.log(err));
       }
     }
   }

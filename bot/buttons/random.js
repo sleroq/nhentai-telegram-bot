@@ -9,8 +9,7 @@ const {
   getMangaMessage
 } = require("../someFuncs.js");
 
-module.exports.randomButton = async function(ctx, next) {
-  let query_data = ctx.update.callback_query;
+module.exports.randomButton = async function(ctx) {
   let manga = await getRandomManga();
   if (!manga) {
     return;
@@ -41,6 +40,4 @@ module.exports.randomButton = async function(ctx, next) {
     .catch(err => {
       console.log(err);
     });
-  // const search = await nhentai.search('yuri');
-  // console.log(search)
 };

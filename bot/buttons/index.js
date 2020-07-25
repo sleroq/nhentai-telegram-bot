@@ -22,7 +22,7 @@ module.exports.cb_query = async function (ctx, next) {
   } else if (query_data.match("helpsearchback")) {
     await help_back(ctx);
   } else if (query_data.match("fixing")) {
-    await ctx.answerCbQuery("Please wait.", true);
+    await ctx.answerCbQuery("Please wait.", true).catch(err=>console.log(err));
   }
   /*else if (query_data.match("prevManga")) {
     await previousManga(ctx);

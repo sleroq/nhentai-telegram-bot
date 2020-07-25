@@ -15,7 +15,7 @@ module.exports.randomCommand = async function(ctx) {
   if (!manga) {
     return;
   }
-  let telegrapfLink = await TelegraphUploadByUrls(manga),
+  let telegrapfLink = await TelegraphUploadByUrls(manga).catch(err=>console.log(err)),
     messageText = getMangaMessage(manga, telegrapfLink),
     manga_id = manga.link.slice(22, -1),
     dbMangaRecord = await db.getManga(manga_id),
@@ -24,6 +24,9 @@ module.exports.randomCommand = async function(ctx) {
       [{ text: "Search", switch_inline_query_current_chat: "" }],
       [{ text: "Next", callback_data: "r_prev" + manga_id }]
     ];
+  if (!telegrapfLink) {
+    return
+  }
   if ((!dbMangaRecord || dbMangaRecord.fixed == 0)&& manga.details.pages[0]>=40) {
     inline_keyboard[0].unshift({
       text: "Fix",
@@ -42,5 +45,5 @@ module.exports.randomCommand = async function(ctx) {
         [{ text: "Next", callback_data: "r_prev" + manga.id }]
       ]
     }
-  });
+  }).catch(err=>console.log(err));
 };

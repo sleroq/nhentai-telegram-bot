@@ -34,7 +34,10 @@ async function TelegraphUploadByUrls(manga) {
     return mangaExists.telegraphUrl;
   }
   let pages = manga.pages;
-  let result = await telegraphCreatePage(manga, pages);
+  let result = await telegraphCreatePage(manga, pages).catch(err => { console.log(err) });
+  if (!result) {
+    return;
+  }
   await db.saveManga(manga, result.url);
   return result.url;
 }
