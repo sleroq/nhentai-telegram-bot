@@ -2,12 +2,17 @@ require("dotenv").config();
 const { Telegraf } = require("telegraf");
 const bot = new Telegraf(process.env.BOT_TOKEN);
 let webhook = true;
-if (process.env.ON_HEROKU) {
-  bot.telegram.setWebhook(process.env.HEROKU_URL);
-} else if (process.env.ON_GLITCH) {
-  console.log(process.env.GLITCH_URL)
-  bot.telegram.setWebhook(process.env.GLITCH_URL);
-} else {
+if (process.env.HEROKU_URL) {
+  console.log('webhook to ' + process.env.HEROKU_URL)
+  bot.telegram.setWebhook(process.env.HEROKU_URL + '/secret-path');
+} else if (process.env.GLITCH_URL) {
+  console.log('webhook to ' + process.env.GLITCH_URL)
+  bot.telegram.setWebhook(process.env.GLITCH_URL + '/secret-path');
+} else if(process.env.REPL_URL){
+  console.log('webhook to ' + process.env.REPL_URL)
+  bot.telegram.setWebhook( process.env.REPL_URL + '/secret-path')
+  }
+  else {
   webhook = false;
 }
 const express = require("express");
