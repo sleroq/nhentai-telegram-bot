@@ -1,11 +1,11 @@
 module.exports.searchtips = async function(ctx) {
   await ctx.editMessageText(
     "*Search*\n" +
-      "• You can change search sorting by adding `/s`_p_`)` before the search query, " +
+      "• You can change search sorting by adding `/s`_p_ before the search query, " +
       "where _p_ - means popular or _n_ - new, for example: " +
       "`(sp) sex toys`\n" +
-      "• You can specify page number by adding `(p`_n_`)` before the search query, " +
-      "where _n_ - page number, for example: `(p5) sex toys`\n" +
+      "• You can specify page number by adding `/p`[_n_] before the search query, " +
+      "where _n_ - page number, for example: `/p5 sex toys`\n" +
       "• You can search for multiple terms at the same time, " +
       "and this will return only galleries that contain both terms. " +
       "For example, anal tanlines finds all " +

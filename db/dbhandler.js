@@ -96,15 +96,7 @@ async function migratePosts() {
   }
   return;
 }
-// testRAM()
-async function testRAM(){
-  let telegraphposts = await db.prepare(`SELECT COUNT(*) FROM telegraphposts`).all();
-  console.log(telegraphposts.length)
-  for(let i=0; i<telegraphposts.length; i++){
-    let x = 1+1
-  }
-  console.log('success')
-}
+
 let botStageStart = JSON.stringify({ zipLoaded: false, doujinsFixing: 0 });
 
 db.prepare(
