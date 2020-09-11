@@ -18,7 +18,7 @@ bot.use(Telegraf.session());
 bot.use(i18n.middleware());
 
 const mongoose = require("mongoose");
-mongoose.connect("mongodb://localhost/nhentai", {
+mongoose.connect(process.env.DATABASE_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
