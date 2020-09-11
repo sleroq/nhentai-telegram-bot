@@ -1,49 +1,71 @@
-const nhentai = require("nhentai-js");
+const nhentai = require("../../nhentai");
 
-const {
-  doujinExists,
-  getDoujin,
-  getRandomManga,
-  getMangaMessage
-} = require("../someFuncs.js");
 const { TelegraphUploadByUrls } = require("../telegraph.js");
+const { getRandomManga, getMangaMessage } = require("../someFuncs.js");
+const { saveAndGetUser } = require("../../db/saveAndGetUser");
 
-const db = require("../../db/dbhandler.js");
+const Manga = require("../../models/manga.model");
+const Message = require("../../models/message.model");
 
-module.exports.randomCommand = async function(ctx) {
+module.exports.randomCommand = async function (ctx) {
+  let user = await saveAndGetUser(ctx);
   let manga = await getRandomManga();
   if (!manga) {
     return;
   }
-  let telegrapfLink = await TelegraphUploadByUrls(manga).catch(err=>console.log(err)),
-    messageText = getMangaMessage(manga, telegrapfLink),
-    manga_id = manga.link.slice(22, -1),
-    dbMangaRecord = await db.getManga(manga_id),
+
+  let telegraph_url = await TelegraphUploadByUrls(manga).catch((err) => {
+      console.log(err);
+    }),
+    savedManga = new Manga({
+      id: manga.id,
+      title: manga.title,
+      description: manga.language,
+      tags: manga.details.tags,
+      telegraph_url: telegraph_url,
+      pages: manga.details.pages,
+    });
+  savedManga.save(function (err) {
+    if (err) return console.error(err);
+    console.log("manga saved");
+  });
+  message = new Message({
+    chat_id: ctx.update.message.from.id,
+    message_id: ctx.update.message.message_id,
+    current: 0,
+    history: [],
+  });
+  message.history.push(manga.id);
+  message.save();
+  user.manga_history.push(manga.id);
+  user.save();
+
+  let messageText = getMangaMessage(manga, telegraph_url, ctx.i18n),
     inline_keyboard = [
-      [{ text: "Telegra.ph", url: telegrapfLink }],
-      [{ text: "Search", switch_inline_query_current_chat: "" }],
-      [{ text: "Next", callback_data: "r_prev" + manga_id }]
+      [{ text: "Telegra.ph", url: telegraph_url }],
+      [
+        {
+          text: ctx.i18n.t("search_button"),
+          switch_inline_query_current_chat: "",
+        },
+      ],
+      [{ text: ctx.i18n.t("next_button"), callback_data: "r_" + manga.id }],
     ];
-  if (!telegrapfLink) {
-    return
-  }
-  if ((!dbMangaRecord || dbMangaRecord.fixed == 0)&& manga.details.pages[0]>=40) {
+  let num_of_pages = manga.details ? manga.details.pages : manga.pages;
+  if (!manga.telegraph_fixed_url && num_of_pages > 100) {
     inline_keyboard[0].unshift({
-      text: "Fix",
-      callback_data: "fix_" + manga_id
+      text: ctx.i18n.t("fix"),
+      callback_data: "fix_" + manga.id,
     });
   }
-  await ctx.reply(messageText, {
-    parse_mode: "HTML",
-    reply_markup: {
-      inline_keyboard: [
-        [
-          { text: "Fix", callback_data: "fix_" + manga_id },
-          { text: "Telegra.ph", url: telegrapfLink }
-        ],
-        [{ text: "Search", switch_inline_query_current_chat: "" }],
-        [{ text: "Next", callback_data: "r_prev" + manga.id }]
-      ]
-    }
-  }).catch(err=>console.log(err));
+  await ctx
+    .reply(messageText, {
+      parse_mode: "HTML",
+      reply_markup: {
+        inline_keyboard: inline_keyboard,
+      },
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 };

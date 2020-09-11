@@ -1,4 +1,5 @@
 const { randomButton } = require("./random.js");
+const { prevButton } = require("./previous");
 const { openiInTelegraph } = require("./open_in_telegraph.js");
 const { fixInstantView } = require("./fix_instant_view.js");
 const { searchtips } = require("./help_searchtips.js");
@@ -15,6 +16,8 @@ module.exports.cb_query = async function (ctx, next) {
     await randomButton(ctx);
   } else if (query_data.match("open")) {
     await openiInTelegraph(ctx);
+  } else if (query_data.match("prev")) {
+    await prevButton(ctx);
   } else if (query_data.match("fix_") /* || query_data.match("tryLater")*/) {
     await fixInstantView(ctx);
   } else if (query_data.match("searchtips")) {
@@ -22,7 +25,9 @@ module.exports.cb_query = async function (ctx, next) {
   } else if (query_data.match("helpsearchback")) {
     await help_back(ctx);
   } else if (query_data.match("fixing")) {
-    await ctx.answerCbQuery("Please wait.", true).catch(err=>console.log(err));
+    await ctx
+      .answerCbQuery("Please wait.", true)
+      .catch((err) => console.log(err));
   }
   /*else if (query_data.match("prevManga")) {
     await previousManga(ctx);

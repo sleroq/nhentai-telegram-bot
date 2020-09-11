@@ -1,67 +1,60 @@
-const nhentai = require("../nhentai");
-const User = require("../models/user.model");
+const nHentaiAPI = require("nhentai-api-js");
+const api = new nHentaiAPI();
 
-const { getMessageInline, sliceByHalf } = require("./someFuncs.js");
-const { saveAndGetUser } = require("../db/saveAndGetUser");
+const { getMessageInline1, sliceByHalf, getTitle } = require("./someFuncs.js");
 
 module.exports.inlineSearch = async function (ctx) {
-  let user = await saveAndGetUser(ctx);
   if (ctx.inlineQuery.query) {
     let inlineQuery = ctx.inlineQuery.query,
-      pageNumber = 1,
-      pageMatch = inlineQuery.match(/\/p\d+/g)
+      pageNumber = 1;
+
+    let PageMatch = inlineQuery.match(/\/p\d+/g)
         ? inlineQuery.match(/\/p\d+/g)[0]
         : undefined,
       isPageModified = false;
-    if (pageMatch) {
+    if (PageMatch) {
       isPageModified = true;
-      pageNumber = pageMatch.slice(2);
-      inlineQuery = inlineQuery.replace(pageMatch, "").trim();
+      pageNumber = PageMatch.slice(2);
+      inlineQuery = inlineQuery.replace(PageMatch, "").trim();
     }
-    // console.log(user);
-    let sortingParametr = user.default_search_sorting
-        ? user.default_search_sorting
-        : "date",
-      sortMatch = inlineQuery.match(/\/s[pn]/)
+    let sortingParametr = "date",
+      SortMatch = inlineQuery.match(/\/s[pn]/)
         ? inlineQuery.match(/\/s[pn]/)[0]
         : undefined,
       isSearchModified = false;
-
-    if (sortMatch) {
+    if (SortMatch) {
       isSearchModified = true;
-      sortingParametr = sortMatch.slice(2) == "p" ? "popular" : "date";
-      inlineQuery = inlineQuery.replace(sortMatch, "").trim();
+      sortingParametr = SortMatch.slice(2) == "p" ? "popular" : "date";
+      inlineQuery = inlineQuery.replace(SortMatch, "").trim();
     }
-    console.log(
-      'search query="' +
-        inlineQuery +
-        '" page=' +
-        pageNumber +
-        " sorting by " +
-        sortingParametr
-    );
+    // console.log(
+    //   'search query="' +
+    //     inlineQuery +
+    //     '" page=' +
+    //     pageNumber +
+    //     " sorting by " +
+    //     sortingParametr
+    // );
     if (!inlineQuery) {
       return;
     }
-    const search = await nhentai
+    const search = await api
       .search(inlineQuery, pageNumber, sortingParametr)
       .catch((err) => {
         console.log(err);
       });
-    // console.log(search);
+    console.log(search);
     if (!search) {
       return;
     }
     let books = search.results;
     // console.log(books);
     let results = [],
-      searchType = user.default_search_type
-        ? user.default_search_type
-        : "article";
+      searchType = "article";
 
     if (books && books.length) {
       for (let i = 0; i < books.length; i++) {
-        books[i].message_text = getMessageInline(books[i]);
+        books[i].message_text = getMessageInline1(books[i]);
         books[i].description = books[i].language
           ? books[i].language
           : sliceByHalf(books[i].title);
@@ -70,12 +63,9 @@ module.exports.inlineSearch = async function (ctx) {
       results = books.map((manga) => ({
         id: manga.id,
         type: searchType,
-        title: manga.title
-          .split(/\[.*?\]/)
-          .join("")
-          .trim(),
+        title: getTitle(manga),
         description: manga.description,
-        thumb_url: manga.thumbnail,
+        thumb_url: manga.thumbnail.s,
         input_message_content: {
           message_text: manga.message_text,
           parse_mode: "HTML",
