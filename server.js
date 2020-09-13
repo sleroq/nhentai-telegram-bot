@@ -17,6 +17,7 @@ const i18n = new I18n({
 bot.use(Telegraf.session());
 bot.use(i18n.middleware());
 
+// const migrateSomething = require("./db/dbhandler");
 const mongoose = require("mongoose");
 mongoose.connect(process.env.DATABASE_URL, {
   useNewUrlParser: true,
@@ -40,14 +41,23 @@ const Manga = require("./models/manga.model");
 //   return photo.title === "My awesome photo";
 // })
 // .pop();
-
 //   console.log(manga_history);
 // });
+
+// Manga.countDocuments({ tags: { $in: ["yuri"] } }, function (err, c) {
+//   console.log("Count is " + c);
+// });
+// Manga.find({ tags: { $in: ["yuri"] } }, (err, mangas) => {
+//   console.log(mangas);
+//   console.log(mangas[0].tags);
+// });
+
 const { saveAndGetUser } = require("./db/saveAndGetUser");
 // //modules
 const { randomCommand } = require("./bot/commands/random.js");
 const { dlzip } = require("./bot/commands/dlzip.js");
 const { help } = require("./bot/commands/help.js");
+// const { settings } = require("./bot/commands/settings.js");
 
 const { cb_query } = require("./bot/buttons/index.js");
 const { inlineSearch } = require("./bot/inline_search.js");
@@ -102,6 +112,9 @@ bot.command("zip", async (ctx) => {
 bot.command("id", async (ctx) => {
   await ctx.reply("`" + ctx.from.id + "`");
 });
+// bot.command("settings", async (ctx) => {
+//   await settings(ctx);
+// });
 
 bot.on("callback_query", async (ctx, next) => {
   await cb_query(ctx);

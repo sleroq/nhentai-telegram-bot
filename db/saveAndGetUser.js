@@ -12,8 +12,9 @@ module.exports.saveAndGetUser = async function (ctx) {
       first_name: ctx.from.first_name,
       last_name: ctx.from.last_name,
       language_code: ctx.from.language_code,
-      default_search_sorting: "date",
-      default_search_type: "article",
+      search_sorting: "date",
+      search_type: "article",
+      random_localy: false,
     });
 
     await user.save(function (err) {
