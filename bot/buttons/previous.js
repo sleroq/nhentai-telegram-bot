@@ -13,15 +13,14 @@ module.exports.prevButton = async function (ctx) {
     message_id: ctx.update.callback_query.message.message_id,
     chat_id: ctx.update.callback_query.message.from.id,
   });
-  console.log(message);
   if (!message || message.history.length == 1) {
     console.log("return");
     return;
   }
   message.current -= 1;
   message.save();
-  console.log(message.current);
-  console.log(message.history);
+  // console.log(message.current);
+  // console.log(message.history);
 
   let manga = await Manga.findOne({ id: message.history[message.current] }),
     telegraph_url;

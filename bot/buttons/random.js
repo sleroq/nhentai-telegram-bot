@@ -33,8 +33,8 @@ module.exports.randomButton = async function (ctx) {
   } else {
     message.current += 1;
   }
-  console.log(message.current);
-  console.log(message.history);
+  // console.log(message.current);
+  // console.log(message.history);
 
   let manga, telegraph_url;
 
@@ -92,7 +92,7 @@ module.exports.randomButton = async function (ctx) {
     message.history.push(manga.id);
   }
   if (!telegraph_url) {
-    console.log("runrun");
+    // console.log("runrun");
     telegraph_url = await TelegraphUploadByUrls(manga).catch((err) => {
       console.log(typeof err);
       console.log(err);
