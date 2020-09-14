@@ -55,10 +55,8 @@ module.exports.inlineSearch = async function (ctx) {
     let books = search.results;
     // console.log(books);
     let results = [],
-      searchType = user.default_search_type
-        ? user.default_search_type
-        : "article";
-
+      searchType = user.search_type ? user.search_type : "article";
+    console.log(searchType);
     if (books && books.length) {
       for (let i = 0; i < books.length; i++) {
         books[i].message_text = getMessageInline(books[i]);
@@ -76,6 +74,7 @@ module.exports.inlineSearch = async function (ctx) {
           .trim(),
         description: manga.description,
         thumb_url: manga.thumbnail,
+        photo_url: manga.thumbnail,
         input_message_content: {
           message_text: manga.message_text,
           parse_mode: "HTML",
@@ -93,6 +92,10 @@ module.exports.inlineSearch = async function (ctx) {
       }));
       let reverseSortingWord =
           sortingParametr == "popular" ? "new" : "popularity",
+        reverseSortingPhotoUrl =
+          sortingParametr == "popular"
+            ? "https://i.imgur.com/wmHyvQk.png"
+            : "https://i.imgur.com/kMsyvIX.png",
         reverseSortingParametr = reverseSortingWord.charAt(0),
         searchSortingSwitch = isPageModified
           ? `/p${pageNumber} /s${reverseSortingParametr} ${inlineQuery}`
@@ -102,8 +105,8 @@ module.exports.inlineSearch = async function (ctx) {
         type: searchType,
         title: "To sort results by " + reverseSortingWord,
         description: `Just add "/s${reverseSortingParametr}" to search qerry: (@nhentai_mangabot ${searchSortingSwitch})`,
-        thumb_url:
-          "https://cdn.glitch.com/project-avatar/37fdc347-68f3-41ad-8166-f97f2fbc8ebf.png",
+        photo_url: reverseSortingPhotoUrl,
+        thumb_url: reverseSortingPhotoUrl, //"https://cdn.glitch.com/project-avatar/37fdc347-68f3-41ad-8166-f97f2fbc8ebf.png",
         input_message_content: {
           message_text:
             "To sort search results by " +
@@ -135,8 +138,8 @@ module.exports.inlineSearch = async function (ctx) {
         description: `Just add "/p${
           +pageNumber + 1
         }" to search qerry: (@nhentai_mangabot ${nextPageSwitch})`,
-        thumb_url:
-          "https://cdn.glitch.com/project-avatar/37fdc347-68f3-41ad-8166-f97f2fbc8ebf.png",
+        photo_url: "https://i.imgur.com/3AMTdoA.png",
+        thumb_url: "https://i.imgur.com/3AMTdoA.png", //"https://cdn.glitch.com/project-avatar/37fdc347-68f3-41ad-8166-f97f2fbc8ebf.png",
         input_message_content: {
           message_text:
             "To view specific page you can *add /p*`n` to the search query, where `n` is page number",
@@ -160,8 +163,8 @@ module.exports.inlineSearch = async function (ctx) {
         type: searchType,
         title: "Nothing is found",
         description: ``,
-        thumb_url:
-          "https://cdn.glitch.com/project-avatar/37fdc347-68f3-41ad-8166-f97f2fbc8ebf.png",
+        photo_url: "https://i.imgur.com/j2zt4j7.png",
+        thumb_url: "https://i.imgur.com/j2zt4j7.png",
         input_message_content: {
           message_text:
             "• To open a specific doujin just send me nhentai's link or nuclear code\n" +
@@ -171,6 +174,7 @@ module.exports.inlineSearch = async function (ctx) {
         reply_markup: {
           inline_keyboard: [
             [{ text: "Search tips", callback_data: "searchtips" }],
+            [{ text: "Settings", callback_data: "settings" }],
           ],
         },
       });

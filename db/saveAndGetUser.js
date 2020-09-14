@@ -15,6 +15,7 @@ module.exports.saveAndGetUser = async function (ctx) {
       search_sorting: "date",
       search_type: "article",
       random_localy: false,
+      can_repeat_in_random: true,
     });
 
     await user.save(function (err) {

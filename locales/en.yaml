@@ -12,6 +12,9 @@ too_many_pages: Too many pages, sorry :(
 try_again_later: Try again later :(
 pages_fixed: pages fixed
 settings: <b>Settings:</b>
+current_language: "Lang: 🇺🇸"
+yes: "yes"
+no: "no"
 help: |
   • To open a specific doujin just send me nhentais link or nuclear code
   • Also you can download images in .zip file with /zip command. For example: `/zip 234638`

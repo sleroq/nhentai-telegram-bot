@@ -18,13 +18,17 @@ function getMangaMessage(manga, telegraphLink, i18n) {
     pages = manga.details ? manga.details.pages : manga.pages,
     caption;
   if (telegraphLink) {
-    caption = `<a href="${telegraphLink}">${title}</a> (${pages} ${i18n.t(
+    caption = `<a href="${telegraphLink}">${title
+      .replace(/>/g, " ")
+      .replace(/</g, " ")}</a> (${pages} ${i18n.t(
       "pages"
     )})\n${tags}\n<a href="${manga.link}">nhentai.net</a> | <code>${
       manga.id
     }</code>`;
   } else {
-    caption = `<a href="${manga.link}">${title}</a> (${pages} ${i18n.t(
+    caption = `<a href="${manga.link}">${title
+      .replace(/>/g, " ")
+      .replace(/</g, " ")}</a> (${pages} ${i18n.t(
       "pages"
     )})\n${tags}\n<a href="${manga.link}">nhentai.net</a> | <code>${
       manga.id
@@ -65,7 +69,9 @@ function sliceByHalf(s) {
 }
 function getMessageInline(manga) {
   let link = "https://nhentai.net/g/" + manga.id + "/",
-    message_text = `<a href="${link}">${manga.title}</a>`;
+    message_text = `<a href="${link}">${manga.title
+      .replace(/>/g, " ")
+      .replace(/</g, " ")}</a>`;
   return message_text;
 }
 function getTitle(manga) {

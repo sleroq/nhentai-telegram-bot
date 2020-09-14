@@ -57,13 +57,11 @@ const { saveAndGetUser } = require("./db/saveAndGetUser");
 const { randomCommand } = require("./bot/commands/random.js");
 const { dlzip } = require("./bot/commands/dlzip.js");
 const { help } = require("./bot/commands/help.js");
-// const { settings } = require("./bot/commands/settings.js");
+const { settings } = require("./bot/commands/settings.js");
 
 const { cb_query } = require("./bot/buttons/index.js");
 const { inlineSearch } = require("./bot/inline_search.js");
 const { textHandler } = require("./bot/commands/textHandler.js");
-
-// const { relativeTimeThreshold } = require("moment");
 
 bot.start(async (ctx) => {
   const user = await saveAndGetUser(ctx);
@@ -112,9 +110,9 @@ bot.command("zip", async (ctx) => {
 bot.command("id", async (ctx) => {
   await ctx.reply("`" + ctx.from.id + "`");
 });
-// bot.command("settings", async (ctx) => {
-//   await settings(ctx);
-// });
+bot.command("settings", async (ctx) => {
+  await settings(ctx);
+});
 
 bot.on("callback_query", async (ctx, next) => {
   await cb_query(ctx);
