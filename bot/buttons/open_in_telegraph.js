@@ -39,7 +39,9 @@ module.exports.openiInTelegraph = async function (ctx) {
     let telegrapfLink = await TelegraphUploadByUrls(manga).catch((err) => {
       console.log(err);
     }); //upload to telegra.ph
-
+  if(!telegrapfLink){
+    return
+  }
     savedManga = new Manga({
       id: manga_id,
       title: manga.title,
