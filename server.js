@@ -30,29 +30,6 @@ db.once("open", function () {
   console.log("we're connected!");
 });
 
-const User = require("./models/user.model");
-const Manga = require("./models/manga.model");
-
-// Manga.deleteMany({}, () => console.log("Mangas are gone"));
-// User.deleteMany({}, () => console.log("Users are gone"));
-// User.findById({ _id: "713644079" }, (err, user) => {
-// let manga_history = user.manga_history;
-// .filter(function (manga) {
-//   return photo.title === "My awesome photo";
-// })
-// .pop();
-//   console.log(manga_history);
-// });
-// Get the count of all users
-
-// Manga.countDocuments({ tags: { $in: ["yuri"] } }, function (err, c) {
-//   console.log("Count is " + c);
-// });
-// Manga.find({ tags: { $in: ["yuri"] } }, (err, mangas) => {
-//   // console.log(mangas);
-//   console.log(mangas[0].tags);
-// });
-
 const { saveAndGetUser } = require("./db/saveAndGetUser");
 // //modules
 const { randomCommand } = require("./bot/commands/random.js");
@@ -80,25 +57,7 @@ bot.start(async (ctx) => {
 bot.help(async (ctx) => {
   await help(ctx);
 });
-bot.command("ru", async (ctx) => {
-  const user = await saveAndGetUser(ctx);
-  ctx.i18n.locale("ru");
-  user.language_code = "ru";
-  user.save();
-  let message = ctx.i18n.t("greeting");
-  ctx
-    .reply(message, {
-      parse_mode: "HTML",
-      reply_markup: {
-        inline_keyboard: [
-          [{ text: ctx.i18n.t("random_button"), callback_data: "r" }],
-        ],
-      },
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-});
+
 bot.command("code", async (ctx) => {
   await ctx.reply("Just send me a code");
 });
