@@ -177,10 +177,11 @@ class nHentai {
           });
 
           let numberOfResults = $("#content")[0]
+            .children[1].children[1].data ? $("#content")[0]
             .children[1].children[1].data.match(resultsToInt)[1]
             .split(",")
             .join("")
-            .trim();
+            .trim() : 0;
           if (parseInt(numberOfResults)) {
             numberOfResults = parseInt(numberOfResults);
           } else {

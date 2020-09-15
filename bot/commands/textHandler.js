@@ -28,7 +28,9 @@ module.exports.textHandler = async function (ctx) {
         savedManga;
       manga = await Manga.findOne({ id: manga_id });
       if (!manga || !manga.telegraph_url) {
-        manga = await nhentai.getDoujin(match[0]);
+        manga = await nhentai.getDoujin(match[0]).catch((err) => {
+          console.log(err.status);
+        });
         if (!manga) {
           ctx
             .reply("`" + manga_id + "` does not exist :/", {

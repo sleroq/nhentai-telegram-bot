@@ -11,7 +11,9 @@ module.exports.getbycode = async function (ctx) {
   let msg = ctx.message.text,
     manga_id = msg.split(" ")[1].trim(),
     user = await saveAndGetUser(ctx),
-    manga = await nhentai.getDoujin(manga_id);
+     manga = await nhentai.getDoujin(manga_id).catch((err) => {
+          console.log(err.status);
+        });
   if (!manga) {
     return;
   }
