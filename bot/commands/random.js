@@ -1,7 +1,10 @@
-const nhentai = require("../../nhentai");
-
 const { TelegraphUploadByUrls } = require("../telegraph.js");
-const { getRandomManga, getMangaMessage } = require("../someFuncs.js");
+
+const {
+  getRandomMangaLocaly,
+  getRandomManga,
+  getMangaMessage,
+} = require("../someFuncs.js");
 const { saveAndGetUser } = require("../../db/saveAndGetUser");
 
 const Manga = require("../../models/manga.model");
@@ -9,14 +12,54 @@ const Message = require("../../models/message.model");
 
 module.exports.randomCommand = async function (ctx) {
   let user = await saveAndGetUser(ctx);
-  let manga = await getRandomManga();
-  if (!manga) {
-    return;
-  }
-
-  let telegraph_url = await TelegraphUploadByUrls(manga).catch((err) => {
+  let savedManga, telegraph_url, manga;
+  if (user.random_localy) {
+    manga = await getRandomMangaLocaly(
+      user.default_random_tags,
+      user.ignored_random_tags
+    );
+    if (manga == null) {
+      await ctx.reply("cant find anything").catch((err) => {
+        console.log(err);
+      });
+      return;
+    }
+    telegraph_url = manga.telegraph_fixed_url
+      ? manga.telegraph_fixed_url
+      : manga.telegraph_url;
+    if (!telegraph_url) {
+      telegraph_url = await TelegraphUploadByUrls(manga).catch((err) => {
+        console.log(typeof err);
+        console.log(err.Error);
+        console.log(err.match(/FLOOD_WAIT_\d+/));
+        console.log(err);
+      });
+      if (!telegraph_url) {
+        console.log("!telegraph_url");
+        return;
+      }
+      manga.telegraph_url = telegraph_url;
+      manga.save(function (err) {
+        if (err) return console.error(err);
+        console.log("manga saved");
+      });
+    }
+  } else {
+    manga = await getRandomManga();
+    if (!manga) {
+      console.log("!manga");
+      return;
+    }
+    telegraph_url = await TelegraphUploadByUrls(manga).catch((err) => {
+      console.log(typeof err);
+      console.log(err.Error);
+      console.log(err.match(/FLOOD_WAIT_\d+/));
       console.log(err);
-    }),
+    });
+    if (!telegraph_url) {
+      console.log("!telegraph_url");
+      return;
+    }
     savedManga = new Manga({
       id: manga.id,
       title: manga.title,
@@ -25,10 +68,8 @@ module.exports.randomCommand = async function (ctx) {
       telegraph_url: telegraph_url,
       pages: manga.details.pages,
     });
-  savedManga.save(function (err) {
-    if (err) return console.error(err);
-    console.log("manga saved");
-  });
+  }
+
   message = new Message({
     chat_id: ctx.update.message.from.id,
     message_id: ctx.update.message.message_id,

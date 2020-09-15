@@ -12,6 +12,9 @@ const resultsToInt = /(.*) Results/i;
 
 class nHentai {
   static getDoujin(identifier) {
+    if (!identifier) {
+      return;
+    }
     const id = identifier.toString().replace(urlToId, "$2");
     return new Promise((resolve, reject) => {
       request
@@ -176,12 +179,13 @@ class nHentai {
             }
           });
 
-          let numberOfResults = $("#content")[0]
-            .children[1].children[1].data ? $("#content")[0]
-            .children[1].children[1].data.match(resultsToInt)[1]
-            .split(",")
-            .join("")
-            .trim() : 0;
+          let numberOfResults = $("#content")[0].children[1].children[1].data
+            ? $("#content")[0]
+                .children[1].children[1].data.match(resultsToInt)[1]
+                .split(",")
+                .join("")
+                .trim()
+            : 0;
           if (parseInt(numberOfResults)) {
             numberOfResults = parseInt(numberOfResults);
           } else {

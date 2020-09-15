@@ -1,4 +1,5 @@
 const nhentai = require("../nhentai");
+const Manga = require("../models/manga.model");
 
 async function getRandomManga() {
   let homepage = await nhentai.getHomepage(),
@@ -9,8 +10,28 @@ async function getRandomManga() {
         console.log(err.status);
         i -= 1;
       });
+
     return manga;
   }
+}
+// getRandomMangaLocaly(["group"], ["rape"]);
+async function getRandomMangaLocaly(tags, ninTags) {
+  let query =
+    (tags != undefined && tags.length != 0) ||
+    (ninTags != undefined && ninTags.length != 0)
+      ? { tags: {} }
+      : undefined;
+  if (tags != undefined && tags.length != 0) {
+    query.tags.$in = tags;
+  }
+  if (ninTags != undefined && ninTags.length != 0) {
+    query.tags.$nin = ninTags;
+  }
+
+  let count = await Manga.countDocuments(query),
+    random = Math.floor(Math.random() * count),
+    result = await Manga.findOne(query).skip(random);
+  return result;
 }
 function getMangaMessage(manga, telegraphLink, i18n) {
   let title = getTitle(manga),
@@ -95,6 +116,7 @@ module.exports = {
   getRandomManga,
   getMangaMessage,
   getMessageInline,
+  getRandomMangaLocaly,
   // getTitle,
   sliceByHalf,
   tagString,

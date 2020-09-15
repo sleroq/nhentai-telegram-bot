@@ -43,12 +43,13 @@ const Manga = require("./models/manga.model");
 // .pop();
 //   console.log(manga_history);
 // });
+// Get the count of all users
 
 // Manga.countDocuments({ tags: { $in: ["yuri"] } }, function (err, c) {
 //   console.log("Count is " + c);
 // });
 // Manga.find({ tags: { $in: ["yuri"] } }, (err, mangas) => {
-//   console.log(mangas);
+//   // console.log(mangas);
 //   console.log(mangas[0].tags);
 // });
 

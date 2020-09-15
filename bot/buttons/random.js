@@ -1,7 +1,11 @@
 const nhentai = require("../../nhentai");
 
 const { TelegraphUploadByUrls } = require("../telegraph.js");
-const { getRandomManga, getMangaMessage } = require("../someFuncs.js");
+const {
+  getRandomManga,
+  getRandomMangaLocaly,
+  getMangaMessage,
+} = require("../someFuncs.js");
 const { saveAndGetUser } = require("../../db/saveAndGetUser");
 
 const Manga = require("../../models/manga.model");
@@ -33,8 +37,8 @@ module.exports.randomButton = async function (ctx) {
   } else {
     message.current += 1;
   }
-  // console.log(message.current);
-  // console.log(message.history);
+  console.log(message.current);
+  console.log(message.history);
 
   let manga, telegraph_url;
 
@@ -73,42 +77,81 @@ module.exports.randomButton = async function (ctx) {
         : manga.telegraph_url;
     }
   } else {
-    manga = await getRandomManga();
-    if (!manga) {
-      console.log("!manga");
-      return;
+    let savedManga;
+    if (user.random_localy) {
+      manga = await getRandomMangaLocaly(
+        user.default_random_tags,
+        user.ignored_random_tags
+      );
+      if (manga == null) {
+        await ctx
+          .editMessageReplyMarkup({
+            reply_markup: {
+              inline_keyboard: [[{ text: "cant find anything :(" }]],
+            },
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+        return;
+      }
+      telegraph_url = manga.telegraph_fixed_url
+        ? manga.telegraph_fixed_url
+        : manga.telegraph_url;
+      if (!telegraph_url) {
+        telegraph_url = await TelegraphUploadByUrls(manga).catch((err) => {
+          console.log(typeof err);
+          console.log(err.Error);
+          console.log(err.match(/FLOOD_WAIT_\d+/));
+          console.log(err);
+        });
+        if (!telegraph_url) {
+          console.log("!telegraph_url");
+          return;
+        }
+        manga.telegraph_url = telegraph_url;
+        manga.save(function (err) {
+          if (err) return console.error(err);
+          console.log("manga saved");
+        });
+      }
+    } else {
+      manga = await getRandomManga();
+      if (!manga) {
+        console.log("!manga");
+        return;
+      }
+      telegraph_url = await TelegraphUploadByUrls(manga).catch((err) => {
+        console.log(typeof err);
+        console.log(err.Error);
+        console.log(err.match(/FLOOD_WAIT_\d+/));
+        console.log(err);
+      });
+
+      if (!telegraph_url) {
+        console.log("!telegraph_url");
+        return;
+      }
+      savedManga = new Manga({
+        id: manga.id,
+        title: manga.title,
+        description: manga.language,
+        tags: manga.details.tags,
+        telegraph_url: telegraph_url,
+        pages: manga.details.pages,
+      });
+      savedManga.save(function (err) {
+        if (err) return console.error(err);
+        console.log("manga saved");
+      });
     }
-    telegraph_url = await TelegraphUploadByUrls(manga).catch((err) => {
-      console.log(typeof err);
-      console.log(err);
-    });
-    let savedManga = new Manga({
-      id: manga.id,
-      title: manga.title,
-      description: manga.language,
-      tags: manga.details.tags,
-      telegraph_url: telegraph_url,
-      pages: manga.details.pages,
-    });
-    savedManga.save(function (err) {
-      if (err) return console.error(err);
-      console.log("manga saved");
-    });
     message.history.push(manga.id);
   }
-  if (!telegraph_url) {
-    // console.log("runrun");
-    telegraph_url = await TelegraphUploadByUrls(manga).catch((err) => {
-      console.log(typeof err);
-      console.log(err.Error);
-      console.log(err.match(/FLOOD_WAIT_\d+/));
-      console.log(err);
-    });
-  }
+
   user.manga_history.push(manga.id);
+
   message.save();
   user.save();
-
   let messageText = getMangaMessage(manga, telegraph_url, ctx.i18n),
     inline_keyboard = [
       [{ text: "Telegra.ph", url: telegraph_url }],
