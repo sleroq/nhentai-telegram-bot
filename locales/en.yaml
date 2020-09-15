@@ -11,7 +11,9 @@ pages: pages
 too_many_pages: Too many pages, sorry :(
 try_again_later: Try again later :(
 pages_fixed: pages fixed
-settings: <b>Settings:</b>
+settings: |
+  <b>Settings:</b>
+  Random localy is much faster!
 current_language: "Lang: 🇺🇸"
 yes: "yes"
 no: "no"
