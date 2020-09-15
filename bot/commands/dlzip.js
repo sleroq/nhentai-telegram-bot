@@ -22,7 +22,9 @@ module.exports.dlzip = async function (ctx) {
     });
     return;
   }
-  let manga = await nhentai.getDoujin(mangaId);
+  let manga = await nhentai.getDoujin(mangaId).catch((err) => {
+          console.log(err.status);
+        });
   if (!manga) {
     await ctx.reply("Failed to get doujin `" + mangaId + "` :/", {
       parse_mode: "Markdown",
