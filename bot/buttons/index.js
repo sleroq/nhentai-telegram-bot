@@ -61,9 +61,6 @@ module.exports.cb_query = async function (ctx, next) {
     user.save();
     await editLangs(user, ctx);
   }
-  /*else if (query_data.match("prevManga")) {
-    await previousManga(ctx);
-  } */
 };
 async function editLangs(user, ctx) {
   const langs = [
@@ -116,19 +113,19 @@ async function editSettings(user, ctx) {
         inline_keyboard: [
           [
             {
-              text: "Search appearance:  " + search_type,
+              text: ctx.i18n.t("search_appearance") + search_type,
               callback_data: "change_search_type",
             },
           ],
           [
             {
-              text: "Random Localy:  " + random_localy,
+              text: ctx.i18n.t("random_localy") + random_localy,
               callback_data: "changa_rangom_localy",
             },
           ],
           [
             {
-              text: "Allow repeat in random:  " + can_repeat_in_random,
+              text: ctx.i18n.t("allow_repeat_in_random") + can_repeat_in_random,
               callback_data: "can_repeat_in_random",
             },
           ],
