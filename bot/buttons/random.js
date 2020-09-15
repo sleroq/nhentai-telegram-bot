@@ -49,10 +49,12 @@ module.exports.randomButton = async function (ctx) {
         console.log("!manga");
         return;
       }
-      telegraph_url = await TelegraphUploadByUrls(manga).catch(err=>{console.log(err.status)});
-      if(!telegraph_url){
-    return
-  }
+      telegraph_url = await TelegraphUploadByUrls(manga).catch((err) => {
+        console.log(err.status);
+      });
+      if (!telegraph_url) {
+        return;
+      }
       let savedManga = new Manga({
         id: manga.id,
         title: manga.title,
@@ -98,6 +100,8 @@ module.exports.randomButton = async function (ctx) {
     // console.log("runrun");
     telegraph_url = await TelegraphUploadByUrls(manga).catch((err) => {
       console.log(typeof err);
+      console.log(err.Error);
+      console.log(err.match(/FLOOD_WAIT_\d+/));
       console.log(err);
     });
   }
@@ -138,6 +142,6 @@ module.exports.randomButton = async function (ctx) {
       },
     })
     .catch((err) => {
-      console.log(err);
+      console.log(err.code);
     });
 };
