@@ -37,13 +37,16 @@ module.exports.randomButton = async function (ctx) {
   } else {
     message.current += 1;
   }
-  console.log(message.current);
-  console.log(message.history);
+  // console.log(message.current);
+  // console.log(message.history);
+  console.log(
+    "message.history.length: " +
+      message.history.length +
+      "   message.current: " +
+      message.current
+  );
 
   let manga, telegraph_url;
-
-  // console.log(message.current);
-  // console.log(message.history.length);
 
   if (message.current < message.history.length) {
     manga = await Manga.findOne({ id: message.history[message.current] });
@@ -132,18 +135,23 @@ module.exports.randomButton = async function (ctx) {
         console.log("!telegraph_url");
         return;
       }
-      savedManga = new Manga({
+      let isMangsSaved = await Manga.findOne({
         id: manga.id,
-        title: manga.title,
-        description: manga.language,
-        tags: manga.details.tags,
-        telegraph_url: telegraph_url,
-        pages: manga.details.pages,
       });
-      savedManga.save(function (err) {
-        if (err) return console.error(err);
-        console.log("manga saved");
-      });
+      if (!isMangsSaved) {
+        savedManga = new Manga({
+          id: manga.id,
+          title: manga.title,
+          description: manga.language,
+          tags: manga.details.tags,
+          telegraph_url: telegraph_url,
+          pages: manga.details.pages,
+        });
+        savedManga.save(function (err) {
+          if (err) return console.error(err);
+          console.log("manga saved");
+        });
+      }
     }
     message.history.push(manga.id);
   }
