@@ -1,4 +1,5 @@
 greeting: Hello, ${uppercase(from.first_name)}\n<b>This bot have R-18 content, click this button only if you mature enough</b>
+# buttons:
 random_button: Random manga
 search_button: Search
 next_button: Next
@@ -7,16 +8,27 @@ back_button: Back
 fix_button: Fix
 waitabit_button: Wait a bit
 search_tips_button: Search tips
+# manga related text:
 pages: pages
+tags: "Tags: "
 too_many_pages: Too many pages, sorry :(
 try_again_later: Try again later :(
-pages_fixed: pages fixed
+pages_fixed: " pages fixed"
+# just text
+yes: "yes"
+no: "no"
+# settings:
 settings: |
   <b>Settings:</b>
   Random localy is much faster!
+search_appearance: "Search appearance:  "
+random_localy: "Random Localy:  "
+allow_repeat_in_random: "Allow repeat in random:  "
+
 current_language: "Lang: 🇺🇸"
-yes: "yes"
-no: "no"
+choose_a_language: Choose a language
+
+# help
 help: |
   • To open a specific doujin just send me nhentais link or nuclear code
   • Also you can download images in .zip file with /zip command. For example: `/zip 234638`

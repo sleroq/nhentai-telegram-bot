@@ -35,7 +35,7 @@ async function getRandomMangaLocaly(tags, ninTags) {
 }
 function getMangaMessage(manga, telegraphLink, i18n) {
   let title = getTitle(manga),
-    tags = tagString(manga),
+    tags = tagString(manga, i18n),
     pages = manga.details ? manga.details.pages : manga.pages,
     caption;
   if (telegraphLink) {
@@ -57,8 +57,8 @@ function getMangaMessage(manga, telegraphLink, i18n) {
   }
   return caption;
 }
-function tagString(manga) {
-  let tags = "Tags: ";
+function tagString(manga, i18n) {
+  let tags = i18n.t("tags");
   tagsArray = manga.details ? manga.details.tags : manga.tags;
   if (!tagsArray || !tagsArray[0]) {
     return "";
