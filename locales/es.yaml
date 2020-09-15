@@ -1,0 +1,45 @@
+greeting: Hola, ${uppercase(from.first_name)}\n<b>Este bot tiene contenido +18, pulsa el botón solo si tienes la edad suficiente.</b>
+# buttons:
+random_button: Manga aleatorio
+search_button: Buscar
+next_button: Siguiente
+previous_button: Anterior
+back_button: Regresar
+fix_button: Arreglar
+waitabit_button: Espera un poco
+search_tips_button: Buscar consejos
+# manga related text:
+pages: páginas
+tags: "Tags: " # untranslated
+too_many_pages: Muchas páginas, lo siento :(
+try_again_later: Inténtalo más tarde :(
+pages_fixed: páginas arregladas
+# just text
+yes: "sí"
+no: "no"
+# settings:
+settings: | # untranslated
+  <b>Ajustes:</b>
+  Random localy is much faster!
+search_appearance: "Search appearance:  " # untranslated
+random_localy: "Random Localy:  " # untranslated
+allow_repeat_in_random: "Allow repeat in random: " # untranslated
+
+current_language: "Lang: 🇪🇸"
+choose_a_language: Choose a language # untranslated
+
+# help
+help: |
+  • Para abrir un doujin en específico solo envíame el link de nhentai o el código nuclear
+  • También puedes descargar imágenes en archivos .zip con el comando /zip. Por ejemplo: “/zip 234638”
+search_tips: |
+  <b>Buscar</b>
+  • Puedes cambiar la clasificación de la búsqueda añadiendo <code>/s</code><I>p</i> antes de lo que quieres buscar, dónde <i>p</i> - significa <b>p</b>opular o <i>n</i> - <b>n</b>ew, por ejemplo: <code>/sp sex toys</code>
+  • Puedes especificar el número de páginas añadiendo <code>/p</code>[<i>n</i>] antes de lo que quieres buscar, dónde <i>n</i> - es el número de páginas, por ejemplo: <code>/p5 sex toys</code>
+  • Puedes buscar varios términos al mismo tiempo, y solo aparecerán las galerías que contienen ambos términos. Por ejemplo, <code>anal tanlines</code> encuentra galerías que contienen ambos, anal y tanlines. 
+  • Puedes excluir términos utilizando <code>-</code>. Por ejemplo, anal tanlines -yaoi encontrara todas las galerías que contengan anal y tanlines sin yaoi.
+  • Búsquedas exactas pueden ser posibles utilizando términos de dos palabras. Por ejemplo, <code>"big breasts"</code> solo encontrará galerías con <i>"big breats"</i> ya sea en el título o en las etiquetas.
+  • Pueden ser combinados con etiquetas para tener un mayor control sobre la búsqueda: <code>parodies:railgun -tag:"big breats"</code>.
+  • Puedes buscar un número específico de páginas con  pages:20, o con un rango de páginas: <code>pages:&gt;20 pages:&lt;=30.</code>
+  • Puedes buscar galerías dentro de un lapso de tiempo con <code>uploaded:20d</code>. Las unidades válidas son h, d, w, m, y.
+  • Puedes usar rangos también: <code>uploaded:>20d uploaded:&lt;30d.</code>

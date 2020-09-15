@@ -66,6 +66,7 @@ async function editLangs(user, ctx) {
   const langs = [
     { name: "Русский", code: "ru" },
     { name: "English", code: "en" },
+    { name: "Español", code: "es" },
   ];
   let check = false,
     inline_keyboard = [];
