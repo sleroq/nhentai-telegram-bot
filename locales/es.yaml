@@ -10,7 +10,7 @@ waitabit_button: Espera un poco
 search_tips_button: Buscar consejos
 # manga related text:
 pages: páginas
-tags: "Tags: " # untranslated
+tags: "Etiquetas: "
 too_many_pages: Muchas páginas, lo siento :(
 try_again_later: Inténtalo más tarde :(
 pages_fixed: páginas arregladas
@@ -18,15 +18,15 @@ pages_fixed: páginas arregladas
 yes: "sí"
 no: "no"
 # settings:
-settings: | # untranslated
+ajustes: |
   <b>Ajustes:</b>
-  Random localy is much faster!
-search_appearance: "Search appearance:  " # untranslated
-random_localy: "Random Localy:  " # untranslated
-allow_repeat_in_random: "Allow repeat in random: " # untranslated
+  ¡La localización aleatoria es mucho mas rápida!
+search_appearance: "Buscar apariencia:  "
+random_localy: "Localizacón aleatoria:  "
+allow_repeat_in_random: "Permitir la repetición en el modo aleatorio: "
 
 current_language: "Lang: 🇪🇸"
-choose_a_language: Choose a language # untranslated
+choose_a_language: Elige un idioma
 
 # help
 help: |
