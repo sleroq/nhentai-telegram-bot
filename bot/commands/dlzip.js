@@ -23,8 +23,8 @@ module.exports.dlzip = async function (ctx) {
     return;
   }
   let manga = await nhentai.getDoujin(mangaId).catch((err) => {
-          console.log(err.status);
-        });
+    console.log(err.status);
+  });
   if (!manga) {
     await ctx.reply("Failed to get doujin `" + mangaId + "` :/", {
       parse_mode: "Markdown",
@@ -40,26 +40,26 @@ module.exports.dlzip = async function (ctx) {
   await ctx.reply("wait a bit");
   console.log(ctx.session.isBotBusy);
 
-  for (let i = 0; ctx.session.isBotBusy; i++) {
-    let messageText;
-    if (i % 2 == 0) {
-      messageText = "you are in a queue, wait a bit.";
-    } else if (i % 3 == 0) {
-      messageText = "you are in a queue, wait a bit...";
-    } else {
-      messageText = "you are in a queue, wait a bit..";
-    }
-    await ctx.telegram
-      .editMessageText(
-        ctx.from.id,
-        ctx.message.message_id + 1,
-        ctx.message.message_id + 1,
-        messageText
-      )
-      .catch((err) => console.log(err));
-    await sleep(2000);
-  }
-  ctx.session.isBotBusy = true;
+  // for (let i = 0; ctx.session.isBotBusy; i++) {
+  //   let messageText;
+  //   if (i % 2 == 0) {
+  //     messageText = "you are in a queue, wait a bit.";
+  //   } else if (i % 3 == 0) {
+  //     messageText = "you are in a queue, wait a bit...";
+  //   } else {
+  //     messageText = "you are in a queue, wait a bit..";
+  //   }
+  //   await ctx.telegram
+  //     .editMessageText(
+  //       ctx.from.id,
+  //       ctx.message.message_id + 1,
+  //       ctx.message.message_id + 1,
+  //       messageText
+  //     )
+  //     .catch((err) => console.log(err));
+  //   await sleep(2000);
+  // }
+  // ctx.session.isBotBusy = true;
 
   let messageText = getMangaMessage(manga, undefined, ctx.i18n);
 
@@ -70,9 +70,7 @@ module.exports.dlzip = async function (ctx) {
     fileSizeB = stats["size"],
     fileSizeMB = fileSizeB / 1000000.0;
   console.log(fileSizeMB);
-  await ctx.telegram
-    .deleteMessage(ctx.from.id, ctx.message.message_id + 1)
-    .catch((err) => console.log(err));
+
   if (fileSizeMB > 50) {
     await ctx.reply(
       "Sorry, file is too big, for bots telegram allow " +
@@ -99,6 +97,9 @@ module.exports.dlzip = async function (ctx) {
       .catch((err) => {
         console.log("reply with file failed :( ", err);
       });
+    await ctx.telegram
+      .deleteMessage(ctx.from.id, ctx.message.message_id + 1)
+      .catch((err) => console.log(err));
   }
   await fs.unlink(`./${mangaId}.zip`, function (err) {
     if (err) {
@@ -107,7 +108,7 @@ module.exports.dlzip = async function (ctx) {
       console.log(`File ${mangaId}.zip deleted!`);
     }
   });
-  ctx.session.isBotBusy = false;
+  // ctx.session.isBotBusy = false;
 };
 
 // const nhentai = require("../../nhentai");
