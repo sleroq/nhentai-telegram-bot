@@ -42,9 +42,9 @@ module.exports.textHandler = async function (ctx) {
         telegraph_url = await TelegraphUploadByUrls(manga).catch((err) => {
           console.log(err);
         });
-        if(!telegraph_url){
-    return
-  }
+        if (!telegraph_url) {
+          return;
+        }
         savedManga = new Manga({
           id: manga.id,
           title: manga.title,

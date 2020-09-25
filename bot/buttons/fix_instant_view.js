@@ -1,12 +1,19 @@
 const nhentai = require("../../nhentai");
 
-const { TelegraphUploadByUrls } = require("../telegraph.js");
+const {
+  TelegraphUploadByUrls,
+  telegraphCreatePage,
+} = require("../telegraph.js");
 const { getMangaMessage } = require("../someFuncs.js");
 const { saveAndGetUser } = require("../../db/saveAndGetUser");
 const { uploadByUrl } = require("telegraph-uploader");
 
 const Manga = require("../../models/manga.model");
 const Message = require("../../models/message.model");
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 module.exports.fixInstantView = async function (ctx) {
   await saveAndGetUser(ctx);
@@ -15,46 +22,44 @@ module.exports.fixInstantView = async function (ctx) {
   if (!manga_id) {
     return;
   }
-  let message = await Message.findOne({
-    message_id: ctx.update.callback_query.message.message_id,
-    chat_id: ctx.update.callback_query.message.from.id,
+  let manga_db = await Manga.findOne({
+    id: manga_id,
   });
-  let current = message ? message.history[message.current] : manga_id;
-
-  let manga = await Manga.findOne({
-    id: current,
-  });
-  let telegraph_url = manga.telegraph_url,
-    telegraph_fixed_url;
-  if (!manga.telegraph_fixed_url) {
-    getManga = await nhentai.getDoujin(manga_id);
-    if (!manga) {
+  let telegraph_fixed_url = manga_db.telegraph_fixed_url,
+    telegraph_url = manga_db.telegraph_url;
+  console.log(telegraph_url);
+  if (!telegraph_fixed_url) {
+    manga = await nhentai.getDoujin(manga_id).catch((err) => {
+      console.log(err);
+    });
+    if (!manga_db) {
       telegraph_url = await TelegraphUploadByUrls(manga).catch((err) => {
         console.log(err.status);
       });
 
-      manga = new Manga({
-        id: getManga.id,
-        title: getManga.title,
-        description: getManga.language,
+      manga_db = new Manga({
+        id: manga.id,
+        title: manga.title,
+        description: manga.language,
         telegraph_url: telegraph_url,
-        tags: getManga.details.tags,
-        pages: getManga.details.pages,
+        tags: manga.details.tags,
+        pages: manga.details.pages,
       });
+      manga_db.save();
     }
-    let pages = getManga.pages,
+    let pages = manga.pages,
       telegrapf_urls = [],
       attempts_counter = 0;
 
     for (let i = 0; i < pages.length; i++) {
-      fixing_keyboard = [[]];
+      let fixing_keyboard = [[]];
       if (telegraph_url) {
         fixing_keyboard[0].push({
           text: "Telegra.ph",
           url: telegraph_url,
         });
       }
-      if (attempts_counter > 3) {
+      if (attempts_counter > 9) {
         fixing_keyboard[0].unshift({
           text: ctx.i18n.t("try_again_later"),
           callback_data: "tryLater_" + manga.id,
@@ -77,8 +82,20 @@ module.exports.fixInstantView = async function (ctx) {
         );
         i -= 1;
         attempts_counter += 1;
+        fixing_keyboard[0].unshift({
+          text: "flood wait",
+          callback_data: "flood_wait",
+        });
+        await ctx
+          .editMessageReplyMarkup({
+            inline_keyboard: fixing_keyboard,
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+        await sleep(5000);
       });
-      telegrapf_urls.push(new_url);
+      telegrapf_urls.push(new_url.link);
       fixing_keyboard[0].unshift({
         text: i + 1 + "/" + pages.length + ctx.i18n.t("pages_fixed"),
         callback_data: "fixing",
@@ -92,51 +109,63 @@ module.exports.fixInstantView = async function (ctx) {
         });
     }
 
-    telegraph_fixed_url = await telegraphCreatePage(
-      getManga,
-      telegrapf_urls
-    ).then((page) => {
-      return page.url;
-    });
-  } else {
-    telegraph_fixed_url = manga.telegraph_fixed_url;
+    telegraph_fixed_url = await telegraphCreatePage(manga, telegrapf_urls)
+      .then((page) => {
+        return page.url;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   if (!telegraph_fixed_url) {
+    if (ctx.update.callback_query.message) {
+      fixing_keyboard[0].push({
+        text: "Telegra.ph",
+        url: telegraph_url,
+      });
+      fixing_keyboard[0].unshift({
+        text: ctx.i18n.t("previous_button"),
+        callback_data: "prev_" + manga.id,
+      });
+    }
     return;
   }
-  manga.telegraph_fixed_url = telegraph_fixed_url;
-  manga.save();
-  messageText = getMangaMessage(manga, newPage.url);
-  inline_keyboard = [
-    [
-      {
-        text: "Telegra.ph",
-        url: telegraph_fixed_url,
-      },
-    ],
-  ];
-  if (ctx.update.callback_query.message) {
-    inline_keyboard.push([
+  manga_db.telegraph_fixed_url = telegraph_fixed_url;
+  manga_db.save();
+  let messageText = getMangaMessage(manga, telegraph_fixed_url, ctx.i18n),
+    inline_keyboard = [
       [
         {
-          text: ctx.i18n.t("search_button"),
-          switch_inline_query_current_chat: "",
+          text: "Telegra.ph",
+          url: telegraph_fixed_url,
         },
       ],
-      [{ text: ctx.i18n.t("next_button"), callback_data: "r_prev" + manga.id }],
+    ];
+  if (ctx.update.callback_query.message) {
+    inline_keyboard.push([
+      {
+        text: ctx.i18n.t("search_button"),
+        switch_inline_query_current_chat: "",
+      },
+    ]);
+    inline_keyboard.push([
+      { text: ctx.i18n.t("next_button"), callback_data: "r_prev" + manga.id },
     ]);
     let message = await Message.findOne({
       message_id: ctx.update.callback_query.message.message_id,
       chat_id: ctx.update.callback_query.message.from.id,
     });
-    if (message.current > 0) {
+    if (message && message.current > 0) {
       inline_keyboard[2].unshift({
         text: ctx.i18n.t("previous_button"),
         callback_data: "prev_" + manga.id,
       });
     }
   }
+  console.log(
+    "fixed from this - " + telegraph_url + "\nto this - " + telegraph_fixed_url
+  );
   await ctx
     .editMessageText(messageText, {
       parse_mode: "HTML",

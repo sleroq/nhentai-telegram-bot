@@ -16,7 +16,13 @@ module.exports.randomButton = async function (ctx) {
   ctx
     .editMessageReplyMarkup({
       inline_keyboard: [
-        [{ text: ctx.i18n.t("waitabit_button"), callback_data: "wait" }],
+        [
+          {
+            text: ctx.i18n.t("previous_button"),
+            callback_data: "prev_",
+          },
+          { text: ctx.i18n.t("waitabit_button"), callback_data: "wait" },
+        ],
       ],
     })
     .catch((err) => {
@@ -50,7 +56,7 @@ module.exports.randomButton = async function (ctx) {
 
   if (message.current < message.history.length) {
     manga = await Manga.findOne({ id: message.history[message.current] });
-    if (!manga) {
+    if (!manga || !manga.telegraph_url) {
       manga = await nhentai.getDoujin(message.history[message.current]);
       if (!manga) {
         console.log("!manga");
