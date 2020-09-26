@@ -159,11 +159,21 @@ module.exports.randomButton = async function (ctx) {
         });
       }
     }
+
     message.history.push(manga.id);
+    if (message.history > 400) {
+      for (let t = message.history.length; t > 200; t--) {
+        message.history.shift();
+      }
+    }
   }
 
   user.manga_history.push(manga.id);
-
+  if (user.manga_history > 200) {
+    for (let t = user.manga_history.length; t > 200; t--) {
+      user.manga_history.shift();
+    }
+  }
   message.save();
   user.save();
   let messageText = getMangaMessage(manga, telegraph_url, ctx.i18n),
