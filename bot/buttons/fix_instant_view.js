@@ -50,8 +50,14 @@ module.exports.fixInstantView = async function (ctx) {
     let pages = manga.pages,
       telegraph_urls = [],
       attempts_counter = 0;
+    function uniq(a) {
+      var seen = {};
+      return a.filter(function (item) {
+        return seen.hasOwnProperty(item) ? false : (seen[item] = true);
+      });
+    }
     if (Array.isArray(manga_db.fixed_pages) || manga_db.fixed_pages.length) {
-      telegraph_urls = manga_db.fixed_pages;
+      telegraph_urls = uniq(manga_db.fixed_pages);
       console.log(
         "here is " + telegraph_urls.length + " pages from previous fix"
       );
