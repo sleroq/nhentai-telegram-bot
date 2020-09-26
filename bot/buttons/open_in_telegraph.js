@@ -68,7 +68,7 @@ module.exports.openiInTelegraph = async function (ctx) {
      so here is a button that can magically fix that */
 
   let num_of_pages = manga.details ? manga.details.pages : manga.pages;
-  if (!manga.telegraph_fixed_url && num_of_pages > 100) {
+  if (!manga.telegraph_fixed_url && num_of_pages > 150) {
     inline_keyboard[0].unshift({
       text: ctx.i18n.t("fix_button"),
       callback_data: "fix_" + manga.id,
