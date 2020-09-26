@@ -86,16 +86,10 @@ module.exports.fixInstantView = async function (ctx) {
           text: "flood wait",
           callback_data: "flood_wait",
         });
-        await ctx
-          .editMessageReplyMarkup({
-            inline_keyboard: fixing_keyboard,
-          })
-          .catch((err) => {
-            console.log(err);
-          });
         await sleep(5000);
-      });
-      telegrapf_urls.push(new_url.link);
+      })
+      if(new_url && new_url.link){telegrapf_urls.push(new_url.link)}
+      
       fixing_keyboard[0].unshift({
         text: i + 1 + "/" + pages.length + ctx.i18n.t("pages_fixed"),
         callback_data: "fixing",
