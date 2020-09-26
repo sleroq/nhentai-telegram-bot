@@ -63,7 +63,7 @@ module.exports.fixInstantView = async function (ctx) {
       );
     }
 
-    for (let i = 0; i < pages.length; i++) {
+    for (let i = telegraph_urls.length || 0; i < pages.length; i++) {
       let fixing_keyboard = [[]];
       if (telegraph_url) {
         fixing_keyboard[0].push({
@@ -109,9 +109,9 @@ module.exports.fixInstantView = async function (ctx) {
           });
         return;
       }
-      if (telegraph_urls.includes(pages[i])) {
-        continue;
-      }
+      // if (telegraph_urls.includes(pages[i])) {
+      //   continue;
+      // }
       let new_url = await uploadByUrl(pages[i]).catch(async (err) => {
         console.log(
           "err in uploading image heppened on try number " +
