@@ -71,6 +71,30 @@ module.exports.fixInstantView = async function (ctx) {
           callback_data: "fixLater_" + manga.id,
         });
         manga_db.save();
+        if (ctx.update.callback_query.message) {
+          inline_keyboard.push([
+            {
+              text: ctx.i18n.t("search_button"),
+              switch_inline_query_current_chat: "",
+            },
+          ]);
+          inline_keyboard.push([
+            {
+              text: ctx.i18n.t("next_button"),
+              callback_data: "r_prev" + manga.id,
+            },
+          ]);
+          let message_db = await Message.findOne({
+            message_id: ctx.update.callback_query.message.message_id,
+            chat_id: ctx.update.callback_query.message.from.id,
+          });
+          if (message && message.current > 0) {
+            inline_keyboard[2].unshift({
+              text: ctx.i18n.t("previous_button"),
+              callback_data: "prev_" + manga.id,
+            });
+          }
+        }
         await ctx
           .editMessageReplyMarkup({
             inline_keyboard: fixing_keyboard,
