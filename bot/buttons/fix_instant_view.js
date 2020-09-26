@@ -48,8 +48,14 @@ module.exports.fixInstantView = async function (ctx) {
       manga_db.save();
     }
     let pages = manga.pages,
-      telegrapf_urls = [],
+      telegraph_urls = [],
       attempts_counter = 0;
+    if (Array.isArray(manga_db.fixed_pages) || manga_db.fixed_pages.length) {
+      telegraph_urls = manga_db.fixed_pages;
+      console.log(
+        "here is " + telegraph_urls.length + " pages from previous fix"
+      );
+    }
 
     for (let i = 0; i < pages.length; i++) {
       let fixing_keyboard = [[]];
@@ -62,8 +68,9 @@ module.exports.fixInstantView = async function (ctx) {
       if (attempts_counter > 9) {
         fixing_keyboard[0].unshift({
           text: ctx.i18n.t("try_again_later"),
-          callback_data: "tryLater_" + manga.id,
+          callback_data: "fixLater_" + manga.id,
         });
+        manga_db.save();
         await ctx
           .editMessageReplyMarkup({
             inline_keyboard: fixing_keyboard,
@@ -72,6 +79,9 @@ module.exports.fixInstantView = async function (ctx) {
             console.log(err);
           });
         return;
+      }
+      if (telegraph_urls.includes(pages[i])) {
+        continue;
       }
       let new_url = await uploadByUrl(pages[i]).catch(async (err) => {
         console.log(
@@ -87,9 +97,12 @@ module.exports.fixInstantView = async function (ctx) {
           callback_data: "flood_wait",
         });
         await sleep(5000);
-      })
-      if(new_url && new_url.link){telegrapf_urls.push(new_url.link)}
-      
+      });
+      if (new_url && new_url.link) {
+        telegraph_urls.push(new_url.link);
+        manga_db.fixed_pages.push(new_url.link);
+      }
+
       fixing_keyboard[0].unshift({
         text: i + 1 + "/" + pages.length + ctx.i18n.t("pages_fixed"),
         callback_data: "fixing",
@@ -103,7 +116,7 @@ module.exports.fixInstantView = async function (ctx) {
         });
     }
 
-    telegraph_fixed_url = await telegraphCreatePage(manga, telegrapf_urls)
+    telegraph_fixed_url = await telegraphCreatePage(manga, telegraph_urls)
       .then((page) => {
         return page.url;
       })

@@ -8,6 +8,7 @@ const mangaSchema = new Schema({
   pages: Number,
   telegraph_url: String,
   telegraph_fixed_url: String,
+  fixed_pages: [String],
 });
 
 module.exports = model("Manga", mangaSchema);

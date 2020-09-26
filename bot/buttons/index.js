@@ -19,7 +19,7 @@ module.exports.cb_query = async function (ctx, next) {
     await openiInTelegraph(ctx);
   } else if (query_data.match("prev")) {
     await prevButton(ctx);
-  } else if (query_data.match("fix_") /* || query_data.match("tryLater")*/) {
+  } else if (query_data.match("fix_") || query_data.match("fixLater_")) {
     await fixInstantView(ctx);
   } else if (query_data.match("searchtips")) {
     await searchtips(ctx);
