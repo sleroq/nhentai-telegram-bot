@@ -125,12 +125,13 @@ module.exports.fixInstantView = async function (ctx) {
           text: "flood wait",
           callback_data: "flood_wait",
         });
-        manga_db.save();
+
         await sleep(5000);
       });
       if (new_url && new_url.link) {
         telegraph_urls.push(new_url.link);
         manga_db.fixed_pages.push(new_url.link);
+        await manga_db.save();
       }
 
       fixing_keyboard[0].unshift({
