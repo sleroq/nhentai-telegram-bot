@@ -76,15 +76,14 @@ module.exports.fixInstantView = async function (ctx) {
           text: ctx.i18n.t("try_again_later"),
           callback_data: "fixLater_" + manga.id,
         });
-        manga_db.save();
         if (ctx.update.callback_query.message) {
-          inline_keyboard.push([
+          fixing_keyboard.push([
             {
               text: ctx.i18n.t("search_button"),
               switch_inline_query_current_chat: "",
             },
           ]);
-          inline_keyboard.push([
+          fixing_keyboard.push([
             {
               text: ctx.i18n.t("next_button"),
               callback_data: "r_prev" + manga.id,
@@ -94,8 +93,8 @@ module.exports.fixInstantView = async function (ctx) {
             message_id: ctx.update.callback_query.message.message_id,
             chat_id: ctx.update.callback_query.message.from.id,
           });
-          if (message && message.current > 0) {
-            inline_keyboard[2].unshift({
+          if (message_db && message_db.current > 0) {
+            fixing_keyboard[2].unshift({
               text: ctx.i18n.t("previous_button"),
               callback_data: "prev_" + manga.id,
             });
@@ -126,6 +125,7 @@ module.exports.fixInstantView = async function (ctx) {
           text: "flood wait",
           callback_data: "flood_wait",
         });
+        manga_db.save();
         await sleep(5000);
       });
       if (new_url && new_url.link) {
