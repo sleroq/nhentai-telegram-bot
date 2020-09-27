@@ -14,7 +14,7 @@ module.exports.prevButton = async function (ctx) {
     chat_id: ctx.update.callback_query.message.from.id,
   });
   if (!message || message.history.length == 1) {
-    console.log("return");
+    console.log("return cause there is no mess in db");
     return;
   }
   message.current -= 1;
@@ -25,6 +25,7 @@ module.exports.prevButton = async function (ctx) {
   let manga = await Manga.findOne({ id: message.history[message.current] }),
     telegraph_url;
 
+  // incase previous manga somehow disappeared from db - i've foreseen this too:
   if (!manga) {
     manga = await nhentai.getDoujin(message.history[message.current]);
     if (!manga) {
@@ -60,13 +61,18 @@ module.exports.prevButton = async function (ctx) {
       ],
       [{ text: ctx.i18n.t("next_button"), callback_data: "r_" + manga.id }],
     ];
+  // in db number of pages in 'pages' var, but in nhentai it's in 'details.pages':
   let num_of_pages = manga.details ? manga.details.pages : manga.pages;
+
+  /*  for those who click buttons without any reason
+      show fix button only if there is really alot of pages: */
   if (!manga.telegraph_fixed_url && num_of_pages > 150) {
     inline_keyboard[0].unshift({
       text: ctx.i18n.t("fix_button"),
       callback_data: "fix_" + manga.id,
     });
   }
+  // prev button only if user isn't at first manga in history:
   if (message.current != 0) {
     inline_keyboard[2].unshift({
       text: ctx.i18n.t("previous_button"),

@@ -4,17 +4,17 @@ const Manga = require("../models/manga.model");
 async function getRandomManga() {
   let homepage = await nhentai.getHomepage(),
     newestMangaId = +homepage.results[0].id;
-  for (let i = 0; i < 15; i++) {
+  for (let i = 0; i < 10; i++) {
     let randomId = Math.floor(Math.random() * newestMangaId) + 1,
       manga = await nhentai.getDoujin(randomId).catch((err) => {
         console.log(err.status);
-        i -= 1;
       });
-
+    if (!manga) {
+      continue;
+    }
     return manga;
   }
 }
-// getRandomMangaLocaly(["group"], ["rape"]);
 async function getRandomMangaLocaly(tags, ninTags) {
   let query =
     (tags != undefined && tags.length != 0) ||

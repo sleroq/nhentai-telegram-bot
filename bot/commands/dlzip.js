@@ -1,17 +1,13 @@
 const nhentai = require("../../nhentai");
-const Manga = require("../../models/manga.model");
-const User = require("../../models/user.model");
-const Message = require("../../models/message.model");
 const { saveAndGetUser } = require("../../db/saveAndGetUser");
 const { getMangaMessage } = require("../someFuncs.js");
 const fs = require("fs");
 const nhdl = require("nhentaidownloader");
-// const db = require("../../db/dbhandler.js");
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
-
+// there will be no comments here, I do not know how it works
 module.exports.dlzip = async function (ctx) {
   let user = await saveAndGetUser(ctx);
   let msg = ctx.message.text,
@@ -38,28 +34,6 @@ module.exports.dlzip = async function (ctx) {
     return;
   }
   await ctx.reply("wait a bit");
-  console.log(ctx.session.isBotBusy);
-
-  // for (let i = 0; ctx.session.isBotBusy; i++) {
-  //   let messageText;
-  //   if (i % 2 == 0) {
-  //     messageText = "you are in a queue, wait a bit.";
-  //   } else if (i % 3 == 0) {
-  //     messageText = "you are in a queue, wait a bit...";
-  //   } else {
-  //     messageText = "you are in a queue, wait a bit..";
-  //   }
-  //   await ctx.telegram
-  //     .editMessageText(
-  //       ctx.from.id,
-  //       ctx.message.message_id + 1,
-  //       ctx.message.message_id + 1,
-  //       messageText
-  //     )
-  //     .catch((err) => console.log(err));
-  //   await sleep(2000);
-  // }
-  // ctx.session.isBotBusy = true;
 
   let messageText = getMangaMessage(manga, undefined, ctx.i18n);
 

@@ -5,11 +5,12 @@ const { getMangaMessage } = require("../someFuncs.js");
 const { saveAndGetUser } = require("../../db/saveAndGetUser");
 
 const Manga = require("../../models/manga.model");
-const User = require("../../models/user.model");
 const Message = require("../../models/message.model");
 
 module.exports.textHandler = async function (ctx) {
   let user = await saveAndGetUser(ctx);
+  /* I don't want it to work in group chats because
+     it will trigger at every numbers, that somebody sent */
   if (
     ctx.message.chat.type != "private" ||
     (ctx.message.via_bot &&
@@ -26,7 +27,9 @@ module.exports.textHandler = async function (ctx) {
         manga,
         telegraph_url,
         savedManga;
+      // check if we already have this manga in db:
       manga = await Manga.findOne({ id: manga_id });
+      // get it if we don't:
       if (!manga || !manga.telegraph_url) {
         manga = await nhentai.getDoujin(match[0]).catch((err) => {
           console.log(err.status);
@@ -43,6 +46,7 @@ module.exports.textHandler = async function (ctx) {
           console.log(err);
         });
         if (!telegraph_url) {
+          console.log("!telegraph_url - return");
           return;
         }
         savedManga = new Manga({
@@ -59,6 +63,10 @@ module.exports.textHandler = async function (ctx) {
         });
       } else {
         telegraph_url = manga.telegraph_url;
+        if (!telegraph_url) {
+          console.log("!telegraph_url - return");
+          return;
+        }
       }
       let message = new Message({
         chat_id: ctx.update.message.from.id,
@@ -88,10 +96,7 @@ module.exports.textHandler = async function (ctx) {
       await message.save();
       user.manga_history.push(manga_id);
       user.save();
-      if (!telegraph_url) {
-        console.log("telegraph_url" + telegraph_url);
-        return;
-      }
+
       await ctx
         .reply(messageText, {
           parse_mode: "HTML",
