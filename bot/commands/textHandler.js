@@ -62,7 +62,9 @@ module.exports.textHandler = async function (ctx) {
           console.log("manga saved");
         });
       } else {
-        telegraph_url = manga.telegraph_url;
+        telegraph_url = manga.telegraph_fixed_url
+          ? manga.telegraph_fixed_url
+          : manga.telegraph_url;
       }
       let message = new Message({
         chat_id: ctx.update.message.from.id,
