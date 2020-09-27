@@ -58,7 +58,7 @@ module.exports.fixInstantView = async function (ctx) {
       attempts_counter = 0; // coun't retries because err
 
     // incase it isn't the first try to fix manga we nont want to reupload same pages
-    if (Array.isArray(manga_db.fixed_pages) || manga_db.fixed_pages.length) {
+    if (Array.isArray(manga_db.fixed_pages) && manga_db.fixed_pages.length) {
       telegraph_urls = uniq(manga_db.fixed_pages); // so get them from db
       console.log(
         "here is " + telegraph_urls.length + " pages from previous fix"
