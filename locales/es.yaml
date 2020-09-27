@@ -8,6 +8,8 @@ back_button: Regresar
 fix_button: Arreglar
 waitabit_button: Espera un poco
 search_tips_button: Buscar consejos
+settings_button: Ajustes
+next_page_button: Siguiente página
 # manga related text:
 pages: páginas
 tags: "Etiquetas: "
@@ -17,17 +19,22 @@ pages_fixed: páginas arregladas
 # just text
 yes: "sí"
 no: "no"
+date: fecha
+popular: popularidad
 # settings:
 ajustes: |
   <b>Ajustes:</b>
   ¡La localización aleatoria es mucho mas rápida!
 search_appearance: "Buscar apariencia:  "
+search_sorting: "Buscar ordenando por "
 random_localy: "Localizacón aleatoria:  "
 allow_repeat_in_random: "Permitir la repetición en el modo aleatorio: "
 
 current_language: "Lang: 🇪🇸"
 choose_a_language: Elige un idioma
 
+article: artículo
+gallery: galería
 # help
 help: |
   • Para abrir un doujin en específico solo envíame el link de nhentai o el código nuclear

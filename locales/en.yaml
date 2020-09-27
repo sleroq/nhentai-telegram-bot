@@ -8,6 +8,8 @@ back_button: Back
 fix_button: Fix
 waitabit_button: Wait a bit
 search_tips_button: Search tips
+settings_button: settings
+next_page_button: Next page
 # manga related text:
 pages: pages
 tags: "Tags: "
@@ -17,17 +19,22 @@ pages_fixed: " pages fixed"
 # just text
 yes: "yes"
 no: "no"
+date: date
+popular: popularity
 # settings:
 settings: |
   <b>Settings:</b>
   Random localy is much faster!
 search_appearance: "Search appearance:  "
+search_sorting: "Search sorting by "
 random_localy: "Random Localy:  "
 allow_repeat_in_random: "Allow repeat in random:  "
 
-current_language: "Lang: 🇺🇸"
+current_language: "Lang: 🇺🇸" # this is emoji
 choose_a_language: Choose a language
 
+article: article
+gallery: gallery
 # help
 help: |
   • To open a specific doujin just send me nhentais link or nuclear code
