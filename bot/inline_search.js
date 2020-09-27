@@ -1,7 +1,13 @@
 const nhentai = require("../nhentai");
 
-const { getMessageInline, sliceByHalf } = require("./someFuncs.js");
+const {
+  getMessageInline,
+  sliceByHalf,
+  getMangaMessage,
+} = require("./someFuncs.js");
+const { TelegraphUploadByUrls } = require("./telegraph.js");
 const { saveAndGetUser } = require("../db/saveAndGetUser");
+const Manga = require("../models/manga.model");
 
 module.exports.inlineSearch = async function (ctx) {
   let user = await saveAndGetUser(ctx);
@@ -13,7 +19,8 @@ module.exports.inlineSearch = async function (ctx) {
     pageMatch = inlineQuery.match(/\/p\d+/g) // if page specified
       ? inlineQuery.match(/\/p\d+/g)[0]
       : undefined,
-    isPageModified = false;
+    isPageModified = false,
+    searchType = user.search_type ? user.search_type : "article";
   if (pageMatch) {
     // ("@bot /p35 smth")
     isPageModified = true; // need this to add tips based on user's query
@@ -25,7 +32,6 @@ module.exports.inlineSearch = async function (ctx) {
       ? inlineQuery.match(/\/s[pn]/)[0]
       : undefined,
     isSearchModified = false;
-  console.log(sortingParametr);
   if (sortMatch) {
     // ("@bot /sp smth")
     isSearchModified = true; // need this to add tips based on user's query
@@ -40,6 +46,114 @@ module.exports.inlineSearch = async function (ctx) {
   //     " sorting by " +
   //     sortingParametr
   // );
+  const nothingIsFound_result = {
+    id: 43210,
+    type: searchType,
+    title: "Nothing is found ¯_(ツ)_/¯",
+    description: ``,
+    photo_url: "https://i.imgur.com/j2zt4j7.png",
+    thumb_url: "https://i.imgur.com/j2zt4j7.png",
+    input_message_content: {
+      message_text: ctx.i18n.t("help"),
+      parse_mode: "Markdown",
+    },
+    reply_markup: {
+      inline_keyboard: [
+        [
+          {
+            text: ctx.i18n.t("search_tips_button"),
+            callback_data: "searchtips",
+          },
+        ],
+        [{ text: ctx.i18n.t("settings_button"), callback_data: "settings" }],
+      ],
+    },
+  };
+
+  if (inlineQuery.match(/\d+/) && inlineQuery.replace(/\d+/, "").trim() == "") {
+    let manga_id = inlineQuery.match(/\d+/)[0];
+    console.log(manga_id);
+    let result = [];
+    // check if we already have this manga in db:
+    manga = await Manga.findOne({ id: manga_id });
+    // get it if we don't:
+    if (!manga || !manga.telegraph_url) {
+      manga = await nhentai.getDoujin(manga_id).catch((err) => {
+        console.log(err.status);
+      });
+      if (!manga) {
+        result.push(nothingIsFound_result);
+        await ctx.answerInlineQuery(result).catch((err) => console.log(err));
+        return;
+      }
+      telegraph_url = await TelegraphUploadByUrls(manga).catch((err) => {
+        console.log(err);
+      });
+      if (!telegraph_url) {
+        console.log("!telegraph_url - return");
+        return;
+      }
+      savedManga = new Manga({
+        id: manga.id,
+        title: manga.title,
+        description: manga.language,
+        tags: manga.details.tags,
+        telegraph_url: telegraph_url,
+        pages: manga.details.pages,
+      });
+      savedManga.save(function (err) {
+        if (err) return console.error(err);
+        console.log("manga saved");
+      });
+    } else {
+      telegraph_url = manga.telegraph_fixed_url
+        ? manga.telegraph_fixed_url
+        : manga.telegraph_url;
+    }
+    let messageText = getMangaMessage(manga, telegraph_url, ctx.i18n),
+      inline_keyboard = [[{ text: "Telegra.ph", url: telegraph_url }]];
+    let num_of_pages = manga.details ? manga.details.pages : manga.pages;
+    if (!manga.telegraph_fixed_url && num_of_pages > 100) {
+      inline_keyboard[0].unshift({
+        text: ctx.i18n.t("fix_button"),
+        callback_data: "fix_" + manga.id,
+      });
+    }
+    let description;
+    console.log(Array.isArray(manga.languages));
+    if (Array.isArray(manga.languages)) {
+      console.log(manga.languages.length);
+    }
+    if (Array.isArray(manga.languages) && manga.languages.length) {
+      description = "";
+      for (let t = 0; t < manga.languages.length - 1; t++) {
+        description += manga.languages[t];
+      }
+    } else {
+      description = sliceByHalf(manga.title);
+    }
+    console.log(manga);
+    result.push({
+      id: manga.id,
+      type: searchType,
+      title: manga.title
+        .split(/\[.*?\]/)
+        .join("")
+        .trim(),
+      description: description,
+      thumb_url: manga.thumbnails ? manga.thumbnails[0] : undefined,
+      photo_url: manga.pages ? manga.pages[0] : undefined,
+      input_message_content: {
+        message_text: messageText,
+        parse_mode: "HTML",
+      },
+      reply_markup: {
+        inline_keyboard: inline_keyboard,
+      },
+    });
+    await ctx.answerInlineQuery(result).catch((err) => console.log(err));
+    return;
+  }
   if (!inlineQuery) {
     /* incase there is only search specifications
        and no actual search query */
@@ -56,8 +170,7 @@ module.exports.inlineSearch = async function (ctx) {
     return;
   }
   let books = search.results;
-  let results = [],
-    searchType = user.search_type ? user.search_type : "article";
+  let results = [];
   if (books && books.length) {
     // incase we found something
 
@@ -164,29 +277,7 @@ module.exports.inlineSearch = async function (ctx) {
       },
     });
   } else {
-    results.push({
-      id: 4321,
-      type: searchType,
-      title: "Nothing is found ¯_(ツ)_/¯",
-      description: ``,
-      photo_url: "https://i.imgur.com/j2zt4j7.png",
-      thumb_url: "https://i.imgur.com/j2zt4j7.png",
-      input_message_content: {
-        message_text: ctx.i18n.t("help"),
-        parse_mode: "Markdown",
-      },
-      reply_markup: {
-        inline_keyboard: [
-          [
-            {
-              text: ctx.i18n.t("search_tips_button"),
-              callback_data: "searchtips",
-            },
-          ],
-          [{ text: ctx.i18n.t("settings_button"), callback_data: "settings" }],
-        ],
-      },
-    });
+    results.push(nothingIsFound_result);
   }
   await ctx.answerInlineQuery(results).catch((err) => console.log(err));
 };
