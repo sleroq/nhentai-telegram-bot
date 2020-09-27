@@ -72,20 +72,21 @@ module.exports.inlineSearch = async function (ctx) {
 
   if (inlineQuery.match(/\d+/) && inlineQuery.replace(/\d+/, "").trim() == "") {
     let manga_id = inlineQuery.match(/\d+/)[0];
-    console.log(manga_id);
-    let result = [];
-    // check if we already have this manga in db:
-    manga = await Manga.findOne({ id: manga_id });
-    // get it if we don't:
-    if (!manga || !manga.telegraph_url) {
-      manga = await nhentai.getDoujin(manga_id).catch((err) => {
-        console.log(err.status);
-      });
-      if (!manga) {
-        result.push(nothingIsFound_result);
-        await ctx.answerInlineQuery(result).catch((err) => console.log(err));
-        return;
-      }
+    let result = [],
+      telegraph_url;
+    manga = await nhentai.getDoujin(manga_id).catch((err) => {
+      console.log(err.status);
+    });
+
+    // check if we have this manga in db:
+    manga_db = await Manga.findOne({ id: manga_id });
+    if (!manga && !manga_db) {
+      result.push(nothingIsFound_result);
+      await ctx.answerInlineQuery(result).catch((err) => console.log(err));
+      return;
+    }
+    // save it if we don't:
+    if (!manga_db) {
       telegraph_url = await TelegraphUploadByUrls(manga).catch((err) => {
         console.log(err);
       });
@@ -93,7 +94,7 @@ module.exports.inlineSearch = async function (ctx) {
         console.log("!telegraph_url - return");
         return;
       }
-      savedManga = new Manga({
+      manga_db = new Manga({
         id: manga.id,
         title: manga.title,
         description: manga.language,
@@ -101,7 +102,7 @@ module.exports.inlineSearch = async function (ctx) {
         telegraph_url: telegraph_url,
         pages: manga.details.pages,
       });
-      savedManga.save(function (err) {
+      manga_db.save(function (err) {
         if (err) return console.error(err);
         console.log("manga saved");
       });
@@ -110,29 +111,30 @@ module.exports.inlineSearch = async function (ctx) {
         ? manga.telegraph_fixed_url
         : manga.telegraph_url;
     }
+    if (!telegraph_url) {
+      console.log("!telegraph_url - return");
+      return;
+    }
     let messageText = getMangaMessage(manga, telegraph_url, ctx.i18n),
       inline_keyboard = [[{ text: "Telegra.ph", url: telegraph_url }]];
-    let num_of_pages = manga.details ? manga.details.pages : manga.pages;
-    if (!manga.telegraph_fixed_url && num_of_pages > 100) {
+    if (!manga_db.telegraph_fixed_url && manga.details.pages > 100) {
       inline_keyboard[0].unshift({
         text: ctx.i18n.t("fix_button"),
         callback_data: "fix_" + manga.id,
       });
     }
     let description;
-    console.log(Array.isArray(manga.languages));
-    if (Array.isArray(manga.languages)) {
-      console.log(manga.languages.length);
-    }
-    if (Array.isArray(manga.languages) && manga.languages.length) {
+    if (
+      Array.isArray(manga.details.languages) &&
+      manga.details.languages.length
+    ) {
       description = "";
-      for (let t = 0; t < manga.languages.length - 1; t++) {
-        description += manga.languages[t];
+      for (let t = 0; t < manga.details.languages.length - 1; t++) {
+        description += manga.details.languages[t] + " ";
       }
     } else {
       description = sliceByHalf(manga.title);
     }
-    console.log(manga);
     result.push({
       id: manga.id,
       type: searchType,
@@ -141,8 +143,11 @@ module.exports.inlineSearch = async function (ctx) {
         .join("")
         .trim(),
       description: description,
-      thumb_url: manga.thumbnails ? manga.thumbnails[0] : undefined,
-      photo_url: manga.pages ? manga.pages[0] : undefined,
+      thumb_url:
+        Array.isArray(manga.thumbnails) && manga.thumbnails[0]
+          ? manga.thumbnails[0]
+          : undefined,
+      photo_url: manga.pages[0] ? manga.pages[0] : undefined,
       input_message_content: {
         message_text: messageText,
         parse_mode: "HTML",
