@@ -63,10 +63,6 @@ module.exports.textHandler = async function (ctx) {
         });
       } else {
         telegraph_url = manga.telegraph_url;
-        if (!telegraph_url) {
-          console.log("!telegraph_url - return");
-          return;
-        }
       }
       let message = new Message({
         chat_id: ctx.update.message.from.id,
