@@ -73,13 +73,13 @@ module.exports.inlineSearch = async function (ctx) {
   if (inlineQuery.match(/\d+/) && inlineQuery.replace(/\d+/, "").trim() == "") {
     let manga_id = inlineQuery.match(/\d+/)[0];
     let result = [],
-      telegraph_url;
-    manga = await nhentai.getDoujin(manga_id).catch((err) => {
-      console.log(err.status);
-    });
+      telegraph_url,
+      manga = await nhentai.getDoujin(manga_id).catch((err) => {
+        console.log(err.status);
+      });
 
     // check if we have this manga in db:
-    manga_db = await Manga.findOne({ id: manga_id });
+    let manga_db = await Manga.findOne({ id: manga_id });
     if (!manga && !manga_db) {
       result.push(nothingIsFound_result);
       await ctx.answerInlineQuery(result).catch((err) => console.log(err));
