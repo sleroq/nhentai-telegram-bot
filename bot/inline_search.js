@@ -107,12 +107,12 @@ module.exports.inlineSearch = async function (ctx) {
         console.log("manga saved");
       });
     } else {
-      telegraph_url = manga.telegraph_fixed_url
-        ? manga.telegraph_fixed_url
-        : manga.telegraph_url;
+      telegraph_url = manga_db.telegraph_fixed_url
+        ? manga_db.telegraph_fixed_url
+        : manga_db.telegraph_url;
     }
     if (!telegraph_url) {
-      console.log("!telegraph_url - return");
+      console.log("!telegraph_url (from db)- return");
       return;
     }
     let messageText = getMangaMessage(manga, telegraph_url, ctx.i18n),
