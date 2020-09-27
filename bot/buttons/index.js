@@ -37,6 +37,11 @@ module.exports.cb_query = async function (ctx, next) {
     user.search_type = user.search_type == "article" ? "photo" : "article";
     user.save();
     await editSettings(user, ctx);
+  } else if (query_data == "change_search_sorting") {
+    let user = await saveAndGetUser(ctx);
+    user.search_sorting = user.search_sorting == "date" ? "popular" : "date";
+    user.save();
+    await editSettings(user, ctx);
   } else if (query_data == "can_repeat_in_random") {
     let user = await saveAndGetUser(ctx);
     user.can_repeat_in_random = user.can_repeat_in_random ? false : true;
@@ -63,6 +68,7 @@ module.exports.cb_query = async function (ctx, next) {
   }
 };
 async function editLangs(user, ctx) {
+  // supported langs:
   const langs = [
     { name: "Русский", code: "ru" },
     { name: "English", code: "en" },
@@ -70,6 +76,7 @@ async function editLangs(user, ctx) {
   ];
   let check = false,
     inline_keyboard = [];
+  // add ✅ to currently selected language
   langs.forEach((x) => {
     if (x.code == user.language_code) {
       x.name += " ✅";
@@ -82,6 +89,8 @@ async function editLangs(user, ctx) {
       },
     ]);
   });
+  /* if language code was not specified in the setings,
+     then it's english: */
   if (!check) {
     inline_keyboard[1].text = +" ✅";
   }
@@ -101,7 +110,14 @@ async function editLangs(user, ctx) {
     .catch((err) => {});
 }
 async function editSettings(user, ctx) {
-  let search_type = user.search_type ? user.search_type : "article",
+  let search_type =
+      user.search_type == "article"
+        ? ctx.i18n.t("article")
+        : ctx.i18n.t("gallery"),
+    search_sorting =
+      user.search_sorting == "date"
+        ? ctx.i18n.t("date")
+        : ctx.i18n.t("popular"),
     random_localy = user.random_localy ? ctx.i18n.t("yes") : ctx.i18n.t("no"),
     can_repeat_in_random = user.can_repeat_in_random
       ? ctx.i18n.t("yes")
@@ -132,6 +148,12 @@ async function editSettings(user, ctx) {
           ],
           [
             {
+              text: ctx.i18n.t("search_sorting") + search_sorting,
+              callback_data: "change_search_sorting",
+            },
+          ],
+          [
+            {
               text: language,
               callback_data: "change_language",
             },
@@ -139,5 +161,7 @@ async function editSettings(user, ctx) {
         ],
       },
     })
-    .catch((err) => {});
+    .catch((err) => {
+      console.log(err);
+    });
 }
