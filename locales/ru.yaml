@@ -24,7 +24,7 @@ popular: популярности
 # settings:
 settings: |
   <b>Настройки:</b>
-  Локальный рандом намного быстрее!
+  Если локальный рандом включен то бот будет искать мангу не среди всех nhentai манг (>242k), а только среди >15k сохраненных в базе даанных бота. Но эти заранее preloaded mangas opens faster and you don't have to wait for 'instant view'.
 search_appearance: "Вид поиска:  "
 search_sorting: "Сортировка результатов по "
 random_localy: "Рандом локально:  "

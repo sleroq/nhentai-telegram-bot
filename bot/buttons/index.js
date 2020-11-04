@@ -136,6 +136,12 @@ async function editSettings(user, ctx) {
           ],
           [
             {
+              text: ctx.i18n.t("search_sorting") + search_sorting,
+              callback_data: "change_search_sorting",
+            },
+          ],
+          [
+            {
               text: ctx.i18n.t("random_localy") + random_localy,
               callback_data: "changa_rangom_localy",
             },
@@ -146,12 +152,7 @@ async function editSettings(user, ctx) {
               callback_data: "can_repeat_in_random",
             },
           ],
-          [
-            {
-              text: ctx.i18n.t("search_sorting") + search_sorting,
-              callback_data: "change_search_sorting",
-            },
-          ],
+
           [
             {
               text: language,
