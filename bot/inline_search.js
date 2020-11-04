@@ -64,7 +64,7 @@ module.exports.inlineSearch = async function (ctx) {
       id: 4321,
       type: searchType,
       title: "Favorites",
-      description: `This is your favorites:`,
+      description: `This is your favorites, tap here to refresh them!`,
       photo_url: "https://i.imgur.com/TmxG1Qr.png",
       thumb_url: "https://i.imgur.com/TmxG1Qr.png",
       input_message_content: {
@@ -334,7 +334,7 @@ module.exports.inlineSearch = async function (ctx) {
       id: 4321,
       type: searchType,
       title: "Next page",
-      description: `Just add "/p${
+      description: `TAP HERE or Just add "/p${
         +pageNumber + 1
       }" to search qerry: (@nhentai_mangabot ${nextPageSwitch})`,
       photo_url: "https://i.imgur.com/3AMTdoA.png",
