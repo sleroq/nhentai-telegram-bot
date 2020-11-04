@@ -6,6 +6,7 @@ const mangaSchema = new Schema({
   description: String,
   tags: [String],
   pages: Number,
+  thumbnail: String,
   telegraph_url: String,
   telegraph_fixed_url: String,
   fixed_pages: [String],

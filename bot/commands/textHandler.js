@@ -73,8 +73,12 @@ module.exports.textHandler = async function (ctx) {
         history: [],
       });
       let messageText = getMangaMessage(manga, telegraph_url, ctx.i18n),
+        heart = user.favorites.id(manga.id) ? "♥️" : "🖤",
         inline_keyboard = [
-          [{ text: "Telegra.ph", url: telegraph_url }],
+          [
+            { text: "Telegra.ph", url: telegraph_url },
+            { text: heart, callback_data: "like_" + manga.id },
+          ],
           [
             {
               text: ctx.i18n.t("search_button"),

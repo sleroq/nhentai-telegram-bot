@@ -1,5 +1,6 @@
 const { randomButton } = require("./random.js");
 const { prevButton } = require("./previous");
+const { likeButton } = require("./like");
 const { openiInTelegraph } = require("./open_in_telegraph.js");
 const { fixInstantView } = require("./fix_instant_view.js");
 const { searchtips } = require("./help_searchtips.js");
@@ -7,9 +8,9 @@ const { help_back } = require("./help_back.js");
 const { saveAndGetUser } = require("../../db/saveAndGetUser");
 
 module.exports.cb_query = async function (ctx, next) {
-  await ctx.answerCbQuery().catch((err) => {
-    console.log(err);
-  });
+  // await ctx.answerCbQuery().catch((err) => {
+  //   console.log(err);
+  // });
   let query_data = ctx.update.callback_query.data;
   console.log(query_data);
 
@@ -19,6 +20,8 @@ module.exports.cb_query = async function (ctx, next) {
     await openiInTelegraph(ctx);
   } else if (query_data.match("prev")) {
     await prevButton(ctx);
+  } else if (query_data.match("like_")) {
+    await likeButton(ctx);
   } else if (query_data.match("fix_") || query_data.match("fixLater_")) {
     await fixInstantView(ctx);
   } else if (query_data.match("searchtips")) {

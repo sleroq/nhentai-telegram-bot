@@ -16,7 +16,7 @@ function sleep(ms) {
 }
 
 module.exports.fixInstantView = async function (ctx) {
-  await saveAndGetUser(ctx);
+  const user = await saveAndGetUser(ctx);
   // get manga from db
   let query_data = ctx.update.callback_query.data,
     manga_id = query_data.split("_")[1];
@@ -187,13 +187,15 @@ module.exports.fixInstantView = async function (ctx) {
   manga_db.telegraph_fixed_url = telegraph_fixed_url;
   manga_db.save();
 
-  let messageText = getMangaMessage(manga, telegraph_fixed_url, ctx.i18n),
+  let heart = user.favorites.id(manga.id) ? "♥️" : "🖤",
+    messageText = getMangaMessage(manga, telegraph_fixed_url, ctx.i18n),
     inline_keyboard = [
       [
         {
           text: "Telegra.ph",
           url: telegraph_fixed_url,
         },
+        { text: heart, callback_data: "like_" + manga.id },
       ],
     ];
   if (ctx.update.callback_query.message) {

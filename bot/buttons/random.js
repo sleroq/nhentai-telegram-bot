@@ -156,26 +156,34 @@ module.exports.randomButton = async function (ctx) {
       manga = await getRandomManga().catch((err) => {
         console.log(err);
       });
+
       if (!manga) {
         console.log("!manga - return");
         return;
       }
-      telegraph_url = await TelegraphUploadByUrls(manga).catch((err) => {
-        console.log(typeof err);
-        console.log(err.Error);
-        console.log(err.match(/FLOOD_WAIT_\d+/));
-        console.log(err);
-        // -err handling? -yes.
-      });
-
-      if (!telegraph_url) {
-        console.log("!telegraph_url - return");
-        return;
-      }
-      let isMangsSaved = await Manga.findOne({
+      console.log(manga.id);
+      let isMangaSaved = await Manga.findOne({
         id: manga.id,
       });
-      if (!isMangsSaved) {
+      if (!isMangaSaved || !isMangaSaved.telegraph_url) {
+        telegraph_url = await TelegraphUploadByUrls(manga).catch((err) => {
+          console.log(typeof err);
+          console.log(err.Error);
+          console.log(err.match(/FLOOD_WAIT_\d+/));
+          console.log(err);
+          // -err handling? -yes.
+        });
+        if (!telegraph_url) {
+          console.log("!telegraph_url - return");
+          return;
+        }
+      } else {
+        telegraph_url = isMangaSaved.telegraph_fixed_url
+          ? isMangaSaved.telegraph_fixed_url
+          : isMangaSaved.telegraph_url;
+      }
+
+      if (!isMangaSaved) {
         savedManga = new Manga({
           id: manga.id,
           title: manga.title,
@@ -183,6 +191,7 @@ module.exports.randomButton = async function (ctx) {
           tags: manga.details.tags,
           telegraph_url: telegraph_url,
           pages: manga.details.pages,
+          thumbnail: manga.thumbnails[0],
         });
         savedManga.save(function (err) {
           if (err) return console.error(err);
@@ -210,16 +219,20 @@ module.exports.randomButton = async function (ctx) {
   message.save();
   user.save();
   let messageText = getMangaMessage(manga, telegraph_url, ctx.i18n),
-    inline_keyboard = [
-      [{ text: "Telegra.ph", url: telegraph_url }],
-      [
-        {
-          text: ctx.i18n.t("search_button"),
-          switch_inline_query_current_chat: "",
-        },
-      ],
-      [{ text: ctx.i18n.t("next_button"), callback_data: "r_" + manga.id }],
-    ];
+    heart = user.favorites.id(manga.id) ? "♥️" : "🖤";
+  inline_keyboard = [
+    [
+      { text: "Telegra.ph", url: telegraph_url },
+      { text: heart, callback_data: "like_" + manga.id },
+    ],
+    [
+      {
+        text: ctx.i18n.t("search_button"),
+        switch_inline_query_current_chat: "",
+      },
+    ],
+    [{ text: ctx.i18n.t("next_button"), callback_data: "r_" + manga.id }],
+  ];
 
   // in db number of pages in 'pages' var, but in nhentai it's in 'details.pages':
   let num_of_pages = manga.details ? manga.details.pages : manga.pages;

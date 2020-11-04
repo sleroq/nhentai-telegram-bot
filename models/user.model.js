@@ -20,8 +20,13 @@ const userSchema = new mongoose.Schema({
 
   favorites: [
     new mongoose.Schema({
-      id: Number,
+      _id: { type: String, required: true },
+      title: String,
+      description: String,
       tags: [String],
+      pages: Number,
+      thumbnail: String,
+      telegraph_url: String,
     }),
   ],
   manga_history: [Number],

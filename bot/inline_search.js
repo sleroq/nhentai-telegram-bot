@@ -11,7 +11,81 @@ const Manga = require("../models/manga.model");
 
 module.exports.inlineSearch = async function (ctx) {
   let user = await saveAndGetUser(ctx);
-  if (!ctx.inlineQuery.query) {
+  if (!ctx.inlineQuery.query || ctx.inlineQuery.query.startsWith("/fav")) {
+    let searchType = /*user.search_type ? user.search_type :*/ "article",
+      favorites = user.favorites;
+    if (!favorites && !favorites[0]) {
+      return;
+    }
+    for (let i = 0; i < favorites.length; i++) {
+      /* it's in for loop and not in .map below
+           because maybe there will be promises */
+      favorites[i].message_text = getMangaMessage(
+        favorites[i],
+        favorites[i].telegraph_url,
+        ctx.i18n
+      );
+      favorites[i].description = sliceByHalf(favorites[i].title);
+      let heart = user.favorites.id(favorites[i].id) ? "♥️" : "🖤";
+      favorites[i].inline_keyboard = [
+        [
+          { text: "Telegra.ph", url: favorites[i].telegraph_url },
+          { text: heart, callback_data: "like_" + favorites[i].id },
+        ],
+      ];
+      if (favorites[i].pages > 100) {
+        inline_keyboard[0].unshift({
+          text: ctx.i18n.t("fix_button"),
+          callback_data: "fix_" + manga.id,
+        });
+      }
+    }
+
+    let results = favorites.map((manga) => ({
+      id: Math.floor(Math.random() * 10000000), //manga.id,
+      type: searchType,
+      title: manga.title
+        .split(/\[.*?\]/)
+        .join("")
+        .trim(),
+      description: manga.description,
+      thumb_url: manga.thumbnail,
+      photo_url: manga.thumbnail,
+
+      input_message_content: {
+        message_text: manga.message_text,
+        parse_mode: "HTML",
+      },
+      reply_markup: {
+        inline_keyboard: manga.inline_keyboard,
+      },
+    }));
+    results.push({
+      id: 4321,
+      type: searchType,
+      title: "Favorites",
+      description: `This is your favorites:`,
+      photo_url: "https://i.imgur.com/TmxG1Qr.png",
+      thumb_url: "https://i.imgur.com/TmxG1Qr.png",
+      input_message_content: {
+        message_text: "Tap to open favorites",
+        parse_mode: "Markdown",
+      },
+      reply_markup: {
+        inline_keyboard: [
+          [
+            {
+              text: "favorites",
+              switch_inline_query_current_chat:
+                "/fav" + Math.floor(Math.random() * 10000000),
+            },
+          ],
+        ],
+      },
+    });
+    await ctx
+      .answerInlineQuery(results.reverse())
+      .catch((err) => console.log(err));
     return;
   }
   let inlineQuery = ctx.inlineQuery.query,

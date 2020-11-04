@@ -39,9 +39,9 @@ module.exports.openiInTelegraph = async function (ctx) {
     let telegrapfLink = await TelegraphUploadByUrls(manga).catch((err) => {
       console.log(err);
     }); //upload to telegra.ph
-  if(!telegrapfLink){
-    return
-  }
+    if (!telegrapfLink) {
+      return;
+    }
     savedManga = new Manga({
       id: manga_id,
       title: manga.title,
@@ -59,7 +59,13 @@ module.exports.openiInTelegraph = async function (ctx) {
   let telegraph_url = savedManga.telegraph_fixed_url
     ? savedManga.telegraph_fixed_url
     : savedManga.telegraph_url;
-  let inline_keyboard = [[{ text: "Telegra.ph", url: telegraph_url }]],
+  let heart = user.favorites.id(manga_id) ? "♥️" : "🖤",
+    inline_keyboard = [
+      [
+        { text: "Telegra.ph", url: telegraph_url },
+        { text: heart, callback_data: "like_" + manga_id },
+      ],
+    ],
     messageText = getMangaMessage(manga, telegraph_url, ctx.i18n);
 
   user.manga_history.push(manga.id); //save to history

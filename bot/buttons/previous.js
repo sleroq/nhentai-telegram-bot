@@ -8,7 +8,7 @@ const Manga = require("../../models/manga.model");
 const Message = require("../../models/message.model");
 
 module.exports.prevButton = async function (ctx) {
-  await saveAndGetUser(ctx);
+  const user = await saveAndGetUser(ctx);
   let message = await Message.findOne({
     message_id: ctx.update.callback_query.message.message_id,
     chat_id: ctx.update.callback_query.message.from.id,
@@ -51,16 +51,20 @@ module.exports.prevButton = async function (ctx) {
       : manga.telegraph_url;
   }
   let messageText = getMangaMessage(manga, telegraph_url, ctx.i18n),
-    inline_keyboard = [
-      [{ text: "Telegra.ph", url: telegraph_url }],
-      [
-        {
-          text: ctx.i18n.t("search_button"),
-          switch_inline_query_current_chat: "",
-        },
-      ],
-      [{ text: ctx.i18n.t("next_button"), callback_data: "r_" + manga.id }],
-    ];
+    heart = user.favorites.id(manga.id) ? "♥️" : "🖤";
+  inline_keyboard = [
+    [
+      { text: "Telegra.ph", url: telegraph_url },
+      { text: heart, callback_data: "like_" + manga.id },
+    ],
+    [
+      {
+        text: ctx.i18n.t("search_button"),
+        switch_inline_query_current_chat: "",
+      },
+    ],
+    [{ text: ctx.i18n.t("next_button"), callback_data: "r_" + manga.id }],
+  ];
   // in db number of pages in 'pages' var, but in nhentai it's in 'details.pages':
   let num_of_pages = manga.details ? manga.details.pages : manga.pages;
 
