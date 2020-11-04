@@ -10,7 +10,12 @@ module.exports.likeButton = async function (ctx) {
   if (ctx.update.callback_query.message) {
     keyboard = ctx.update.callback_query.message.reply_markup.inline_keyboard;
   } else {
-    keyboard = [[{ text: "Telegra.ph", url: manga.telegraph_url }]];
+    keyboard = [
+      [
+        { text: "Telegra.ph", url: manga.telegraph_url },
+        { text: "🖤", callback_data: "like_" + manga.id },
+      ],
+    ];
   }
   if (!manga.thumbnail) {
     getManga = await nhentai.getDoujin(manga_id).catch((err) => {
@@ -39,7 +44,8 @@ module.exports.likeButton = async function (ctx) {
 
     await user.save();
     console.log("Added to favorites!");
-    keyboard[0].push({ text: "♥️", callback_data: "like_" + manga.id });
+    // keyboard[0].push({ text: "♥️", callback_data: "like_" + manga.id });
+    keyboard[0][keyboard[0].length - 1].text = "♥️";
     await ctx
       .answerCbQuery("Added to favorites!")
       .catch((err) => console.log(err));
@@ -53,7 +59,8 @@ module.exports.likeButton = async function (ctx) {
     await ctx
       .answerCbQuery("Removed from favorites!")
       .catch((err) => console.log(err));
-    keyboard[0].push({ text: "🖤", callback_data: "like_" + manga.id });
+
+    keyboard[0][keyboard[0].length - 1].text = "🖤";
     await ctx
       .editMessageReplyMarkup({ inline_keyboard: keyboard })
       .catch((err) => console.log(err));
