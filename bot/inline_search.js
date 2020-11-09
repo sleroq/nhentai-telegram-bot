@@ -84,7 +84,10 @@ module.exports.inlineSearch = async function (ctx) {
       },
     });
     await ctx
-      .answerInlineQuery(results.reverse(), 3, true)
+      .answerInlineQuery(results.reverse(), {
+        cache_time: 0,
+        is_personal: true,
+      })
       .catch((err) => console.log(err));
     return;
   }
