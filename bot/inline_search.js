@@ -63,8 +63,8 @@ module.exports.inlineSearch = async function (ctx) {
     results.push({
       id: 4321,
       type: searchType,
-      title: "Favorites",
-      description: `This is your favorites, tap here to refresh them!`,
+      title: "Favorites!",
+      description: `This is your favorites:`,
       photo_url: "https://i.imgur.com/TmxG1Qr.png",
       thumb_url: "https://i.imgur.com/TmxG1Qr.png",
       input_message_content: {
@@ -76,8 +76,7 @@ module.exports.inlineSearch = async function (ctx) {
           [
             {
               text: "favorites",
-              switch_inline_query_current_chat:
-                "/fav" + Math.floor(Math.random() * 10000000),
+              switch_inline_query_current_chat: "", ///fav" + Math.floor(Math.random() * 10000000),
             },
           ],
         ],
