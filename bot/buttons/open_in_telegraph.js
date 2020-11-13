@@ -6,7 +6,7 @@ const { saveAndGetUser } = require("../../db/saveAndGetUser");
 
 const Manga = require("../../models/manga.model");
 
-module.exports.openiInTelegraph = async function (ctx) {
+module.exports.openiInTelegraph = async function(ctx) {
   let user = await saveAndGetUser(ctx);
   ctx
     .editMessageReplyMarkup({
@@ -30,7 +30,7 @@ module.exports.openiInTelegraph = async function (ctx) {
     return;
   }
   //get manga from database
-  let savedManga = await Manga.findOne({ id: manga_id }, function (err) {
+  let savedManga = await Manga.findOne({ id: manga_id }, function(err) {
     if (err) console.log(err);
   });
 
@@ -51,7 +51,7 @@ module.exports.openiInTelegraph = async function (ctx) {
       pages: manga.details.pages,
     });
 
-    savedManga.save(function (err) {
+    savedManga.save(function(err) {
       if (err) return console.error(err);
       console.log("manga saved");
     });
@@ -72,9 +72,10 @@ module.exports.openiInTelegraph = async function (ctx) {
   user.save();
   /* if the manga is too big, the telegram might refuse to create an instant view,
      so here is a button that can magically fix that */
-
   let num_of_pages = manga.details ? manga.details.pages : manga.pages;
-  if (!manga.telegraph_fixed_url && num_of_pages > 150) {
+  let isFullColor = manga.tags ? manga.tags.includes('full color') : manga.details.tags.includes('full color');
+  if (!manga.telegraph_fixed_url && 
+  (num_of_pages > 150 || isFullColor)) {
     inline_keyboard[0].unshift({
       text: ctx.i18n.t("fix_button"),
       callback_data: "fix_" + manga.id,

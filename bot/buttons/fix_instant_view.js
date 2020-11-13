@@ -74,8 +74,8 @@ module.exports.fixInstantView = async function (ctx) {
           url: telegraph_url,
         });
       }
-      // incase we were retrying after err 10 times - stop it
-      if (attempts_counter > 9) {
+      // incase we were retrying after err 3 times - stop it
+      if (attempts_counter > 2) {
         fixing_keyboard[0].unshift({
           // button to try again:
           text: ctx.i18n.t("try_again_later"),
