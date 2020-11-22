@@ -9,6 +9,7 @@ Features:
 
 [![search.jpg](https://i.postimg.cc/XJZ7JLyN/search.jpg)](https://postimg.cc/Vr8cZjR2)
 
-3. Random manga
-4. Using a code(s)
-5. Read in telegram with instant preview from your phone
+3. Get random manga with /random manga.
+4. Open with code.
+5. Read directly in the telegram from your phone.
+6. Database - works even if nhentai is down (more then 50k doujins are saved).
