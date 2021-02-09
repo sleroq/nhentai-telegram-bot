@@ -69,7 +69,7 @@ class api {
     }
   }
   static async lastManga() {
-    const manga = await Manga.findOne({}, {}, { sort: { 'created_at' : -1 } });
+    const manga = await Manga.findOne({}, {}, { sort: { _id: -1} });
        return {
         manga: manga
     }
