@@ -88,9 +88,7 @@ module.exports.saveAndGetManga = async function (id, user) {
           updatedAt: Date.now()
         },
       }
-    ).then(() => {
-      console.log("Value Updated " + manga.id + " " + Date.now())
-    })
+    )
   }
   return manga
 }

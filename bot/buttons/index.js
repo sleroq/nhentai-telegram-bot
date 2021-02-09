@@ -12,7 +12,7 @@ module.exports.cb_query = async function (ctx, next) {
   //   console.log(err);
   // });
   let query_data = ctx.update.callback_query.data;
-  console.log(query_data);
+  // console.log(query_data);
 
   if (query_data[0] == "r") {
     await randomButton(ctx);
