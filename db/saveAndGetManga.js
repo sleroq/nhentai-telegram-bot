@@ -85,7 +85,6 @@ module.exports.saveAndGetManga = async function(id, user) {
     });
     console.log(manga.date)
   }
-  // console.log(manga)
   return manga
 }
 function saveNewManga(manga) {
