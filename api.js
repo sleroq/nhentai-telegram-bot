@@ -33,7 +33,7 @@ class api {
     const date_now = moment().format("YYYY-MM-DD");
     const date_tomorrow = moment().add(1, "d").format("YYYY-MM-DD");
     const count = await Message.countDocuments({
-      date: {
+      updatedAt: {
         $gte: date_now,
         $lt: date_tomorrow
       }
@@ -46,7 +46,7 @@ class api {
     const date_now = moment().format("YYYY-MM-DD");
     const date_tomorrow = moment().add(1, "d").format("YYYY-MM-DD");
     const count = await User.countDocuments({
-      date: {
+      createdAt: {
         $gte: date_now,
         $lt: date_tomorrow
       }
@@ -55,11 +55,24 @@ class api {
       count: { number: count, string: numberWithCommas(count) }
     }
   }
-      static async mangaToday() {
+    static async mangaToday() {
     const date_now = moment().format("YYYY-MM-DD");
     const date_tomorrow = moment().add(1, "d").format("YYYY-MM-DD");
     const count = await Manga.countDocuments({
-      date: {
+      createdAt: {
+        $gte: date_now,
+        $lt: date_tomorrow
+      }
+    });
+       return {
+      count: { number: count, string: numberWithCommas(count) }
+    }
+  }
+  static async lastManga() {
+    const date_now = moment().format("YYYY-MM-DD");
+    const date_tomorrow = moment().add(1, "d").format("YYYY-MM-DD");
+    const count = await Manga.countDocuments({
+      createdAt: {
         $gte: date_now,
         $lt: date_tomorrow
       }
