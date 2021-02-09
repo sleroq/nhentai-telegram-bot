@@ -37,6 +37,10 @@ function startListen(bot, PORT) {
     let answer = await api.mangaToday();
     res.send(answer);
   });
+  expressApp.get("/api/lastManga", async (req, res) => {
+    let answer = await api.mangaToday();
+    res.send(answer);
+  });
   expressApp.get("/api", async (req, res) => {
     let answer = await api.allinfo();
     res.send(answer);

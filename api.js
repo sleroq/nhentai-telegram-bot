@@ -69,16 +69,10 @@ class api {
     }
   }
   static async lastManga() {
-    const date_now = moment().format("YYYY-MM-DD");
-    const date_tomorrow = moment().add(1, "d").format("YYYY-MM-DD");
-    const count = await Manga.countDocuments({
-      createdAt: {
-        $gte: date_now,
-        $lt: date_tomorrow
-      }
-    });
+    const manga = await Manga.findOne({}, {}, { sort: { 'created_at' : -1 } });
+    console.log(manga)
        return {
-      count: { number: count, string: numberWithCommas(count) }
+        manga: manga
     }
   }
   static async allinfo() {
@@ -88,13 +82,15 @@ class api {
     const messagesToday = await this.messagesToday()
     const usersToday = await this.usersToday()
     const mangaToday = await this.mangaToday();
+    const lastManga = await this.lastManga();
     return {
       users_total: users.count,
       manga_total: doujins.count,
       messages_total: messagesTotal.count,
       messages_today: messagesToday.count,
       manga_today: mangaToday.count,
-      users_today: usersToday.count
+      users_today: usersToday.count,
+      last_manga: lastManga,
     }
   }
 }
