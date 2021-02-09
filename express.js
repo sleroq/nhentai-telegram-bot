@@ -34,11 +34,11 @@ function startListen(bot, PORT) {
     res.send(answer);
   });
   expressApp.get("/api/usersToday", async (req, res) => {
-    let answer = await api.mangaToday();
+    let answer = await api.usersToday();
     res.send(answer);
   });
   expressApp.get("/api/lastManga", async (req, res) => {
-    let answer = await api.mangaToday();
+    let answer = await api.lastManga();
     res.send(answer);
   });
   expressApp.get("/api", async (req, res) => {
