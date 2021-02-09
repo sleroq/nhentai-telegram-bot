@@ -29,7 +29,7 @@ module.exports.openiInTelegraph = async function (ctx) {
     return;
   }
   //get manga from database
-  let savedManga = saveAndGetManga(manga_id)
+  let savedManga = await saveAndGetManga(manga_id)
   let telegraph_url = savedManga.telegraph_fixed_url
     ? savedManga.telegraph_fixed_url
     : savedManga.telegraph_url;
