@@ -16,7 +16,9 @@ module.exports.saveAndGetManga = async function (id, user) {
       manga = await getRandomMangaLocaly(
         user.default_random_tags,
         user.ignored_random_tags
-      );
+      ).catch((err) => {
+        console.log(err);
+      });
       // console.log('got manga random localy')
     } else { // (if not localy)
       manga = await getRandomManga().catch((err) => {
@@ -30,6 +32,8 @@ module.exports.saveAndGetManga = async function (id, user) {
       console.log(manga.id);
       let isMangaSaved = await Manga.findOne({
         id: manga.id,
+      }).catch((err) => {
+        console.log(err);
       });
       if (isMangaSaved) {
         manga = isMangaSaved;
@@ -39,7 +43,9 @@ module.exports.saveAndGetManga = async function (id, user) {
       // console.log('got manga random not localy')
     }
   } else {
-    manga = await Manga.findOne({ id: id });
+    manga = await Manga.findOne({ id: id }).catch((err) => {
+        console.log(err);
+      });
     if (!manga) {
       manga = await nhentai.getDoujin(id);
       if (!manga) {
@@ -55,14 +61,18 @@ module.exports.saveAndGetManga = async function (id, user) {
         console.log("!telegraph_url");
         return;
       }
-      manga = saveNewManga(manga);
+      manga = saveNewManga(manga).catch((err) => {
+        console.log(err);
+      });
     }
     // console.log('got manga by id')
   }
 
   if (!manga.telegraph_url) {
     if (!manga.images) {
-      manga_with_pages = await nhentai.getDoujin(manga.id);
+      manga_with_pages = await nhentai.getDoujin(manga.id).catch((err) => {
+        console.log(err);
+      });
       manga.images = manga_with_pages.pages
       console.log("pages for uploading  fixed")
     }
