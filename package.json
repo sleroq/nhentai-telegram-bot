@@ -1,5 +1,5 @@
 {
-  "name": "nhentai-telegram-bot",
+  "name": "telegram-bot",
   "version": "0.0.1",
   "description": "A simple Nodejs telegram app built on millions of broken APIs, instantly up and running (not always).",
   "main": "server.js",
@@ -7,8 +7,9 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "better-sqlite3": "^7.1.0",
+    "better-sqlite3": "^7.1.2",
     "cheerio": "^1.0.0-rc.3",
+    "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "moment": "^2.26.0",

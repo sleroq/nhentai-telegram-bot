@@ -1,6 +1,5 @@
 const Telegraph = require("telegra.ph");
 const client = new Telegraph(process.env.TELEGRAPH_TOKEN);
-const db = require("../db/dbhandler.js");
 
 async function telegraphCreatePage(
   manga,
