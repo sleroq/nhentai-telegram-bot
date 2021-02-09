@@ -10,6 +10,7 @@ const mangaSchema = new Schema({
   telegraph_url: String,
   telegraph_fixed_url: String,
   fixed_pages: [String],
+  date: { type: Date, default: Date.now },
 });
 
 module.exports = model("Manga", mangaSchema);

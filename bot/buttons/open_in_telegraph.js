@@ -35,7 +35,7 @@ module.exports.openiInTelegraph = async function(ctx) {
   });
 
   if (!savedManga) {
-    //save manga to database if it's not new
+    //save manga to database if it's new
     let telegrapfLink = await TelegraphUploadByUrls(manga).catch((err) => {
       console.log(err);
     }); //upload to telegra.ph
@@ -59,6 +59,12 @@ module.exports.openiInTelegraph = async function(ctx) {
   let telegraph_url = savedManga.telegraph_fixed_url
     ? savedManga.telegraph_fixed_url
     : savedManga.telegraph_url;
+          if(!savedManga.date){
+        savedManga.date=Date.now;
+        savedManga.save(function (err) {
+        if (err) return console.error(err);
+        });
+      }
   let heart = user.favorites.id(manga_id) ? "♥️" : "🖤",
     inline_keyboard = [
       [

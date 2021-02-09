@@ -65,6 +65,12 @@ module.exports.textHandler = async function (ctx) {
         telegraph_url = manga.telegraph_fixed_url
           ? manga.telegraph_fixed_url
           : manga.telegraph_url;
+                if(!manga.date){
+        manga.date=Date.now;
+        manga.save(function (err) {
+        if (err) return console.error(err);
+        });
+      }
       }
       let message = new Message({
         chat_id: ctx.update.message.from.id,

@@ -7,11 +7,12 @@ const {
   getMangaMessage,
 } = require("../someFuncs.js");
 const { saveAndGetUser } = require("../../db/saveAndGetUser");
+// const { saveAndGetManga } = require("../../db/saveAndGetManga");
 
 const Manga = require("../../models/manga.model");
 const Message = require("../../models/message.model");
 
-module.exports.randomButton = async function (ctx) {
+module.exports.randomButton = async function(ctx) {
   let user = await saveAndGetUser(ctx);
 
   let message = await Message.findOne({
@@ -48,12 +49,6 @@ module.exports.randomButton = async function (ctx) {
   } else {
     message.current += 1;
   }
-  // console.log(
-  //   "message.history.length: " +
-  //     message.history.length +
-  //     "   message.current: " +
-  //     message.current
-  // );
 
   let manga, telegraph_url;
   /* if user previously was clicking back button and he is not at the and of history
@@ -61,6 +56,10 @@ module.exports.randomButton = async function (ctx) {
              usr                    (current==1)
   */
   if (message.current < message.history.length) {
+    // manga = await saveAndGetManga();
+    //       telegraph_url = manga.telegraph_fixed_url
+    //       ? manga.telegraph_fixed_url
+    //       : manga.telegraph_url;
     manga = await Manga.findOne({ id: message.history[message.current] });
     // incase manga|telegraph_url somehow disappeared from db - get_it() & save_it():
     if (!manga || !manga.telegraph_url) {
@@ -84,7 +83,7 @@ module.exports.randomButton = async function (ctx) {
         telegraph_url: telegraph_url,
         pages: manga.details.pages,
       });
-      savedManga.save(function (err) {
+      savedManga.save(function(err) {
         if (err) return console.error(err);
         console.log("manga saved");
       });
@@ -146,11 +145,19 @@ module.exports.randomButton = async function (ctx) {
           return;
         }
         manga.telegraph_url = telegraph_url;
-        manga.save(function (err) {
+        manga.save(function(err) {
           if (err) return console.error(err);
           console.log("manga saved");
         });
       }
+      // incase manga was saved without date
+      if (!manga.date) {
+        manga.date = Date.now;
+        manga.save(function(err) {
+          if (err) return console.error(err);
+        });
+      }
+      console.log(manga.date)
     } else {
       // (if not localy)
       manga = await getRandomManga().catch((err) => {
@@ -193,7 +200,7 @@ module.exports.randomButton = async function (ctx) {
           pages: manga.details.pages,
           thumbnail: manga.thumbnails[0],
         });
-        savedManga.save(function (err) {
+        savedManga.save(function(err) {
           if (err) return console.error(err);
           console.log("manga saved");
         });

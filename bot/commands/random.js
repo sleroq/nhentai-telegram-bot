@@ -44,6 +44,16 @@ module.exports.randomCommand = async function (ctx) {
         console.log("manga saved");
       });
     }
+          
+      if(!manga.date){
+        manga.date=Date.now;
+        manga.save(function (err) {
+        if (err) return console.error(err);
+        console.log("manga saved");
+        });
+      }
+      // console.log(manga.date)
+
   } else {
     manga = await getRandomManga();
     if (!manga) {

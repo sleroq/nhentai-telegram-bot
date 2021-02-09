@@ -42,17 +42,46 @@ class api {
       count: { number: count, string: numberWithCommas(count) }
     }
   }
+    static async usersToday() {
+    const date_now = moment().format("YYYY-MM-DD");
+    const date_tomorrow = moment().add(1, "d").format("YYYY-MM-DD");
+    const count = await User.countDocuments({
+      date: {
+        $gte: date_now,
+        $lt: date_tomorrow
+      }
+    });
+       return {
+      count: { number: count, string: numberWithCommas(count) }
+    }
+  }
+      static async mangaToday() {
+    const date_now = moment().format("YYYY-MM-DD");
+    const date_tomorrow = moment().add(1, "d").format("YYYY-MM-DD");
+    const count = await Manga.countDocuments({
+      date: {
+        $gte: date_now,
+        $lt: date_tomorrow
+      }
+    });
+       return {
+      count: { number: count, string: numberWithCommas(count) }
+    }
+  }
   static async allinfo() {
     const users = await this.countUsers()
     const doujins = await this.countManga()
     const messagesTotal = await this.countMessages()
     const messagesToday = await this.messagesToday()
+    const usersToday = await this.usersToday()
+    const mangaToday = await this.mangaToday();
     return {
       users_total: users.count,
       manga_total: doujins.count,
       messages_total: messagesTotal.count,
-      messages_today: messagesToday.count
-
+      messages_today: messagesToday.count,
+      manga_today: mangaToday.count,
+      users_today: usersToday.count
     }
   }
 }
