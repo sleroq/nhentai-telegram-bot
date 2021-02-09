@@ -3,8 +3,8 @@ const nhentai = require("../../nhentai");
 const { TelegraphUploadByUrls } = require("../telegraph.js");
 const { getMangaMessage } = require("../someFuncs.js");
 const { saveAndGetUser } = require("../../db/saveAndGetUser");
+const { saveAndGetManga } = require("../../db/saveAndGetManga");
 
-const Manga = require("../../models/manga.model");
 const Message = require("../../models/message.model");
 
 module.exports.prevButton = async function (ctx) {
@@ -19,37 +19,12 @@ module.exports.prevButton = async function (ctx) {
   }
   message.current -= 1;
   message.save();
-  // console.log(message.current);
-  // console.log(message.history);
 
-  let manga = await Manga.findOne({ id: message.history[message.current] }),
-    telegraph_url;
+  let manga = await saveAndGetManga(message.history[message.current]);
+  let telegraph_url = manga.telegraph_fixed_url
+    ? manga.telegraph_fixed_url
+    : manga.telegraph_url;
 
-  // incase previous manga somehow disappeared from db - i've foreseen this too:
-  if (!manga) {
-    manga = await nhentai.getDoujin(message.history[message.current]);
-    if (!manga) {
-      console.log("!manga");
-      return;
-    }
-    telegraph_url = await TelegraphUploadByUrls(manga);
-    let savedManga = new Manga({
-      id: manga.id,
-      title: manga.title,
-      description: manga.language,
-      tags: manga.details.tags,
-      telegraph_url: telegraph_url,
-      pages: manga.details.pages,
-    });
-    savedManga.save(function (err) {
-      if (err) return console.error(err);
-      console.log("manga saved");
-    });
-  } else {
-    telegraph_url = manga.telegraph_fixed_url
-      ? manga.telegraph_fixed_url
-      : manga.telegraph_url;
-  }
   let messageText = getMangaMessage(manga, telegraph_url, ctx.i18n),
     heart = user.favorites.id(manga.id) ? "♥️" : "🖤";
   inline_keyboard = [

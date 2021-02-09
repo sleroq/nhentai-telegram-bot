@@ -1,12 +1,11 @@
 const nhentai = require("../../nhentai");
 
 const { getMangaMessage } = require("../someFuncs.js");
-const { TelegraphUploadByUrls } = require("../telegraph.js");
 const { saveAndGetUser } = require("../../db/saveAndGetUser");
+const { saveAndGetManga } = require("../../db/saveAndGetManga");
 
-const Manga = require("../../models/manga.model");
 
-module.exports.openiInTelegraph = async function(ctx) {
+module.exports.openiInTelegraph = async function (ctx) {
   let user = await saveAndGetUser(ctx);
   ctx
     .editMessageReplyMarkup({
@@ -30,41 +29,11 @@ module.exports.openiInTelegraph = async function(ctx) {
     return;
   }
   //get manga from database
-  let savedManga = await Manga.findOne({ id: manga_id }, function(err) {
-    if (err) console.log(err);
-  });
-
-  if (!savedManga) {
-    //save manga to database if it's new
-    let telegrapfLink = await TelegraphUploadByUrls(manga).catch((err) => {
-      console.log(err);
-    }); //upload to telegra.ph
-    if (!telegrapfLink) {
-      return;
-    }
-    savedManga = new Manga({
-      id: manga_id,
-      title: manga.title,
-      description: manga.language,
-      tags: manga.details.tags,
-      telegraph_url: telegrapfLink,
-      pages: manga.details.pages,
-    });
-
-    savedManga.save(function(err) {
-      if (err) return console.error(err);
-      console.log("manga saved");
-    });
-  }
+  let savedManga = saveAndGetManga(manga_id)
   let telegraph_url = savedManga.telegraph_fixed_url
     ? savedManga.telegraph_fixed_url
     : savedManga.telegraph_url;
-          if(!savedManga.date){
-        savedManga.date=Date.now;
-        savedManga.save(function (err) {
-        if (err) return console.error(err);
-        });
-      }
+
   let heart = user.favorites.id(manga_id) ? "♥️" : "🖤",
     inline_keyboard = [
       [
@@ -80,8 +49,8 @@ module.exports.openiInTelegraph = async function(ctx) {
      so here is a button that can magically fix that */
   let num_of_pages = manga.details ? manga.details.pages : manga.pages;
   let isFullColor = manga.tags ? manga.tags.includes('full color') : manga.details.tags.includes('full color');
-  if (!manga.telegraph_fixed_url && 
-  (num_of_pages > 150 || isFullColor)) {
+  if (!manga.telegraph_fixed_url &&
+    (num_of_pages > 150 || isFullColor)) {
     inline_keyboard[0].unshift({
       text: ctx.i18n.t("fix_button"),
       callback_data: "fix_" + manga.id,

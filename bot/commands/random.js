@@ -6,80 +6,19 @@ const {
   getMangaMessage,
 } = require("../someFuncs.js");
 const { saveAndGetUser } = require("../../db/saveAndGetUser");
+const { saveAndGetManga } = require("../../db/saveAndGetManga");
 
-const Manga = require("../../models/manga.model");
 const Message = require("../../models/message.model");
 
 module.exports.randomCommand = async function (ctx) {
   ctx.reply("use @nhentai_mangabot instead")
   let user = await saveAndGetUser(ctx);
-  let savedManga, telegraph_url, manga;
-  if (user.random_localy) {
-    manga = await getRandomMangaLocaly(
-      user.default_random_tags,
-      user.ignored_random_tags
-    );
-    if (manga == null) {
-      await ctx.reply("cant find anything").catch((err) => {
-        console.log(err);
-      });
-      return;
-    }
-    telegraph_url = manga.telegraph_fixed_url
-      ? manga.telegraph_fixed_url
-      : manga.telegraph_url;
-    if (!telegraph_url) {
-      telegraph_url = await TelegraphUploadByUrls(manga).catch((err) => {
-        console.log(typeof err);
-        console.log(err.Error);
-        console.log(err.match(/FLOOD_WAIT_\d+/));
-        console.log(err);
-      });
-      if (!telegraph_url) {
-        console.log("!telegraph_url");
-        return;
-      }
-      manga.telegraph_url = telegraph_url;
-      manga.save(function (err) {
-        if (err) return console.error(err);
-        console.log("manga saved");
-      });
-    }
-          
-      if(!manga.date){
-        manga.date=Date.now;
-        manga.save(function (err) {
-        if (err) return console.error(err);
-        console.log("manga saved");
-        });
-      }
-      // console.log(manga.date)
+  let telegraph_url, manga;
 
-  } else {
-    manga = await getRandomManga();
-    if (!manga) {
-      console.log("!manga");
-      return;
-    }
-    telegraph_url = await TelegraphUploadByUrls(manga).catch((err) => {
-      console.log(typeof err);
-      console.log(err.Error);
-      console.log(err.match(/FLOOD_WAIT_\d+/));
-      console.log(err);
-    });
-    if (!telegraph_url) {
-      console.log("!telegraph_url");
-      return;
-    }
-    savedManga = new Manga({
-      id: manga.id,
-      title: manga.title,
-      description: manga.language,
-      tags: manga.details.tags,
-      telegraph_url: telegraph_url,
-      pages: manga.details.pages,
-    });
-  }
+  manga = await saveAndGetManga(undefined, user);
+  telegraph_url = manga.telegraph_fixed_url
+    ? manga.telegraph_fixed_url
+    : manga.telegraph_url;
 
   message = new Message({
     chat_id: ctx.update.message.from.id,

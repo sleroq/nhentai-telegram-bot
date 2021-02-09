@@ -7,8 +7,8 @@ const {
 const { getMangaMessage } = require("../someFuncs.js");
 const { saveAndGetUser } = require("../../db/saveAndGetUser");
 const { uploadByUrl } = require("telegraph-uploader");
+const { saveAndGetManga } = require("../../db/saveAndGetManga");
 
-const Manga = require("../../models/manga.model");
 const Message = require("../../models/message.model");
 
 function sleep(ms) {
@@ -23,9 +23,8 @@ module.exports.fixInstantView = async function (ctx) {
   if (!manga_id) {
     return;
   }
-  let manga_db = await Manga.findOne({
-    id: manga_id,
-  });
+
+  let manga_db = await saveAndGetManga(manga_id)
 
   let telegraph_fixed_url = manga_db.telegraph_fixed_url,
     telegraph_url = manga_db.telegraph_url;
@@ -36,22 +35,6 @@ module.exports.fixInstantView = async function (ctx) {
       console.log(err);
     });
     // save manga if it's not already
-    if (!manga_db) {
-      //if this fix fails we will atleast have prev url
-      telegraph_url = await TelegraphUploadByUrls(manga).catch((err) => {
-        console.log(err.status);
-      });
-
-      manga_db = new Manga({
-        id: manga.id,
-        title: manga.title,
-        description: manga.language,
-        telegraph_url: telegraph_url,
-        tags: manga.details.tags,
-        pages: manga.details.pages,
-      });
-      manga_db.save();
-    }
 
     let pages = manga.pages,
       telegraph_urls = [],
@@ -119,9 +102,9 @@ module.exports.fixInstantView = async function (ctx) {
       let new_url = await uploadByUrl(pages[i]).catch(async (err) => {
         console.log(
           "err in uploading image heppened on try number " +
-            attempts_counter +
-            "\nerr: " +
-            err
+          attempts_counter +
+          "\nerr: " +
+          err
         );
         i -= 1;
         attempts_counter += 1;

@@ -5,9 +5,9 @@ const {
   sliceByHalf,
   getMangaMessage,
 } = require("./someFuncs.js");
-const { TelegraphUploadByUrls } = require("./telegraph.js");
 const { saveAndGetUser } = require("../db/saveAndGetUser");
-const Manga = require("../models/manga.model");
+const { saveAndGetManga } = require("../db/saveAndGetManga");
+
 
 module.exports.inlineSearch = async function (ctx) {
   let user = await saveAndGetUser(ctx);
@@ -155,42 +155,18 @@ module.exports.inlineSearch = async function (ctx) {
       });
 
     // check if we have this manga in db:
-    let manga_db = await Manga.findOne({ id: manga_id });
+    let manga_db = await saveAndGetManga(manga_id);
+    telegraph_url = manga_db.telegraph_fixed_url
+    ? manga_db.telegraph_fixed_url
+    : manga_db.telegraph_url;
+
     if (!manga && !manga_db) {
       result.push(nothingIsFound_result);
       await ctx.answerInlineQuery(result).catch((err) => console.log(err));
       return;
     }
     // save it if we don't:
-    if (!manga_db) {
-      telegraph_url = await TelegraphUploadByUrls(manga).catch((err) => {
-        console.log(err);
-      });
-      if (!telegraph_url) {
-        console.log("!telegraph_url - return");
-        return;
-      }
-      manga_db = new Manga({
-        id: manga.id,
-        title: manga.title,
-        description: manga.language,
-        tags: manga.details.tags,
-        telegraph_url: telegraph_url,
-        pages: manga.details.pages,
-      });
-      manga_db.save(function (err) {
-        if (err) return console.error(err);
-        console.log("manga saved");
-      });
-    } else {
-      telegraph_url = manga_db.telegraph_fixed_url
-        ? manga_db.telegraph_fixed_url
-        : manga_db.telegraph_url;
-    }
-    if (!telegraph_url) {
-      console.log("!telegraph_url (from db)- return");
-      return;
-    }
+
     let messageText = getMangaMessage(manga, telegraph_url, ctx.i18n),
       inline_keyboard = [[{ text: "Telegra.ph", url: telegraph_url }]];
     if (!manga_db.telegraph_fixed_url && manga.details.pages > 100) {
