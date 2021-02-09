@@ -27,13 +27,15 @@ async function telegraphCreatePage(
   );
 }
 async function TelegraphUploadByUrls(manga) {
-  let pages = manga.pages;
+  let pages = manga.images ? manga.images  : manga.pages;
+  console.log(pages + " --- pages")
   let result = await telegraphCreatePage(manga, pages).catch((err) => {
     console.log(err);
   });
   if (!result) {
     return;
   }
+  console.log(result.url + " --- result.url")
   return result.url;
 }
 module.exports = {
