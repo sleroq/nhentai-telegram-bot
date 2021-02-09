@@ -9,7 +9,6 @@ const { saveAndGetManga } = require("../../db/saveAndGetManga");
 const Message = require("../../models/message.model");
 
 module.exports.randomButton = async function (ctx) {
-  ctx.reply("use @nhentai_mangabot instead")
   let user = await saveAndGetUser(ctx);
 
   let message = await Message.findOne({
