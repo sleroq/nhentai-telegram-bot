@@ -7,7 +7,7 @@ const {
   getRandomMangaLocaly
 } = require("../bot/someFuncs");
 
-module.exports.saveAndGetManga = async function(id, user) {
+module.exports.saveAndGetManga = async function (id, user) {
   let manga;
 
   if (!id) {  // RANDOM NEW MANGA
@@ -73,16 +73,24 @@ module.exports.saveAndGetManga = async function(id, user) {
       console.log("!telegraph_url");
       return;
     }
-    manga.save(function(err) {
+    manga.save(function (err) {
       if (err) return console.error(err);
     });
   }
-  if (!manga.date) {
-    manga.date = Date.now();
-    manga.save(function(err) {
-      if (err) return console.error(err);
-    });
-    console.log(manga.date)
+  // update old manga to new date format
+  if (!manga.createdAt || !manga.updatedAt) {
+    Manga.updateOne(
+      { id: manga.id },
+      {
+        $set:
+        {
+          createdAt: Date.now(),
+          updatedAt: Date.now()
+        },
+      }
+    ).then(() => {
+      console.log("Value Updated " + manga.id + " " + Date.now())
+    })
   }
   return manga
 }
@@ -97,7 +105,7 @@ function saveNewManga(manga) {
     telegraph_url: manga.telegraph_url,
     pages: manga.details.pages,
   });
-  manga.save(function(err) {
+  manga.save(function (err) {
     if (err) return console.error(err);
     console.log("manga saved");
   });
