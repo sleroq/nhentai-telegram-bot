@@ -9,7 +9,6 @@ const {
 
 module.exports.saveAndGetManga = async function(id, user) {
   let manga;
-  let telegraph_url;
 
   if (!id) {  // RANDOM NEW MANGA
     if (user.random_localy) {
@@ -18,7 +17,7 @@ module.exports.saveAndGetManga = async function(id, user) {
         user.default_random_tags,
         user.ignored_random_tags
       );
-      console.log('got manga random localy')
+      // console.log('got manga random localy')
     } else { // (if not localy)
       manga = await getRandomManga().catch((err) => {
         console.log(err);
@@ -37,7 +36,7 @@ module.exports.saveAndGetManga = async function(id, user) {
       } else {
         manga = saveNewManga(manga)
       }
-      console.log('got manga random not localy')
+      // console.log('got manga random not localy')
     }
   } else {
     manga = await Manga.findOne({ id: id });
@@ -58,7 +57,7 @@ module.exports.saveAndGetManga = async function(id, user) {
       }
       manga = saveNewManga(manga);
     }
-    console.log('got manga by id')
+    // console.log('got manga by id')
   }
 
   if (!manga.telegraph_url) {
