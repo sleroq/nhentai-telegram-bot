@@ -31,7 +31,6 @@ const userSchema = new mongoose.Schema({
   ],
   manga_history: [Number],
   search_history: [String],
-  date: { type: Date, default: Date.now },
 },  { timestamps: true });
 
 module.exports = mongoose.model("User", userSchema);
