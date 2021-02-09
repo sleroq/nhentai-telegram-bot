@@ -6,8 +6,18 @@ const cors = require('cors');
 
 function startListen(bot, PORT) {
   const port = PORT || 3000;
+  let current_url
+  if(process.env.REPL_URL2){
+    setInterval(()=>{
+      current_url = current_url==process.env.REPL_URL ? process.env.REPL_URL2 : process.env.REPL_URL
+      console.log("url changed ---" + current_url)
+      bot.telegram.setWebhook(current_url + "/secret-path");
+    }, 100000)
 
-  bot.telegram.setWebhook(process.env.REPL_URL + "/secret-path");
+  }else{
+    bot.telegram.setWebhook(process.env.REPL_URL + "/secret-path");
+  }
+  
   expressApp.use(cors())
   expressApp.use(bot.webhookCallback("/secret-path"));
   expressApp.get("/", (req, res) => {
