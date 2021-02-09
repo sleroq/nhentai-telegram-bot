@@ -6,6 +6,6 @@ const messageSchema = new Schema({
   current: Number,
   history: [Number],
   date: { type: Date, default: Date.now },
-});
+},  { timestamps: true });
 
 module.exports = model("Message", messageSchema);
