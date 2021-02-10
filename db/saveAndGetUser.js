@@ -16,12 +16,14 @@ module.exports.saveAndGetUser = async function (ctx) {
       search_type: "photo",
       random_localy: true,
       can_repeat_in_random: true,
-    });
+    })
 
     await user.save(function (err) {
       if (err) return console.error(err);
       console.log("user saved");
-    });
+    }).catch((err) => {
+      console.log(err);
+    });;
   }
   if (user.language_code == "ru") {
     ctx.i18n.locale("ru");

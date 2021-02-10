@@ -11,5 +11,5 @@ module.exports.help = async function (ctx) {
         ],
       ],
     },
-  });
+  }).catch((err)=>{return})
 };

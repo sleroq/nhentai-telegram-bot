@@ -42,6 +42,13 @@ const { inlineSearch } = require("./bot/inline_search.js");
 const { textHandler } = require("./bot/commands/textHandler.js");
 
 bot.start(async (ctx) => {
+  if (ctx.message.date < 1612970000){
+    // ctx.reply('too many :((((((\ntry to use search')
+    console.log("return " + ctx.message.date)
+    return
+  }else{
+    console.log(ctx.message.date + "not return")
+  }
   const user = await saveAndGetUser(ctx);
   let message = ctx.i18n.t("greeting");
   ctx.reply(message, {
@@ -51,40 +58,93 @@ bot.start(async (ctx) => {
         [{ text: ctx.i18n.t("random_button"), callback_data: "r" }],
       ],
     },
-  });
+  }).catch((err) => {
+    console.log(err);
+    return
+  });;
 });
 
 bot.help(async (ctx) => {
+  // if (ctx.message.date < 1612990000){
+    
+  //   console.log("return " + ctx.message.date)
+  //   return
+  // }else{
+  //   console.log(ctx.message.date + "not return")
+  // }
   await help(ctx);
 });
 
 bot.command("code", async (ctx) => {
-  await ctx.reply("Just send me a code");
+  // if (ctx.message.date < 1612990000){
+    
+  //   console.log("return " + ctx.message.date)
+  //   return
+  // }else{
+  //   console.log(ctx.message.date + "not return")
+  // }
+  await ctx.reply("Just send me a code").catch((err)=>{return});
 });
 bot.command("rand", async (ctx) => {
+  if (ctx.message.date < 1612990000){
+    
+    console.log("return " + ctx.message.date)
+    return
+  }else{
+    console.log(ctx.message.date + "not return")
+  }
   await randomCommand(ctx);
 });
 bot.command("zip", async (ctx) => {
+  // if (ctx.message.date < 1612990000){
+    
+  //   console.log("return " + ctx.message.date)
+  //   return
+  // }else{
+  //   console.log(ctx.message.date + "not return")
+  // }
   await dlzip(ctx);
 });
 bot.command("id", async (ctx) => {
+  // if (ctx.message.date < 1612990000){
+    
+  //   console.log("return " + ctx.message.date)
+  //   return
+  // }else{
+  //   console.log(ctx.message.date + "not return")
+  // }
   await ctx.reply("`" + ctx.from.id + "`");
 });
 bot.command("settings", async (ctx) => {
+  // if (ctx.message.date < 1612990000){
+    
+  //   console.log("return " + ctx.message.date)
+  //   return
+  // }else{
+  //   console.log(ctx.message.date + "not return")
+  // }
   await settings(ctx);
 });
 
 bot.on("callback_query", async (ctx, next) => {
+
   await cb_query(ctx);
 });
 bot.on("inline_query", async (ctx) => {
   await inlineSearch(ctx);
 });
 bot.on("text", async (ctx, next) => {
+  if (ctx.message.date < 1612990000){
+    
+    console.log("return " + ctx.message.date)
+    return
+  }else{
+    console.log(ctx.message.date + "not return")
+  }
   await textHandler(ctx);
 });
 
-if (process.env.REPL_URL) {
+if (false){//process.env.REPL_URL) {
   require("./express.js").startListen(bot, process.env.PORT);
 } else {
   bot.telegram.deleteWebhook();

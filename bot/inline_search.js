@@ -36,7 +36,7 @@ module.exports.inlineSearch = async function (ctx) {
       if (favorites[i].pages > 100) {
         inline_keyboard[0].unshift({
           text: ctx.i18n.t("fix_button"),
-          callback_data: "fix_" + manga.id,
+          callback_data: "fix_" + favorites[i].id,
         });
       }
     }

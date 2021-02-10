@@ -15,7 +15,9 @@ module.exports.dlzip = async function (ctx) {
   if (!mangaId) {
     await ctx.reply("Yuo have to specify a code: `/zip 234638`", {
       parse_mode: "Markdown",
-    });
+    }).catch((err)=>{
+      return
+    })
     return;
   }
   let manga = await nhentai.getDoujin(mangaId).catch((err) => {

@@ -169,7 +169,7 @@ module.exports.fixInstantView = async function (ctx) {
   // save new url ofcourse:
   manga_db.telegraph_fixed_url = telegraph_fixed_url;
   manga_db.save();
-
+  
   let heart = user.favorites.id(manga.id) ? "♥️" : "🖤",
     messageText = getMangaMessage(manga, telegraph_fixed_url, ctx.i18n),
     inline_keyboard = [

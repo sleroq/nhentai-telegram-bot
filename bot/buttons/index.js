@@ -12,7 +12,18 @@ module.exports.cb_query = async function (ctx, next) {
   //   console.log(err);
   // });
   let query_data = ctx.update.callback_query.data;
-  // console.log(query_data);
+  console.log(query_data);
+// console.log("ctx.update.callback_query")
+// console.log()
+if(ctx.update.callback_query && ctx.update.callback_query.date && ctx.update.callback_query < 1612959500){
+  return
+}
+// console.log(ctx.update.callback_query)
+// console.log("ctx.update.callback_query")
+if(ctx.update.callback_query.date < 1612958359)
+{
+  return
+}
 
   if (query_data[0] == "r") {
     await randomButton(ctx);

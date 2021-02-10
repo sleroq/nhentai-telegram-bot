@@ -27,6 +27,7 @@ async function telegraphCreatePage(
   );
 }
 async function TelegraphUploadByUrls(manga) {
+  console.log("start uploaing url")
   let pages = manga.images ? manga.images  : manga.pages;
   let result = await telegraphCreatePage(manga, pages).catch((err) => {
     console.log(err);
