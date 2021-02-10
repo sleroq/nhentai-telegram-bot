@@ -35,11 +35,14 @@ module.exports.textHandler = async function (ctx) {
         console.log("no manga in textHandler, continue")
         continue;
       }
-
+    
       telegraph_url = manga.telegraph_fixed_url
         ? manga.telegraph_fixed_url
         : manga.telegraph_url;
-
+  if(!telegraph_url){
+                console.log("no telegraph url in textHandler, continue")
+        continue;
+      }
       let message = new Message({
         chat_id: ctx.update.message.from.id,
         message_id: ctx.update.message.message_id,
