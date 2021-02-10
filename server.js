@@ -134,13 +134,13 @@ bot.on("inline_query", async (ctx) => {
   await inlineSearch(ctx);
 });
 bot.on("text", async (ctx, next) => {
-  if (ctx.message.date < 1613000000){
+  // if (ctx.message.date < 1613000000){
     
-    console.log("return " + ctx.message.date + " text")
-    return
-  }else{
-    console.log(ctx.message.date + "not return")
-  }
+  //   console.log("return " + ctx.message.date + " text")
+  //   return
+  // }else{
+  //   console.log(ctx.message.date + "not return")
+  // }
   await textHandler(ctx);
 });
 
@@ -158,9 +158,7 @@ if (process.env.REPL_URL) {
   bot.polling.offset = clearOldMessages(bot).then((x)=>{console.log(x); return x})
   require("./express.js").startListen(bot, process.env.PORT);
 } else {
-
-bot.polling.offset = clearOldMessages(bot).then((x)=>{console.log(x); return x})
-
   bot.telegram.deleteWebhook();
+  bot.polling.offset = clearOldMessages(bot).then((x)=>{console.log(x); return x})
   bot.launch().then(() => console.log("Bot is working!"));
 }

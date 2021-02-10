@@ -30,10 +30,9 @@ module.exports.textHandler = async function (ctx) {
 
       manga = await saveAndGetManga(manga_id).catch(err=>{
         console.log(err)
-        console.log("got err in textHandler, continue")
-        continue
       })
       if(!manga){
+        console.log("no manga in textHandler, continue")
         continue;
       }
 
