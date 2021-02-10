@@ -13,6 +13,7 @@ module.exports.inlineSearch = async function (ctx) {
   let user = await saveAndGetUser(ctx);
 
   // favorites: 
+
   if (!ctx.inlineQuery.query || ctx.inlineQuery.query.startsWith("/fav")) {
     let searchType = "article",
       favorites = user.favorites,
@@ -62,7 +63,7 @@ module.exports.inlineSearch = async function (ctx) {
         ],
       ];
       let isFullColor = manga.tags.includes('full color');
-      if (!manga.telegraph_fixed_url && (favorites[i].pages > 100 || isFullColor )) {
+      if (!manga.telegraph_fixed_url && (favorites[i].pages > 100 || isFullColor)) {
         favorites[i].inline_keyboard[0].unshift({
           text: ctx.i18n.t("fix_button"),
           callback_data: "fix_" + favorites[i].id,
@@ -115,40 +116,12 @@ module.exports.inlineSearch = async function (ctx) {
       .catch((err) => console.log(err));
     return;
   }
-  let inlineQuery = ctx.inlineQuery.query,
-    pageNumber = 1,
-    pageMatch = inlineQuery.match(/\/p\d+/g) // if page specified
-      ? inlineQuery.match(/\/p\d+/g)[0]
-      : undefined,
-    isPageModified = false,
-    searchType = user.search_type ? user.search_type : "article";
-  if (pageMatch) {
-    // ("@bot /p35 smth")
-    isPageModified = true; // need this to add tips based on user's query
-    pageNumber = pageMatch.slice(2);
-    inlineQuery = inlineQuery.replace(pageMatch, "").trim();
-  }
-  let sortingParametr = user.search_sorting ? user.search_sorting : "date",
-    sortMatch = inlineQuery.match(/\/s[pn]/) // if results order specified
-      ? inlineQuery.match(/\/s[pn]/)[0]
-      : undefined,
-    isSearchModified = false;
-  if (sortMatch) {
-    // ("@bot /sp smth")
-    isSearchModified = true; // need this to add tips based on user's query
-    sortingParametr = sortMatch.slice(2) == "p" ? "popular" : "date";
-    inlineQuery = inlineQuery.replace(sortMatch, "").trim();
-  }
-  // console.log(
-  //   'search query="' +
-  //     inlineQuery +
-  //     '" page=' +
-  //     pageNumber +
-  //     " sorting by " +
-  //     sortingParametr
-  // );
+
+  // search:
+
+  // variables
   const nothingIsFound_result = {
-    id: 43210,
+    id: 6969696969,
     type: searchType,
     title: "Nothing is found ¯_(ツ)_/¯",
     description: ``,
@@ -171,39 +144,70 @@ module.exports.inlineSearch = async function (ctx) {
     },
   };
 
+  let inlineQuery = ctx.inlineQuery.query,
+    pageNumber = 1,
+    pageMatch = inlineQuery.match(/\/p\d+/g) // check if page specified
+      ? inlineQuery.match(/\/p\d+/g)[0]
+      : undefined,
+    isPageModified = false,
+    searchType = user.search_type ? user.search_type : "article";
+  if (pageMatch) { // for example "@bot /p35 smth" 
+    isPageModified = true; // need this to add tips based on user's query
+    pageNumber = pageMatch.slice(2);
+    inlineQuery = inlineQuery.replace(pageMatch, "").trim();
+  }
+  let sortingParametr = user.search_sorting ? user.search_sorting : "date",
+    sortMatch = inlineQuery.match(/\/s[pn]/) // check if results order specified
+      ? inlineQuery.match(/\/s[pn]/)[0]
+      : undefined,
+    isSearchModified = false;
+  if (sortMatch) { // for example "@bot /sp smth"
+    isSearchModified = true; // need this to add tips based on user's query
+    sortingParametr = sortMatch.slice(2) == "p" ? "popular" : "date";
+    inlineQuery = inlineQuery.replace(sortMatch, "").trim();
+  }
+  console.log(
+    'Someone is searching for "' +
+    inlineQuery +
+    '" at page ' +
+    pageNumber +
+    'and sorting by ' +
+    sortingParametr
+  );
+
+  // search for id if there is only numbers in query
   if (inlineQuery.match(/\d+/) && inlineQuery.replace(/\d+/, "").trim() == "") {
     let manga_id = inlineQuery.match(/\d+/)[0];
     let result = [],
       telegraph_url,
-      manga = await nhentai.getDoujin(manga_id).catch((err) => {
-        console.log(err.status);
-      });
+      manga = await saveAndGetManga(manga_id);
 
-    // check if we have this manga in db:
-    let manga_db = await saveAndGetManga(manga_id);
-    telegraph_url = manga_db.telegraph_fixed_url
-      ? manga_db.telegraph_fixed_url
-      : manga_db.telegraph_url;
+    telegraph_url = manga.telegraph_fixed_url
+      ? manga.telegraph_fixed_url
+      : manga.telegraph_url;
 
-    if (!manga && !manga_db) {
+    // if nothing is found
+    if (!manga) {
       result.push(nothingIsFound_result);
       await ctx.answerInlineQuery(result).catch((err) => console.log(err));
       return;
     }
-    // save it if we don't:
 
     let messageText = getMangaMessage(manga, telegraph_url, ctx.i18n),
       inline_keyboard = [[{ text: "Telegra.ph", url: telegraph_url }]];
-    if (!manga_db.telegraph_fixed_url && manga.details.pages > 100) {
+
+    let isFullColor = manga.tags ? manga.tags.includes('full color') : manga.details.tags.includes('full color');
+    if (!manga.telegraph_fixed_url && (num_of_pages > 100 || isFullColor)) {
       inline_keyboard[0].unshift({
         text: ctx.i18n.t("fix_button"),
         callback_data: "fix_" + manga.id,
       });
     }
     let description;
+    // show manga language in the description if any
     if (
       Array.isArray(manga.details.languages) &&
-      manga.details.languages.length
+      manga.details.languages.length !== 0
     ) {
       description = "";
       for (let t = 0; t < manga.details.languages.length - 1; t++) {
@@ -212,6 +216,9 @@ module.exports.inlineSearch = async function (ctx) {
     } else {
       description = sliceByHalf(manga.title);
     }
+    let thumbnail = Array.isArray(manga.thumbnails) && manga.thumbnails[0]
+      ? manga.thumbnails[0]
+      : undefined;
     result.push({
       id: manga.id,
       type: searchType,
@@ -220,10 +227,7 @@ module.exports.inlineSearch = async function (ctx) {
         .join("")
         .trim(),
       description: description,
-      thumb_url:
-        Array.isArray(manga.thumbnails) && manga.thumbnails[0]
-          ? manga.thumbnails[0]
-          : undefined,
+      thumb_url: thumbnail,
       photo_url: manga.pages[0] ? manga.pages[0] : undefined,
       input_message_content: {
         message_text: messageText,
@@ -244,11 +248,12 @@ module.exports.inlineSearch = async function (ctx) {
   const search = await nhentai
     .search(inlineQuery, pageNumber, sortingParametr)
     .catch((err) => {
+      console.log("search error in inline_search");
       console.log(err);
     });
   if (!search) {
     // if err or something
-    console.log("!search - return");
+    console.log("!search in inline_search - return");
     return;
   }
   let books = search.results;
@@ -302,8 +307,9 @@ module.exports.inlineSearch = async function (ctx) {
       searchSortingSwitch = isPageModified
         ? `/p${pageNumber} /s${reverseSortingParametr} ${inlineQuery}`
         : `/s${reverseSortingParametr} ${inlineQuery}`;
+
     results.unshift({
-      id: 43210,
+      id: 69696969420,
       type: searchType,
       title: "To sort results by " + reverseSortingWord,
       description: `Just add "/s${reverseSortingParametr}" to search qerry: (@nhentai_mangabot ${searchSortingSwitch})`,
@@ -334,7 +340,7 @@ module.exports.inlineSearch = async function (ctx) {
         ? `/p${+pageNumber + 1} /s${sortingParametrLetter} ${inlineQuery}`
         : `/p${+pageNumber + 1} ${inlineQuery}`;
     results.push({
-      id: 4321,
+      id: 9696969696,
       type: searchType,
       title: "Next page",
       description: `TAP HERE or Just add "/p${+pageNumber + 1
