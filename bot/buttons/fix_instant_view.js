@@ -25,7 +25,12 @@ module.exports.fixInstantView = async function (ctx) {
   }
 
   let manga_db = await saveAndGetManga(manga_id)
+      if(!manga){
+                console.log("couldn't get manga so return")
 
+      ctx.reply("couldn't get manga")
+      return
+    }
   let telegraph_fixed_url = manga_db.telegraph_fixed_url,
     telegraph_url = manga_db.telegraph_url;
 

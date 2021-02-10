@@ -54,14 +54,24 @@ module.exports.randomButton = async function (ctx) {
   */
   if (message.current < message.history.length) {
     manga = await saveAndGetManga(message.history[message.current]);
+    if(!manga){
+      ctx.reply("couldn't get manga")
+        console.log("couldn't get manga so return")
 
+      return
+    }
     /* if user at the end of history and looking for new manga:
         [ 234, 123, 345, 1243, 356]  - history.length==5
                                usr     (current==4)
     */
   } else {
     manga = await saveAndGetManga(undefined, user);
+    if(!manga){
+      ctx.reply("couldn't get manga")
+        console.log("couldn't get manga so return")
 
+      return
+    }
     message.history.push(manga.id);
     if (message.history.length > 400) {
       // (i have only 500mb bro stop)
