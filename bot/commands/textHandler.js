@@ -26,7 +26,16 @@ module.exports.textHandler = async function (ctx) {
       let manga_id = match[i],
         manga,
         telegraph_url;
-      manga = await saveAndGetManga(manga_id)
+    console.log("textHandler started work on " + manga_id)
+
+      manga = await saveAndGetManga(manga_id).catch(err=>{
+        console.log(err)
+        console.log("got err in textHandler, continue")
+        continue
+      })
+      if(!manga){
+        continue;
+      }
 
       telegraph_url = manga.telegraph_fixed_url
         ? manga.telegraph_fixed_url
