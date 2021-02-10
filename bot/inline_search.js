@@ -62,8 +62,8 @@ module.exports.inlineSearch = async function (ctx) {
           { text: heart, callback_data: "like_" + favorites[i].id },
         ],
       ];
-      let isFullColor = manga.tags.includes('full color');
-      if (!manga.telegraph_fixed_url && (favorites[i].pages > 100 || isFullColor)) {
+      let isFullColor = favorites[i].tags.includes('full color');
+      if (!favorites[i].telegraph_fixed_url && (favorites[i].pages > 100 || isFullColor)) {
         favorites[i].inline_keyboard[0].unshift({
           text: ctx.i18n.t("fix_button"),
           callback_data: "fix_" + favorites[i].id,
@@ -166,7 +166,7 @@ module.exports.inlineSearch = async function (ctx) {
       ],
     },
   };
-  
+
   console.log(
     'Someone is searching for "' +
     inlineQuery +
