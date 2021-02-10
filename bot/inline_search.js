@@ -34,7 +34,7 @@ module.exports.inlineSearch = async function (ctx) {
         ],
       ];
       if (favorites[i].pages > 100) {
-        inline_keyboard[0].unshift({
+        favorites[i].inline_keyboard[0].unshift({
           text: ctx.i18n.t("fix_button"),
           callback_data: "fix_" + favorites[i].id,
         });
@@ -82,6 +82,7 @@ module.exports.inlineSearch = async function (ctx) {
         ],
       },
     });
+
     await ctx
       .answerInlineQuery(results.reverse(), {
         cache_time: 0,
