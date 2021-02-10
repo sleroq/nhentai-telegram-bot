@@ -26,21 +26,21 @@ module.exports.textHandler = async function (ctx) {
       let manga_id = match[i],
         manga,
         telegraph_url;
-    console.log("textHandler started work on " + manga_id)
+      console.log("textHandler started work on " + manga_id)
 
-      manga = await saveAndGetManga(manga_id).catch(err=>{
+      manga = await saveAndGetManga(manga_id).catch(err => {
         console.log(err)
       })
-      if(!manga){
+      if (!manga) {
         console.log("no manga in textHandler, continue")
         continue;
       }
-    
+
       telegraph_url = manga.telegraph_fixed_url
         ? manga.telegraph_fixed_url
         : manga.telegraph_url;
-  if(!telegraph_url){
-                console.log("no telegraph url in textHandler, continue")
+      if (!telegraph_url) {
+        console.log("no telegraph url in textHandler, continue")
         continue;
       }
       let message = new Message({
@@ -88,6 +88,9 @@ module.exports.textHandler = async function (ctx) {
         .catch((err) => {
           console.log(err);
         });
+      if (match.length !== 1 && i === match.length - 1) {
+        console.log("textHandler finished work")
+      }
     }
   }
 };
