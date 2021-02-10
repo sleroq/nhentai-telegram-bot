@@ -82,7 +82,10 @@ module.exports.inlineSearch = async function (ctx) {
         ],
       },
     });
-
+    if(results.length > 50){
+      let num_of_superfluous = results.length - 50
+      results.splice(0, num_of_superfluous)
+    }
     await ctx
       .answerInlineQuery(results.reverse(), {
         cache_time: 0,
