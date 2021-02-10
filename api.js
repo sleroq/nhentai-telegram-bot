@@ -1,4 +1,3 @@
-const mongoose = require('mongoose')
 const moment = require("moment");
 const Manga = require("./models/manga.model");
 const User = require("./models/user.model");
@@ -19,13 +18,13 @@ class api {
   }
   static async countUsers() {
     const count = await User.countDocuments({});
-       return {
+    return {
       count: { number: count, string: numberWithCommas(count) }
     }
   }
   static async countMessages() {
     const count = await Message.countDocuments({});
-       return {
+    return {
       count: { number: count, string: numberWithCommas(count) }
     }
   }
@@ -38,11 +37,11 @@ class api {
         $lt: date_tomorrow
       }
     });
-       return {
+    return {
       count: { number: count, string: numberWithCommas(count) }
     }
   }
-    static async usersToday() {
+  static async usersToday() {
     const date_now = moment().format("YYYY-MM-DD");
     const date_tomorrow = moment().add(1, "d").format("YYYY-MM-DD");
     const count = await User.countDocuments({
@@ -51,11 +50,11 @@ class api {
         $lt: date_tomorrow
       }
     });
-       return {
+    return {
       count: { number: count, string: numberWithCommas(count) }
     }
   }
-    static async mangaToday() {
+  static async mangaToday() {
     const date_now = moment().format("YYYY-MM-DD");
     const date_tomorrow = moment().add(1, "d").format("YYYY-MM-DD");
     const count = await Manga.countDocuments({
@@ -64,14 +63,14 @@ class api {
         $lt: date_tomorrow
       }
     });
-       return {
+    return {
       count: { number: count, string: numberWithCommas(count) }
     }
   }
   static async lastManga() {
-    const manga = await Manga.findOne({}, {}, { sort: { _id: -1} });
-       return {
-        manga: manga
+    const manga = await Manga.findOne({}, {}, { sort: { _id: -1 } });
+    return {
+      manga: manga
     }
   }
   static async allinfo() {
