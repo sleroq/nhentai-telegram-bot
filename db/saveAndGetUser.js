@@ -21,9 +21,7 @@ module.exports.saveAndGetUser = async function (ctx) {
     await user.save(function (err) {
       if (err) return console.error(err);
       console.log("user saved");
-    }).catch((err) => {
-      console.log(err);
-    });;
+    })
   }
   if (user.language_code == "ru") {
     ctx.i18n.locale("ru");
