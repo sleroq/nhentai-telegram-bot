@@ -168,11 +168,11 @@ module.exports.inlineSearch = async function (ctx) {
   };
   
   console.log(
-    'Someone is searching for "' +
+    'Someone is searching for ' +
     inlineQuery +
-    '" at page ' +
+    ' at page ' +
     pageNumber +
-    'and sorting by ' +
+    ' and sorting by ' +
     sortingParametr
   );
 
