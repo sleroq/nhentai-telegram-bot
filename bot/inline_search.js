@@ -183,16 +183,15 @@ module.exports.inlineSearch = async function (ctx) {
       telegraph_url,
       manga = await saveAndGetManga(manga_id);
 
-    telegraph_url = manga.telegraph_fixed_url
-      ? manga.telegraph_fixed_url
-      : manga.telegraph_url;
-
     // if nothing is found
     if (!manga) {
       result.push(nothingIsFound_result);
       await ctx.answerInlineQuery(result).catch((err) => console.log(err));
       return;
     }
+        telegraph_url = manga.telegraph_fixed_url
+      ? manga.telegraph_fixed_url
+      : manga.telegraph_url;
 
     let messageText = getMangaMessage(manga, telegraph_url, ctx.i18n),
       inline_keyboard = [[{ text: "Telegra.ph", url: telegraph_url }]];
