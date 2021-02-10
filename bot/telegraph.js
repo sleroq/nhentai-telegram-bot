@@ -35,6 +35,7 @@ async function TelegraphUploadByUrls(manga) {
   if (!result) {
     return;
   }
+  console.log("returning uploaded url")
   return result.url;
 }
 module.exports = {

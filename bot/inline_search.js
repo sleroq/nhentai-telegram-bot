@@ -11,15 +11,43 @@ const { saveAndGetManga } = require("../db/saveAndGetManga");
 
 module.exports.inlineSearch = async function (ctx) {
   let user = await saveAndGetUser(ctx);
+
+  // favorites: 
   if (!ctx.inlineQuery.query || ctx.inlineQuery.query.startsWith("/fav")) {
-    let searchType = /*user.search_type ? user.search_type :*/ "article",
-      favorites = user.favorites;
-    if (!favorites && !favorites[0]) {
+    let searchType = "article",
+      favorites = user.favorites,
+      results = [],
+      favorites_reply_markup = {
+        inline_keyboard: [
+          [
+            {
+              text: "favorites",
+              switch_inline_query_current_chat: "",
+            },
+          ],
+        ],
+      }
+
+    if (!Array.isArray(favorites) || favorites.length === 0) {
+      // favorites is empty
+      results.push({
+        id: 69696969696969,
+        type: searchType,
+        title: "Favorites!",
+        description: `This is your favorites:`,
+        photo_url: "https://i.imgur.com/TmxG1Qr.png",
+        thumb_url: "https://i.imgur.com/TmxG1Qr.png",
+        input_message_content: {
+          message_text: "You haven't liked anything yet",
+          parse_mode: "Markdown",
+        },
+        reply_markup: favorites_reply_markup,
+      });
       return;
     }
     for (let i = 0; i < favorites.length; i++) {
       /* it's in for loop and not in .map below
-           because maybe there will be promises */
+           because maybe i'will add functions with promises */
       favorites[i].message_text = getMangaMessage(
         favorites[i],
         favorites[i].telegraph_url,
@@ -33,7 +61,8 @@ module.exports.inlineSearch = async function (ctx) {
           { text: heart, callback_data: "like_" + favorites[i].id },
         ],
       ];
-      if (favorites[i].pages > 100) {
+      let isFullColor = manga.tags.includes('full color');
+      if (!manga.telegraph_fixed_url && (favorites[i].pages > 100 || isFullColor )) {
         favorites[i].inline_keyboard[0].unshift({
           text: ctx.i18n.t("fix_button"),
           callback_data: "fix_" + favorites[i].id,
@@ -41,8 +70,8 @@ module.exports.inlineSearch = async function (ctx) {
       }
     }
 
-    let results = favorites.map((manga) => ({
-      id: Math.floor(Math.random() * 10000000), //manga.id,
+    results = favorites.map((manga) => ({
+      id: Math.floor(Math.random() * 10000000),
       type: searchType,
       title: manga.title
         .split(/\[.*?\]/)
@@ -61,7 +90,7 @@ module.exports.inlineSearch = async function (ctx) {
       },
     }));
     results.push({
-      id: 4321,
+      id: 69696969696969,
       type: searchType,
       title: "Favorites!",
       description: `This is your favorites:`,
@@ -71,18 +100,10 @@ module.exports.inlineSearch = async function (ctx) {
         message_text: "Tap to open favorites",
         parse_mode: "Markdown",
       },
-      reply_markup: {
-        inline_keyboard: [
-          [
-            {
-              text: "favorites",
-              switch_inline_query_current_chat: "", ///fav" + Math.floor(Math.random() * 10000000),
-            },
-          ],
-        ],
-      },
+      reply_markup: favorites_reply_markup,
     });
-    if(results.length > 50){
+    // rm old favorites cause of telegram limit
+    if (results.length > 50) {
       let num_of_superfluous = results.length - 50
       results.splice(0, num_of_superfluous)
     }
@@ -161,8 +182,8 @@ module.exports.inlineSearch = async function (ctx) {
     // check if we have this manga in db:
     let manga_db = await saveAndGetManga(manga_id);
     telegraph_url = manga_db.telegraph_fixed_url
-    ? manga_db.telegraph_fixed_url
-    : manga_db.telegraph_url;
+      ? manga_db.telegraph_fixed_url
+      : manga_db.telegraph_url;
 
     if (!manga && !manga_db) {
       result.push(nothingIsFound_result);
@@ -272,7 +293,7 @@ module.exports.inlineSearch = async function (ctx) {
     // Tips and buttons to help user with search:
 
     let reverseSortingWord =
-        sortingParametr == "popular" ? "new" : "popularity",
+      sortingParametr == "popular" ? "new" : "popularity",
       reverseSortingPhotoUrl =
         sortingParametr == "popular"
           ? "https://i.imgur.com/wmHyvQk.png"
@@ -316,9 +337,8 @@ module.exports.inlineSearch = async function (ctx) {
       id: 4321,
       type: searchType,
       title: "Next page",
-      description: `TAP HERE or Just add "/p${
-        +pageNumber + 1
-      }" to search qerry: (@nhentai_mangabot ${nextPageSwitch})`,
+      description: `TAP HERE or Just add "/p${+pageNumber + 1
+        }" to search qerry: (@nhentai_mangabot ${nextPageSwitch})`,
       photo_url: "https://i.imgur.com/3AMTdoA.png",
       thumb_url: "https://i.imgur.com/3AMTdoA.png",
       input_message_content: {
