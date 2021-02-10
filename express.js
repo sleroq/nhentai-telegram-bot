@@ -15,7 +15,7 @@ function startListen(bot, PORT) {
     }, 100000)
 
   }else{
-    bot.telegram.setWebhook(process.env.REPL_URL + "/secret-path");
+    bot.telegram.setWebhook(process.env.REPL_URL + "/secret-path").then((x)=>{console.log('webhook set - ' + process.env.REPL_URL + " " + x)})
   }
   
   expressApp.use(cors())

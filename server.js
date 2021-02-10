@@ -144,9 +144,6 @@ bot.on("text", async (ctx, next) => {
   await textHandler(ctx);
 });
 
-if (false){//process.env.REPL_URL) {
-  require("./express.js").startListen(bot, process.env.PORT);
-} else {
   async function clearOldMessages(tgBot) {
     // Get updates for the bot
     const updates = await tgBot.telegram.getUpdates(0, 100, -1);
@@ -157,6 +154,11 @@ if (false){//process.env.REPL_URL) {
             : 0
     ;
 }
+if (process.env.REPL_URL) {
+  bot.polling.offset = clearOldMessages(bot).then((x)=>{console.log(x); return x})
+  require("./express.js").startListen(bot, process.env.PORT);
+} else {
+
 bot.polling.offset = clearOldMessages(bot).then((x)=>{console.log(x); return x})
 
   bot.telegram.deleteWebhook();
