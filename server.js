@@ -27,7 +27,7 @@ mongoose.connect(process.env.DATABASE_URL, {
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
 db.once("open", function () {
-  console.log("we're connected!");
+  console.log("mongoose is connected!");
 });
 
 const { saveAndGetUser } = require("./db/saveAndGetUser");
@@ -87,35 +87,36 @@ bot.on("text", async (ctx, next) => {
   await textHandler(ctx);
 });
 
+
+// with webhook
+if (process.env.REPL_URL) {
+  start_the_bot(bot)
+  // with polling
+} else {
+
+  bot.polling.offset = clearOldMessages(bot)
+    .then(() => bot.launch()
+      .then(() => console.log("Bot is started polling!")))
+}
+
 async function clearOldMessages(tgBot) {
+  // Delete webhook (with webhook u cant use getUpdates())
+  await bot.telegram.deleteWebhook()
+  console.log("webhook deleted")
   // Get updates for the bot
   const updates = await tgBot.telegram.getUpdates(0, 100, -1);
 
   //  Add 1 to the ID of the last one, if there is one
-  return updates.length > 0
+  let newOffset = updates.length > 0
     ? updates[updates.length - 1].update_id + 1
     : 0
     ;
+  console.log("new offset is " + newOffset);
+  return newOffset
 }
-// with webhook
-if (process.env.REPL_URL) {
-  bot.telegram.deleteWebhook()
-    .then(() => {
-      bot.polling.offset = clearOldMessages(bot)
-        .then((x) => {
-          console.log("new offset = " + x);
-          return x
-        })
-    });
+
+async function start_the_bot(bot) {
+  bot.polling.offset = await clearOldMessages(bot);
+
   require("./express.js").startListen(bot, process.env.PORT);
-  // with polling
-} else {
-  bot.telegram.deleteWebhook().then(() => {
-    bot.polling.offset = clearOldMessages(bot)
-      .then((x) => {
-        console.log("new offset = " + x);
-        return x
-      }).then(() => bot.launch()
-        .then(() => console.log("Bot is working!")))
-  })
 }
