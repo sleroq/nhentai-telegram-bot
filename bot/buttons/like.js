@@ -6,6 +6,9 @@ module.exports.likeButton = async function (ctx) {
   let user = await saveAndGetUser(ctx),
     manga_id = ctx.update.callback_query.data.split("_")[1];
   manga = await Manga.findOne({ id: manga_id });
+  if(!manga){
+    return
+  }
   let keyboard;
   if (ctx.update.callback_query.message) {
     keyboard = ctx.update.callback_query.message.reply_markup.inline_keyboard;
