@@ -71,9 +71,6 @@ bot.command("settings", async (ctx) => {
 bot.command("id", async (ctx) => {
   await ctx.reply("`" + ctx.from.id + "`", { parse_mode: "Markdown" });
 });
-bot.on("text", async (ctx, next) => {
-  await textHandler(ctx);
-});
 
 // commands with nhentai
 bot.command("rand", async (ctx) => {
@@ -88,6 +85,11 @@ bot.on("callback_query", async (ctx, next) => {
 });
 bot.on("inline_query", async (ctx) => {
   await inlineSearch(ctx);
+});
+
+// get with id
+bot.on("text", async (ctx, next) => {
+  await textHandler(ctx);
 });
 
 // start the bot 
