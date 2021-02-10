@@ -26,5 +26,8 @@ module.exports.saveAndGetUser = async function (ctx) {
   if (user.language_code == "ru") {
     ctx.i18n.locale("ru");
   }
+  if (user.language_code == "es") {
+    ctx.i18n.locale("es");
+  }
   return user;
 };
