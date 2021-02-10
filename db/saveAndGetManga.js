@@ -47,7 +47,10 @@ module.exports.saveAndGetManga = async function (id, user) {
         console.log(err);
       });
     if (!manga) {
-      manga = await nhentai.getDoujin(id);
+      manga = await nhentai.getDoujin(id).catch((err)=>{
+        // console.log(err)
+        })
+        ;
       if (!manga) {
         console.log("!manga");
         return;
@@ -69,7 +72,7 @@ module.exports.saveAndGetManga = async function (id, user) {
   if (!manga.telegraph_url) {
     if (!manga.images) {
       manga_with_pages = await nhentai.getDoujin(manga.id).catch((err) => {
-        console.log(err);
+        // console.log(err);
       });
       manga.images = manga_with_pages.pages
       console.log("pages for uploading  fixed")
