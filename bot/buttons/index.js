@@ -26,11 +26,17 @@ if(ctx.update.callback_query.date < 1612958359)
 }
 
   if (query_data[0] == "r") {
-    await randomButton(ctx);
+    await randomButton(ctx).catch(err=>console.log(err));
   } else if (query_data.match("open")) {
-    await openiInTelegraph(ctx);
+    await openiInTelegraph(ctx).catch((err) => {
+      console.log(err);
+      return
+    });;
   } else if (query_data.match("prev")) {
-    await prevButton(ctx);
+    await prevButton(ctx).catch((err) => {
+      console.log(err);
+      return
+    });;
   } else if (query_data.match("like_")) {
     await likeButton(ctx);
   } else if (query_data.match("fix_") || query_data.match("fixLater_")) {
