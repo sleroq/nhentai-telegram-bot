@@ -79,7 +79,10 @@ module.exports.randomButton = async function (ctx) {
     }
   }
   message.save();
-  user.save();
+  user.save(function (err) {
+    if (err) return console.error(err);
+    console.log("user saved");
+  });
 
   telegraph_url = manga.telegraph_fixed_url
     ? manga.telegraph_fixed_url
