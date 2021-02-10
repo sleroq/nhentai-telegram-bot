@@ -120,29 +120,6 @@ module.exports.inlineSearch = async function (ctx) {
   // search:
 
   // variables
-  const nothingIsFound_result = {
-    id: 6969696969,
-    type: searchType,
-    title: "Nothing is found ¯_(ツ)_/¯",
-    description: ``,
-    photo_url: "https://i.imgur.com/j2zt4j7.png",
-    thumb_url: "https://i.imgur.com/j2zt4j7.png",
-    input_message_content: {
-      message_text: ctx.i18n.t("help"),
-      parse_mode: "Markdown",
-    },
-    reply_markup: {
-      inline_keyboard: [
-        [
-          {
-            text: ctx.i18n.t("search_tips_button"),
-            callback_data: "searchtips",
-          },
-        ],
-        [{ text: ctx.i18n.t("settings_button"), callback_data: "settings" }],
-      ],
-    },
-  };
 
   let inlineQuery = ctx.inlineQuery.query,
     pageNumber = 1,
@@ -166,6 +143,30 @@ module.exports.inlineSearch = async function (ctx) {
     sortingParametr = sortMatch.slice(2) == "p" ? "popular" : "date";
     inlineQuery = inlineQuery.replace(sortMatch, "").trim();
   }
+    const nothingIsFound_result = {
+    id: 6969696969,
+    type: searchType,
+    title: "Nothing is found ¯_(ツ)_/¯",
+    description: ``,
+    photo_url: "https://i.imgur.com/j2zt4j7.png",
+    thumb_url: "https://i.imgur.com/j2zt4j7.png",
+    input_message_content: {
+      message_text: ctx.i18n.t("help"),
+      parse_mode: "Markdown",
+    },
+    reply_markup: {
+      inline_keyboard: [
+        [
+          {
+            text: ctx.i18n.t("search_tips_button"),
+            callback_data: "searchtips",
+          },
+        ],
+        [{ text: ctx.i18n.t("settings_button"), callback_data: "settings" }],
+      ],
+    },
+  };
+  
   console.log(
     'Someone is searching for "' +
     inlineQuery +
