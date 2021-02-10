@@ -168,11 +168,11 @@ module.exports.inlineSearch = async function (ctx) {
   };
 
   console.log(
-    'Someone is searching for "' +
+    'Someone is searching for ' +
     inlineQuery +
-    '" at page ' +
+    ' at page ' +
     pageNumber +
-    'and sorting by ' +
+    ' and sorting by ' +
     sortingParametr
   );
 
@@ -198,7 +198,7 @@ module.exports.inlineSearch = async function (ctx) {
       inline_keyboard = [[{ text: "Telegra.ph", url: telegraph_url }]];
 
     let isFullColor = manga.tags ? manga.tags.includes('full color') : manga.details.tags.includes('full color');
-    if (!manga.telegraph_fixed_url && (num_of_pages > 100 || isFullColor)) {
+    if (!manga.telegraph_fixed_url && (manga.pages > 100 || isFullColor)) {
       inline_keyboard[0].unshift({
         text: ctx.i18n.t("fix_button"),
         callback_data: "fix_" + manga.id,
@@ -206,7 +206,7 @@ module.exports.inlineSearch = async function (ctx) {
     }
     let description;
     // show manga language in the description if any
-    if (
+    if (manga.details &&
       Array.isArray(manga.details.languages) &&
       manga.details.languages.length !== 0
     ) {
