@@ -2,12 +2,18 @@ const nhentai = require("../nhentai");
 const Manga = require("../models/manga.model");
 
 async function getRandomManga() {
-  let homepage = await nhentai.getHomepage(),
+  /* get the newest possible id from homepage
+     assuming there are latest added doujins  */
+  let homepage = await nhentai.getHomepage().catch(err => {
+    new Error("failed to get Homepage in getRandomManga()")
+  }),
     newestMangaId = +homepage.results[0].id;
+
+  // trying to get manga 10 times (to be sure)
   for (let i = 0; i < 10; i++) {
     let randomId = Math.floor(Math.random() * newestMangaId) + 1,
       manga = await nhentai.getDoujin(randomId).catch((err) => {
-        console.log(err.status);
+        console.log("failed to get Doujin in getRandomManga(), but that's ok - continue")
       });
     if (!manga) {
       continue;
@@ -18,7 +24,7 @@ async function getRandomManga() {
 async function getRandomMangaLocaly(tags, ninTags) {
   let query =
     (tags != undefined && tags.length != 0) ||
-    (ninTags != undefined && ninTags.length != 0)
+      (ninTags != undefined && ninTags.length != 0)
       ? { tags: {} }
       : undefined;
   if (tags != undefined && tags.length != 0) {
@@ -34,27 +40,16 @@ async function getRandomMangaLocaly(tags, ninTags) {
   return result;
 }
 function getMangaMessage(manga, telegraphLink, i18n) {
-  let title = getTitle(manga),
+  const title = getTitle(manga),
     tags = tagString(manga, i18n),
+    pages_word = i18n.t("pages"),
     pages = manga.details ? manga.details.pages : manga.pages,
-    caption;
-  if (telegraphLink) {
-    caption = `<a href="${telegraphLink}">${title
-      .replace(/>/g, " ")
-      .replace(/</g, " ")}</a> (${pages} ${i18n.t(
-      "pages"
-    )})\n${tags}\n<a href="${manga.link}">nhentai.net</a> | <code>${
-      manga.id
-    }</code>`;
-  } else {
-    caption = `<a href="${manga.link}">${title
-      .replace(/>/g, " ")
-      .replace(/</g, " ")}</a> (${pages} ${i18n.t(
-      "pages"
-    )})\n${tags}\n<a href="${manga.link}">nhentai.net</a> | <code>${
-      manga.id
-    }</code>`;
-  }
+    link = telegraphLink ? telegraphLink : manga.link,
+
+    caption = `
+    <a href="${link}">${title}</a> (${pages} ${pages_word})
+    ${tags}\n<a href="${manga.link}">nhentai.net</a> | <code>${manga.id
+      }</code>`;
   return caption;
 }
 function tagString(manga, i18n) {
@@ -84,15 +79,14 @@ function sliceByHalf(s) {
     middle = before;
   }
 
-  let s1 = s.substr(0, middle);
+  // let s1 = s.substr(0, middle);
   let s2 = s.substr(middle + 1);
   return s2;
 }
 function getMessageInline(manga) {
   let link = "https://nhentai.net/g/" + manga.id + "/",
-    message_text = `<a href="${link}">${manga.title
-      .replace(/>/g, " ")
-      .replace(/</g, " ")}</a>`;
+    title = getTitle(manga),
+    message_text = `<a href="${link}">${title}</a>`;
   return message_text;
 }
 function getTitle(manga) {
@@ -110,14 +104,15 @@ function getTitle(manga) {
       title = manga.title;
     }
   }
-  return title;
+  return title
+    .replace(/>/g, " ")
+    .replace(/</g, " ");
 }
 module.exports = {
   getRandomManga,
   getMangaMessage,
   getMessageInline,
   getRandomMangaLocaly,
-  // getTitle,
   sliceByHalf,
   tagString,
 };
