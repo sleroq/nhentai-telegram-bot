@@ -1,6 +1,5 @@
 const nhentai = require("../../nhentai");
 
-const { TelegraphUploadByUrls } = require("../telegraph.js");
 const { getMangaMessage, isFullColor } = require("../someFuncs.js");
 const { saveAndGetUser } = require("../../db/saveAndGetUser");
 const { saveAndGetManga } = require("../../db/saveAndGetManga");
