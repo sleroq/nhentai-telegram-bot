@@ -63,8 +63,7 @@ module.exports.inlineSearch = async function (ctx) {
           { text: heart, callback_data: "like_" + favorites[i].id },
         ],
       ];
-      let isFullColor = isFullColor(favorites[i]);
-      if (!favorites[i].telegraph_fixed_url && (favorites[i].pages > 100 || isFullColor)) {
+      if (!favorites[i].telegraph_fixed_url && (favorites[i].pages > 100 || isFullColor(favorites[i]))) {
         favorites[i].inline_keyboard[0].unshift({
           text: ctx.i18n.t("fix_button"),
           callback_data: "fix_" + favorites[i].id,
@@ -197,8 +196,7 @@ module.exports.inlineSearch = async function (ctx) {
     let messageText = getMangaMessage(manga, telegraph_url, ctx.i18n),
       inline_keyboard = [[{ text: "Telegra.ph", url: telegraph_url }]];
 
-    let isFullColor = isFullColor(manga);
-    if (!manga.telegraph_fixed_url && (manga.pages > 100 || isFullColor)) {
+    if (!manga.telegraph_fixed_url && (manga.pages > 100 || isFullColor(manga))) {
       inline_keyboard[0].unshift({
         text: ctx.i18n.t("fix_button"),
         callback_data: "fix_" + manga.id,

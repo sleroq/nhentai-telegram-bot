@@ -1,7 +1,7 @@
 const nhentai = require("../../nhentai");
 
 const { TelegraphUploadByUrls } = require("../telegraph.js");
-const { getMangaMessage } = require("../someFuncs.js");
+const { getMangaMessage, isFullColor } = require("../someFuncs.js");
 const { saveAndGetUser } = require("../../db/saveAndGetUser");
 const { saveAndGetManga } = require("../../db/saveAndGetManga");
 
@@ -65,9 +65,8 @@ module.exports.textHandler = async function (ctx) {
           [{ text: ctx.i18n.t("next_button"), callback_data: "r_" + manga.id }],
         ];
       let num_of_pages = manga.details ? manga.details.pages : manga.pages;
-      let isFullColor = isFullColor(manga);
 
-      if (!manga.telegraph_fixed_url && (num_of_pages > 100 || isFullColor)) {
+      if (!manga.telegraph_fixed_url && (num_of_pages > 100 || isFullColor(manga))) {
         inline_keyboard[0].unshift({
           text: ctx.i18n.t("fix_button"),
           callback_data: "fix_" + manga.id,
