@@ -108,6 +108,14 @@ function getTitle(manga) {
     .replace(/>/g, " ")
     .replace(/</g, " ");
 }
+function isFullColor(manga) {
+  if(manga.tags || (manga.details && manga.details.tags)){
+    let answer = manga.tags ? manga.tags.includes('full color') : manga.details.tags.includes('full color');
+    return answer
+  }else{
+    return false
+  }
+}
 module.exports = {
   getRandomManga,
   getMangaMessage,
@@ -115,4 +123,5 @@ module.exports = {
   getRandomMangaLocaly,
   sliceByHalf,
   tagString,
+  isFullColor,
 };

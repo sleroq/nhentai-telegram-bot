@@ -4,6 +4,7 @@ const {
   getMessageInline,
   sliceByHalf,
   getMangaMessage,
+  isFullColor,
 } = require("./someFuncs.js");
 const { saveAndGetUser } = require("../db/saveAndGetUser");
 const { saveAndGetManga } = require("../db/saveAndGetManga");
@@ -62,7 +63,7 @@ module.exports.inlineSearch = async function (ctx) {
           { text: heart, callback_data: "like_" + favorites[i].id },
         ],
       ];
-      let isFullColor = favorites[i].tags.includes('full color');
+      let isFullColor = isFullColor(favorites[i]);
       if (!favorites[i].telegraph_fixed_url && (favorites[i].pages > 100 || isFullColor)) {
         favorites[i].inline_keyboard[0].unshift({
           text: ctx.i18n.t("fix_button"),
@@ -143,7 +144,7 @@ module.exports.inlineSearch = async function (ctx) {
     sortingParametr = sortMatch.slice(2) == "p" ? "popular" : "date";
     inlineQuery = inlineQuery.replace(sortMatch, "").trim();
   }
-    const nothingIsFound_result = {
+  const nothingIsFound_result = {
     id: 6969696969,
     type: searchType,
     title: "Nothing is found ¯_(ツ)_/¯",
@@ -189,14 +190,14 @@ module.exports.inlineSearch = async function (ctx) {
       await ctx.answerInlineQuery(result).catch((err) => console.log(err));
       return;
     }
-        telegraph_url = manga.telegraph_fixed_url
+    telegraph_url = manga.telegraph_fixed_url
       ? manga.telegraph_fixed_url
       : manga.telegraph_url;
 
     let messageText = getMangaMessage(manga, telegraph_url, ctx.i18n),
       inline_keyboard = [[{ text: "Telegra.ph", url: telegraph_url }]];
 
-    let isFullColor = manga.tags ? manga.tags.includes('full color') : manga.details.tags.includes('full color');
+    let isFullColor = isFullColor(manga);
     if (!manga.telegraph_fixed_url && (manga.pages > 100 || isFullColor)) {
       inline_keyboard[0].unshift({
         text: ctx.i18n.t("fix_button"),

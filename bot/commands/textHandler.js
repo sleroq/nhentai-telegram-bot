@@ -65,7 +65,7 @@ module.exports.textHandler = async function (ctx) {
           [{ text: ctx.i18n.t("next_button"), callback_data: "r_" + manga.id }],
         ];
       let num_of_pages = manga.details ? manga.details.pages : manga.pages;
-      let isFullColor = manga.tags ? manga.tags.includes('full color') : manga.details.tags.includes('full color');
+      let isFullColor = isFullColor(manga);
 
       if (!manga.telegraph_fixed_url && (num_of_pages > 100 || isFullColor)) {
         inline_keyboard[0].unshift({

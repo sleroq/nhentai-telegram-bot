@@ -1,6 +1,6 @@
 const nhentai = require("../../nhentai");
 
-const { getMangaMessage } = require("../someFuncs.js");
+const { getMangaMessage, isFullColor } = require("../someFuncs.js");
 const { saveAndGetUser } = require("../../db/saveAndGetUser");
 const { saveAndGetManga } = require("../../db/saveAndGetManga");
 
@@ -54,7 +54,7 @@ module.exports.openiInTelegraph = async function (ctx) {
   /* if the manga is too big, the telegram might refuse to create an instant view,
      so here is a button that can magically fix that */
   let num_of_pages = manga.details ? manga.details.pages : manga.pages;
-  let isFullColor = manga.tags ? manga.tags.includes('full color') : manga.details.tags.includes('full color');
+  let isFullColor = isFullColor(manga);
   if (!manga.telegraph_fixed_url &&
     (num_of_pages > 150 || isFullColor)) {
     inline_keyboard[0].unshift({
