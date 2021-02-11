@@ -177,12 +177,12 @@ module.exports.inlineSearch = async function (ctx) {
   );
 
   // search for id if there is only numbers in query
+
   if (inlineQuery.match(/\d+/) && inlineQuery.replace(/\d+/, "").trim() === "") {
     let manga_id = inlineQuery.match(/\d+/)[0];
     let result = [],
       telegraph_url,
       manga = await saveAndGetManga(manga_id);
-
     // if nothing is found
     if (!manga) {
       result.push(nothingIsFound_result);
@@ -215,9 +215,6 @@ module.exports.inlineSearch = async function (ctx) {
     } else {
       description = sliceByHalf(manga.title);
     }
-    let thumbnail = Array.isArray(manga.thumbnails) && manga.thumbnails[0]
-      ? manga.thumbnails[0]
-      : undefined;
     result.push({
       id: manga.id,
       type: searchType,
@@ -226,8 +223,8 @@ module.exports.inlineSearch = async function (ctx) {
         .join("")
         .trim(),
       description: description,
-      thumb_url: thumbnail,
-      photo_url: manga.pages[0] ? manga.pages[0] : undefined,
+      thumb_url: manga.thumbnail,
+      photo_url: manga.page0,
       input_message_content: {
         message_text: messageText,
         parse_mode: "HTML",
