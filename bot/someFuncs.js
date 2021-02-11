@@ -47,9 +47,8 @@ function getMangaMessage(manga, telegraphLink, i18n) {
     link = telegraphLink ? telegraphLink : manga.link,
 
     caption = `
-    <a href="${link}">${title}</a> (${pages} ${pages_word})
-    ${tags}\n<a href="${manga.link}">nhentai.net</a> | <code>${manga.id
-      }</code>`;
+<a href="${link}">${title}</a> (${pages} ${pages_word})
+${tags}\n<a href="${manga.link}">nhentai.net</a> | <code>${manga.id}</code>`;
   return caption;
 }
 function tagString(manga, i18n) {
