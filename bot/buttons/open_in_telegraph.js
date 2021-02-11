@@ -66,5 +66,7 @@ module.exports.openiInTelegraph = async function (ctx) {
     reply_markup: {
       inline_keyboard: inline_keyboard,
     },
-  });
+  }).catch(err=>{
+    console.log(err)
+  })
 }
