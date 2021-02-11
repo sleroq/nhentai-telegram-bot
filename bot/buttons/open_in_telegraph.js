@@ -68,4 +68,4 @@ module.exports.openiInTelegraph = async function (ctx) {
       inline_keyboard: inline_keyboard,
     },
   });
-};
+}
