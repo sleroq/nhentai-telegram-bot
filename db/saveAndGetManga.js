@@ -7,7 +7,7 @@ const {
   getRandomMangaLocaly
 } = require("../bot/someFuncs");
 
-module.exports.saveAndGetManga = async function(id, user) {
+module.exports.saveAndGetManga = async function (id, user) {
   let manga;
 
   if (!id) {  // RANDOM NEW MANGA
@@ -82,7 +82,7 @@ module.exports.saveAndGetManga = async function(id, user) {
       console.log("!telegraph_url");
       return;
     }
-    manga.save(function(err) {
+    manga.save(function (err) {
       if (err) return console.error(err);
     });
   }
@@ -99,12 +99,33 @@ module.exports.saveAndGetManga = async function(id, user) {
       }
     )
   }
+  //add thumbnail and page if was saved without them
+  if (!manga.thumbnail || !manga.page0) {
+      console.log('no thumbnail or page0- ' + manga.id)
+
+      let manga_with_thumbnail = await nhentai.getDoujin(manga.id)
+    if (Array.isArray(manga_with_thumbnail.thumbnails) && manga_with_thumbnail.thumbnails[0]) {
+      manga.thumbnail = manga_with_thumbnail.thumbnails[0];
+      console.log('updated thumbnail - ' + manga.id)
+    }
+    manga.page0 = manga_with_thumbnail.pages[0]
+    console.log('updated page0 - ' + manga.id)
+    manga.save(function (err) {
+      if (err) return console.error(err);
+    })
+    
+  }
   console.log("returning manga")
   return manga
 }
 function saveNewManga(manga) {
   // console.log(manga)
-  let images = manga.pages
+  let images = manga.pages,
+    thumbnail = Array.isArray(manga.thumbnails) && manga.thumbnails[0]
+      ? manga.thumbnails[0]
+      : undefined,
+    page0 = manga.pages[0]
+
   manga = new Manga({
     id: manga.id,
     title: manga.title,
@@ -112,8 +133,10 @@ function saveNewManga(manga) {
     tags: manga.details.tags,
     telegraph_url: manga.telegraph_url,
     pages: manga.details.pages,
+    thumbnail: thumbnail,
+    page0: page0,
   });
-  manga.save(function(err) {
+  manga.save(function (err) {
     if (err) return console.error(err);
     console.log("manga saved");
   });
