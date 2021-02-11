@@ -178,7 +178,7 @@ module.exports.inlineSearch = async function (ctx) {
   );
 
   // search for id if there is only numbers in query
-  if (inlineQuery.match(/\d+/) && inlineQuery.replace(/\d+/, "").trim() == "") {
+  if (inlineQuery.match(/\d+/) && inlineQuery.replace(/\d+/, "").trim() === "") {
     let manga_id = inlineQuery.match(/\d+/)[0];
     let result = [],
       telegraph_url,

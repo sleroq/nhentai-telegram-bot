@@ -137,7 +137,7 @@ module.exports.fixInstantView = async function (ctx) {
           inline_keyboard: fixing_keyboard,
         })
         .catch((err) => {
-          console.log(err);
+          // console.log(err);
         });
     }
 
