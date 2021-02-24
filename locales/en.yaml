@@ -39,6 +39,7 @@ gallery: gallery
 help: |
   • To open a specific doujin just send me nhentais link or nuclear code
   • Also you can download images in .zip file with /zip command. For example: `/zip 234638`
+  [GitHub](https://github.com/iamdowner/nhentai-telegram-bot)
 search_tips: |
   <b>Search</b>
   • You can change search sorting by adding <code>/s</code><I>p</i> before the search query, where <i>p</i> - means by <b>p</b>opular or <i>n</i> - by <b>n</b>ew, for example: <code>/sp sex toys</code>
