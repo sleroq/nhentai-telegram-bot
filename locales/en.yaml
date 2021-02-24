@@ -24,10 +24,10 @@ popular: popularity
 # settings:
 settings: |
   <b>Settings:</b>
-  If Random localy is turned on bot will randomize not between all nhentai doujins (>242k), but only between >46.961k already saved in bot database. But these preloaded mangas opens faster and you don't have to wait for 'instant view'.
+  If Random locally is turned on bot will randomize not between all nhentai doujins (>250k), but only between >50k already saved in bot's database. But these preloaded doujins opens faster and you don't have to wait for 'instant view' page to be generated.
 search_appearance: "Search appearance:  "
 search_sorting: "Search sorting by "
-random_localy: "Random Localy:  "
+random_localy: "Random Locally:  "
 allow_repeat_in_random: "Allow repeat in random:  "
 
 current_language: "Lang: 🇺🇸" # this is emoji
