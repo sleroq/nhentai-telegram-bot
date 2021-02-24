@@ -35,7 +35,7 @@ const { saveAndGetUser } = require("./db/saveAndGetUser");
 const { randomCommand } = require("./bot/commands/random.js");
 const { dlzip } = require("./bot/commands/dlzip.js");
 const { help } = require("./bot/commands/help.js");
-const { settings } = require("./bot/commands/settings.js");
+const { settings } = require("./bot/settings/settings.js");
 
 const { cb_query } = require("./bot/buttons/index.js");
 const { inlineSearch } = require("./bot/inline_search.js");

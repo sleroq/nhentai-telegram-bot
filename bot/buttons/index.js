@@ -6,22 +6,17 @@ const { fixInstantView } = require("./fix_instant_view.js");
 const { searchtips } = require("./help_searchtips.js");
 const { help_back } = require("./help_back.js");
 const { saveAndGetUser } = require("../../db/saveAndGetUser");
+const { edit_settings } = require("../settings/edit_settings");
 
 module.exports.cb_query = async function (ctx, next) {
   // await ctx.answerCbQuery().catch((err) => {
   //   console.log(err);
   // });
-  let query_data = ctx.update.callback_query.data;
+  const query_data = ctx.update.callback_query.data;
   console.log(query_data);
 // console.log("ctx.update.callback_query")
 // console.log()
-if(ctx.update.callback_query && ctx.update.callback_query.date && ctx.update.callback_query < 1612959500){
-  return
-}
-// console.log(ctx.update.callback_query)
-// console.log("ctx.update.callback_query")
-if(ctx.update.callback_query.date < 1612958359)
-{
+if(ctx.update.callback_query && ctx.update.callback_query.date){
   return
 }
 
@@ -49,29 +44,6 @@ if(ctx.update.callback_query.date < 1612958359)
     await ctx
       .answerCbQuery("Please wait.", true)
       .catch((err) => console.log(err));
-  } else if (query_data == "settings" || query_data == "back_to_settings") {
-    let user = await saveAndGetUser(ctx);
-    await editSettings(user, ctx);
-  } else if (query_data == "change_search_type") {
-    let user = await saveAndGetUser(ctx);
-    user.search_type = user.search_type == "article" ? "photo" : "article";
-    user.save();
-    await editSettings(user, ctx);
-  } else if (query_data == "change_search_sorting") {
-    let user = await saveAndGetUser(ctx);
-    user.search_sorting = user.search_sorting == "date" ? "popular" : "date";
-    user.save();
-    await editSettings(user, ctx);
-  } else if (query_data == "can_repeat_in_random") {
-    let user = await saveAndGetUser(ctx);
-    user.can_repeat_in_random = user.can_repeat_in_random ? false : true;
-    user.save();
-    await editSettings(user, ctx);
-  } else if (query_data == "changa_rangom_localy") {
-    let user = await saveAndGetUser(ctx);
-    user.random_localy = user.random_localy ? false : true;
-    user.save();
-    await editSettings(user, ctx);
   } else if (query_data == "change_language") {
     let user = await saveAndGetUser(ctx);
     await editLangs(user, ctx);
@@ -85,6 +57,8 @@ if(ctx.update.callback_query.date < 1612958359)
     ctx.i18n.locale(lang);
     user.save();
     await editLangs(user, ctx);
+  } else {
+    await edit_settings(ctx)
   }
 };
 async function editLangs(user, ctx) {
@@ -128,61 +102,4 @@ async function editLangs(user, ctx) {
       },
     })
     .catch((err) => {});
-}
-async function editSettings(user, ctx) {
-  let search_type =
-      user.search_type == "article"
-        ? ctx.i18n.t("article")
-        : ctx.i18n.t("gallery"),
-    search_sorting =
-      user.search_sorting == "date"
-        ? ctx.i18n.t("date")
-        : ctx.i18n.t("popular"),
-    random_localy = user.random_localy ? ctx.i18n.t("yes") : ctx.i18n.t("no"),
-    can_repeat_in_random = user.can_repeat_in_random
-      ? ctx.i18n.t("yes")
-      : ctx.i18n.t("no"),
-    language = ctx.i18n.t("current_language");
-  await ctx
-    .editMessageText(ctx.i18n.t("settings"), {
-      parse_mode: "HTML",
-      reply_markup: {
-        inline_keyboard: [
-          [
-            {
-              text: ctx.i18n.t("search_appearance") + search_type,
-              callback_data: "change_search_type",
-            },
-          ],
-          [
-            {
-              text: ctx.i18n.t("search_sorting") + search_sorting,
-              callback_data: "change_search_sorting",
-            },
-          ],
-          [
-            {
-              text: ctx.i18n.t("random_localy") + random_localy,
-              callback_data: "changa_rangom_localy",
-            },
-          ],
-          [
-            {
-              text: ctx.i18n.t("allow_repeat_in_random") + can_repeat_in_random,
-              callback_data: "can_repeat_in_random",
-            },
-          ],
-
-          [
-            {
-              text: language,
-              callback_data: "change_language",
-            },
-          ],
-        ],
-      },
-    })
-    .catch((err) => {
-      console.log(err);
-    });
 }
