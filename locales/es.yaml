@@ -18,7 +18,9 @@ try_again_later: Inténtalo más tarde :(
 pages_fixed: páginas arregladas
 # just text
 yes: "sí"
+enabled: "habilitado"
 no: "no"
+disabled: "deshabilitado"
 date: fecha
 popular: popularidad
 # settings:
@@ -29,6 +31,7 @@ search_appearance: "Buscar apariencia:  "
 search_sorting: "Buscar ordenando por "
 random_localy: "Localizacón aleatoria:  "
 allow_repeat_in_random: "Permitir la repetición en el modo aleatorio: "
+safe_mode: "Modo seguro está "
 
 current_language: "Lang: 🇪🇸"
 choose_a_language: Elige un idioma

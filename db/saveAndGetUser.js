@@ -1,10 +1,10 @@
 const User = require("../models/user.model");
+const { awfulTags } = require("../bot/settings/safe_mode");
 
 module.exports.saveAndGetUser = async function (ctx) {
   let user = await User.findById(ctx.from.id, function (err) {
     if (err) console.log(err);
   });
-
   if (!user) {
     user = new User({
       _id: ctx.from.id,
@@ -14,6 +14,7 @@ module.exports.saveAndGetUser = async function (ctx) {
       language_code: ctx.from.language_code,
       search_sorting: "date",
       search_type: "photo",
+      ignored_random_tags: awfulTags,
       random_localy: true,
       can_repeat_in_random: true,
     })

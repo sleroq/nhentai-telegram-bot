@@ -19,6 +19,13 @@ module.exports.saveAndGetManga = async function (id, user) {
       ).catch((err) => {
         console.log(err);
       });
+      if(!manga && (user.default_random_tags.length > 0 || user.ignored_random_tags > 0)){
+      console.log("couldn't find manga with such tags")
+      return
+      }
+      if(!manga){
+        return
+      }
       console.log('got manga random localy')
     } else { // (if not localy)
       manga = await getRandomManga().catch((err) => {

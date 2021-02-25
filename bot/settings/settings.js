@@ -15,39 +15,39 @@ module.exports.settings = async function (ctx) {
     can_repeat_in_random = user.can_repeat_in_random ?
       ctx.i18n.t("yes") :
       ctx.i18n.t("no"),
-    language = ctx.i18n.t("current_language")//,
-    // safe_mode_text = `safe mode is ${isSafeModeOn(user) ? "on" : "off"}`
-      await ctx
-        .reply(ctx.i18n.t("settings"), {
-          parse_mode: "HTML",
-          reply_markup: {
-            inline_keyboard: [
-              [{
-                text: ctx.i18n.t("search_appearance") + search_type,
-                callback_data: "change_search_type",
-              },],
-              [{
-                text: ctx.i18n.t("search_sorting") + search_sorting,
-                callback_data: "change_search_sorting",
-              },],
-              [{
-                text: ctx.i18n.t("random_localy") + random_localy,
-                callback_data: "changa_rangom_localy",
-              },],
-              [{
-                text: ctx.i18n.t("allow_repeat_in_random") + can_repeat_in_random,
-                callback_data: "can_repeat_in_random",
-              },],
-              // [{
-              //   text: safe_mode_text,
-              //   callback_data: "safe_mode",
-              // },],
-              [{
-                text: language,
-                callback_data: "change_language",
-              },],
-            ],
-          },
-        })
-        .catch((err) => { });
+    language = ctx.i18n.t("current_language"),
+    safe_mode_text = ctx.i18n.t("safe_mode") + (isSafeModeOn(user) ? ctx.i18n.t("enabled") : ctx.i18n.t("disabled"))
+  await ctx
+    .reply(ctx.i18n.t("settings"), {
+      parse_mode: "HTML",
+      reply_markup: {
+        inline_keyboard: [
+          [{
+            text: ctx.i18n.t("search_appearance") + search_type,
+            callback_data: "change_search_type",
+          },],
+          [{
+            text: ctx.i18n.t("search_sorting") + search_sorting,
+            callback_data: "change_search_sorting",
+          },],
+          [{
+            text: ctx.i18n.t("random_localy") + random_localy,
+            callback_data: "changa_rangom_localy",
+          },],
+          [{
+            text: ctx.i18n.t("allow_repeat_in_random") + can_repeat_in_random,
+            callback_data: "can_repeat_in_random",
+          },],
+          [{
+            text: safe_mode_text,
+            callback_data: "toggle_safe_mode",
+          },],
+          [{
+            text: language,
+            callback_data: "change_language",
+          },],
+        ],
+      },
+    })
+    .catch((err) => { });
 };

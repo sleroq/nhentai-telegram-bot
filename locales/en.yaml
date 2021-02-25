@@ -18,7 +18,9 @@ try_again_later: Try again later :(
 pages_fixed: " pages fixed"
 # just text
 yes: "yes"
+enabled: "enabled"
 no: "no"
+disabled: "disabled"
 date: date
 popular: popularity
 # settings:
@@ -29,6 +31,7 @@ search_appearance: "Search appearance:  "
 search_sorting: "Search sorting by "
 random_localy: "Random Locally:  "
 allow_repeat_in_random: "Allow repeat in random:  "
+safe_mode: "Safe mode is "
 
 current_language: "Lang: 🇺🇸" # this is emoji
 choose_a_language: Choose a language
