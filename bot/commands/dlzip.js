@@ -2,7 +2,7 @@ const nhentai = require("../../nhentai");
 const { saveAndGetUser } = require("../../db/saveAndGetUser");
 const { getMangaMessage } = require("../someFuncs.js");
 const fs = require("fs");
-const nhdl = require("nhentaidownloader");
+const nhdl = require("../../nhentaidownloader");
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));

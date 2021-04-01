@@ -7,16 +7,15 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "better-sqlite3": "^7.1.2",
-    "cheerio": "^1.0.0-rc.3",
+    "adm-zip": "^0.5.5",
+    "axios": "^0.21.1",
+    "axios-retry": "^3.1.9",
+    "cheerio": "*",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "moment": "^2.26.0",
-    "mongoose": "^5.10.3",
-    "nhentai-api-js": "^1.1.4",
-    "nhentai-js": "^4.0.0",
-    "nhentaidownloader": "^1.1.5",
+    "moment": "^2.29.1",
+    "mongoose": "^5.12.3",
     "superagent": "^6.1.0",
     "telegra.ph": "^1.0.1",
     "telegraf": "^3.38.0",
@@ -24,7 +23,7 @@
     "telegraph-uploader": "^2.0.0"
   },
   "engines": {
-    "node": "12.x"
+    "node": "15.x"
   },
   "repository": {
     "url": "https://github.com/iamdowner/nhentai-telegram-bot"
