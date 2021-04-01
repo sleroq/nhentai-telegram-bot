@@ -73,18 +73,18 @@ module.exports.randomButton = async function (ctx) {
       return
     }
     message.history.push(manga.id);
-    if (message.history.length > 400) {
+    if (message.history.length > 50) {
       // (i have only 500mb bro stop)
-      for (let t = message.history.length; t > 200; t--) {
+      for (let t = message.history.length; t > 50; t--) {
         message.history.shift();
       }
     }
   }
 
   user.manga_history.push(manga.id);
-  if (user.manga_history.length > 200) {
+  if (user.manga_history.length > 50) {
     // you don't need so much history, do you?
-    for (let t = user.manga_history.length; t > 200; t--) {
+    for (let t = user.manga_history.length; t > 50; t--) {
       user.manga_history.shift();
     }
   }
