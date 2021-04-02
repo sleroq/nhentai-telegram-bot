@@ -1,7 +1,6 @@
 const nhentai = require("../../nhentai");
 
 const {
-  TelegraphUploadByUrls,
   telegraphCreatePage,
 } = require("../telegraph.js");
 const { getMangaMessage } = require("../someFuncs.js");
@@ -25,12 +24,10 @@ module.exports.fixInstantView = async function (ctx) {
   }
 
   let manga_db = await saveAndGetManga(manga_id)
-      if(!manga_db){
-                console.log("couldn't get manga so return")
-
-      ctx.reply("couldn't get manga")
-      return
-    }
+  if (!manga_db) {
+    console.log("couldn't get manga in fixinstant so return")
+    return
+  }
   let telegraph_fixed_url = manga_db.telegraph_fixed_url,
     telegraph_url = manga_db.telegraph_url;
 
@@ -173,8 +170,10 @@ module.exports.fixInstantView = async function (ctx) {
   }
   // save new url ofcourse:
   manga_db.telegraph_fixed_url = telegraph_fixed_url;
+  // delete all fixed pages cause we already have webpage
+  manga_db.fixed_pages = [];
   manga_db.save();
-  
+
   let heart = user.favorites.id(manga.id) ? "♥️" : "🖤",
     messageText = getMangaMessage(manga, telegraph_fixed_url, ctx.i18n),
     inline_keyboard = [
