@@ -8,6 +8,7 @@ const {
 } = require("./someFuncs.js");
 const { saveAndGetUser } = require("../db/saveAndGetUser");
 const { saveAndGetManga } = require("../db/saveAndGetManga");
+const Manga = require("../models/manga.model.js");
 
 
 module.exports.inlineSearch = async function (ctx) {
@@ -23,7 +24,7 @@ module.exports.inlineSearch = async function (ctx) {
         inline_keyboard: [
           [
             {
-              text: "favorites",
+              text: ctx.i18n.t("favorites"),
               switch_inline_query_current_chat: "",
             },
           ],
@@ -35,12 +36,12 @@ module.exports.inlineSearch = async function (ctx) {
       results.push({
         id: 69696969696969,
         type: searchType,
-        title: "Favorites!",
-        description: `This is your favorites:`,
+        title: ctx.i18n.t("favorites"),
+        description: ctx.i18n.t("favorites_tip_desctiption"),
         photo_url: "https://i.imgur.com/TmxG1Qr.png",
         thumb_url: "https://i.imgur.com/TmxG1Qr.png",
         input_message_content: {
-          message_text: "You haven't liked anything yet",
+          message_text: ctx.i18n.t("favorites_is_empty"),
           parse_mode: "Markdown",
         },
         reply_markup: favorites_reply_markup,
@@ -91,14 +92,14 @@ module.exports.inlineSearch = async function (ctx) {
       },
     }));
     results.push({
-      id: 69696969696969,
+      id: Math.floor(Math.random() * 10000000),
       type: searchType,
-      title: "Favorites!",
-      description: `This is your favorites:`,
+      title: ctx.i18n.t("favorites"),
+      description: ctx.i18n.t("favorites_tip_desctiption"),
       photo_url: "https://i.imgur.com/TmxG1Qr.png",
       thumb_url: "https://i.imgur.com/TmxG1Qr.png",
       input_message_content: {
-        message_text: "Tap to open favorites",
+        message_text: ctx.i18n.t("tap_to_open_favorites"),
         parse_mode: "Markdown",
       },
       reply_markup: favorites_reply_markup,
@@ -108,6 +109,110 @@ module.exports.inlineSearch = async function (ctx) {
       let num_of_superfluous = results.length - 50
       results.splice(0, num_of_superfluous)
     }
+    await ctx
+      .answerInlineQuery(results.reverse(), {
+        cache_time: 0,
+        is_personal: true,
+      })
+      .catch((err) => console.log(err));
+    return;
+  }
+
+  // history
+  if (ctx.inlineQuery.query.startsWith("/h")) {
+    let searchType = "article",
+      history = [],
+      results = [],
+      history_reply_markup = {
+        inline_keyboard: [
+          [
+            {
+              text: ctx.i18n.t("history_tip_title"),
+              switch_inline_query_current_chat: "/h",
+            },
+          ],
+        ],
+      }
+
+    if (!Array.isArray(user.manga_history) || user.manga_history.length === 0) {
+      // history is empty
+      results.push({
+        id: 69696969696969,
+        type: searchType,
+        title: ctx.i18n.t("history_tip_title"),
+        description: ctx.i18n.t("history_is_empty"),
+        photo_url: "https://i.imgur.com/vQxvN28.jpeg",
+        thumb_url: "https://i.imgur.com/vQxvN28.jpeg",
+        input_message_content: {
+          message_text: ctx.i18n.t("tap_to_open_history"),
+          parse_mode: "Markdown",
+        },
+        reply_markup: history_reply_markup,
+      });
+      return;
+    }
+
+    // get all info about manga from database in the same order 
+    history = await Manga.find({ 'id' : { $in: user.manga_history } })
+    history.sort(function(a, b) {
+      // Sort docs by the order of their _id values in ids.
+      return user.manga_history.indexOf(a.id) - user.manga_history.indexOf( b.id);
+    })
+
+    for (let i = 0; i < history.length; i++) {
+      history[i].message_text = getMangaMessage(
+        history[i],
+        history[i].telegraph_url,
+        ctx.i18n
+      );
+      history[i].description = sliceByHalf(history[i].title);
+      const heart = user.favorites.id(history[i].id) ? "♥️" : "🖤";
+      history[i].inline_keyboard = [
+        [
+          { text: "Telegra.ph", url: history[i].telegraph_url },
+          { text: heart, callback_data: "like_" + history[i].id },
+        ],
+      ];
+      if (!history[i].telegraph_fixed_url && (history[i].pages > 100 || isFullColor(history[i]))) {
+        history[i].inline_keyboard[0].unshift({
+          text: ctx.i18n.t("fix_button"),
+          callback_data: "fix_" + history[i].id,
+        });
+      }
+    }
+
+    results = history.map((manga) => ({
+      id: Math.floor(Math.random() * 10000000),
+      type: searchType,
+      title: manga.title
+        .split(/\[.*?\]/)
+        .join("")
+        .trim(),
+      description: manga.description,
+      thumb_url: manga.thumbnail,
+      photo_url: manga.thumbnail,
+
+      input_message_content: {
+        message_text: manga.message_text,
+        parse_mode: "HTML",
+      },
+      reply_markup: {
+        inline_keyboard: manga.inline_keyboard,
+      },
+    }));
+    results.push({
+      id: 69696969696969,
+      type: searchType,
+      title: ctx.i18n.t("history_tip_title"),
+      description: ctx.i18n.t("history_tip_desctiption"),
+      photo_url: "https://i.imgur.com/vQxvN28.jpeg",
+      thumb_url: "https://i.imgur.com/vQxvN28.jpeg",
+      input_message_content: {
+        message_text: ctx.i18n.t("tap_to_open_history"),
+        parse_mode: "Markdown",
+      },
+      reply_markup: history_reply_markup,
+    });
     await ctx
       .answerInlineQuery(results.reverse(), {
         cache_time: 0,

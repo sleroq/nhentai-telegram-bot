@@ -23,6 +23,16 @@ no: "no"
 disabled: "deshabilitado"
 date: fecha
 popular: popularidad
+# inline search
+history_tip_title: ¡Historia!
+history_tip_desctiption: "Este es tu historial:"
+history_is_empty: Tu historial está vacío ...
+tap_to_open_history: "Toca para abrir el historial"
+
+favorites: Favoritos!
+favorites_tip_desctiption: "Estos son tus favoritos:"
+favorites_is_empty: No te ha gustado nada todavía"
+tap_to_open_favorites: Toca para abrir favoritos
 # settings:
 ajustes: |
   <b>Ajustes:</b>
