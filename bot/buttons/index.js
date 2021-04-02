@@ -14,14 +14,12 @@ module.exports.cb_query = async function (ctx, next) {
   // });
   const query_data = ctx.update.callback_query.data;
   console.log(query_data);
-// console.log("ctx.update.callback_query")
-// console.log()
-if(ctx.update.callback_query && ctx.update.callback_query.date){
-  return
-}
+  if (ctx.update.callback_query && ctx.update.callback_query.date) {
+    return
+  }
 
   if (query_data[0] == "r") {
-    await randomButton(ctx).catch(err=>console.log(err));
+    await randomButton(ctx).catch(err => console.log(err));
   } else if (query_data.match("open")) {
     await openiInTelegraph(ctx).catch((err) => {
       console.log(err);
@@ -101,5 +99,5 @@ async function editLangs(user, ctx) {
         inline_keyboard: inline_keyboard,
       },
     })
-    .catch((err) => {});
+    .catch((err) => { });
 }

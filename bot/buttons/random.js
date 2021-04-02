@@ -54,9 +54,9 @@ module.exports.randomButton = async function (ctx) {
   */
   if (message.current < message.history.length) {
     manga = await saveAndGetManga(message.history[message.current]);
-    if(!manga){
+    if (!manga) {
       ctx.reply("couldn't get manga")
-        console.log("couldn't get manga so return")
+      console.log("couldn't get manga so return")
 
       return
     }
@@ -66,9 +66,9 @@ module.exports.randomButton = async function (ctx) {
     */
   } else {
     manga = await saveAndGetManga(undefined, user);
-    if(!manga){
+    if (!manga) {
       ctx.reply("couldn't get manga")
-        console.log("couldn't get manga so return")
+      console.log("couldn't get manga so return")
 
       return
     }
@@ -89,10 +89,7 @@ module.exports.randomButton = async function (ctx) {
     }
   }
   message.save();
-  user.save(function (err) {
-    if (err) return console.error(err);
-    console.log("user saved");
-  });
+  user.save();
 
   telegraph_url = manga.telegraph_fixed_url
     ? manga.telegraph_fixed_url

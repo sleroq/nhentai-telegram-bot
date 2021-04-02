@@ -54,7 +54,7 @@ module.exports.likeButton = async function (ctx) {
       .catch((err) => console.log(err));
     await ctx
       .editMessageReplyMarkup({ inline_keyboard: keyboard })
-      .catch((err) => console.log(err));
+      .catch((err) => {}/*console.log(err)*/);
   } else {
     user.favorites.id(manga_id).remove();
     await user.save();
