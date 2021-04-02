@@ -2,6 +2,7 @@ module.exports.help_back = async function (ctx) {
   ctx
     .editMessageText(ctx.i18n.t("help"), {
       parse_mode: "Markdown",
+      disable_web_page_preview: true,
       reply_markup: {
         inline_keyboard: [
           [
