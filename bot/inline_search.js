@@ -46,6 +46,12 @@ module.exports.inlineSearch = async function (ctx) {
         },
         reply_markup: favorites_reply_markup,
       });
+      await ctx
+      .answerInlineQuery(results, {
+        cache_time: 0,
+        is_personal: true,
+      })
+      .catch((err) => console.log(err));
       return;
     }
     for (let i = 0; i < favorites.length; i++) {
@@ -149,6 +155,12 @@ module.exports.inlineSearch = async function (ctx) {
         },
         reply_markup: history_reply_markup,
       });
+      await ctx
+      .answerInlineQuery(results, {
+        cache_time: 0,
+        is_personal: true,
+      })
+      .catch((err) => console.log(err));
       return;
     }
 
