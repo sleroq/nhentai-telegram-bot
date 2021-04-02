@@ -10,6 +10,18 @@ module.exports.help_back = async function (ctx) {
               callback_data: "searchtips",
             },
           ],
+          [
+            {
+              text: ctx.i18n.t("tap_to_open_favorites"),
+              switch_inline_query_current_chat: "",
+            },
+          ],
+          [
+            {
+              text: ctx.i18n.t("tap_to_open_history"),
+              switch_inline_query_current_chat: "/h",
+            },
+          ],
         ],
       },
     })
