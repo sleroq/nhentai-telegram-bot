@@ -94,10 +94,10 @@ bot.on("text", async (ctx, next) => {
 
 // start the bot 
 
-if (process.env.REPL_URL) { // with webhook
-  start_bot_with_webhook(bot)
-} else {                    // with polling
-  start_bot_with_polling(bot)
+if (process.env.REPL_URL || process.env.HEROKU_URL) { 
+  start_bot_with_webhook(bot) // with webhook
+} else {                    
+  start_bot_with_polling(bot) // with polling
 }
 
 async function start_bot_with_webhook(bot) {
