@@ -37,9 +37,3 @@
  * Get [telegra.ph token](https://telegra.ph/api#createAccount)
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
-<style>
-details[open] summary {
-    border-bottom: 1px solid #aaa;
-    margin-bottom: .5em;
-}
-</style>
