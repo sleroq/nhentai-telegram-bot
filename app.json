@@ -22,9 +22,5 @@
         "TELEGRAPH_TOKEN": {
             "description": "https://telegra.ph/api#createAccount"
         }
-    },
-    "scripts": {
-        "postdeploy": "npm install",
-        "start": "npm start"
     }
 }
