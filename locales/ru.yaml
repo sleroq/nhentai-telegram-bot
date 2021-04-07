@@ -25,6 +25,10 @@ date: дате
 popular: популярности
 nothing_is_found: "Ничего не нашлось ¯_(ツ)_/¯"
 manga_does_not_exist: "Этой манги не существует!"
+failed_to_get: Не удалось получить мангу!
+zip_tip: "Тебе нужно указать код: `/zip 234638`"
+something_went_wrong: "Что-то пошло не так :("
+file_is_too_big: "Извини, не могу отправить файл размером больше 50 MB в связи с ограничениями телеграма"
 # inline search
 history_tip_title: История!
 history_tip_desctiption: "Это твоя история:"
