@@ -23,6 +23,8 @@ no: "no"
 disabled: "deshabilitado"
 date: fecha
 popular: popularidad
+nothing_is_found: "No se encuentra nada ¯_(ツ)_/¯"
+manga_does_not_exist: "Este manga no existe"
 # inline search
 history_tip_title: ¡Historia!
 history_tip_desctiption: "Este es tu historial:"

@@ -23,6 +23,8 @@ no: нет
 disabled: "выключен"
 date: дате
 popular: популярности
+nothing_is_found: "Ничего не нашлось ¯_(ツ)_/¯"
+manga_does_not_exist: "Этой манги не существует!"
 # inline search
 history_tip_title: История!
 history_tip_desctiption: "Это твоя история:"
@@ -36,7 +38,7 @@ tap_to_open_favorites: Тыкни чтобы открыть избранные
 # settings:
 settings: |
   <b>Настройки:</b>
-  Если локальный рандом включен то бот будет искать мангу не среди всех nhentai манг (>242k), а только среди >46.961k сохраненных в базе даанных бота. Но эти заранее preloaded mangas opens faster and you don't have to wait for 'instant view'.
+  Если локальный рандом включен то бот будет искать мангу не среди всех nhentai манг (>360k), а только среди >180k сохраненных в базе даанных бота. Но эти заранее сохраненные в базу данных манги открываются быстрее.
 search_appearance: "Вид поиска:  "
 search_sorting: "Сортировка результатов по "
 random_localy: "Рандом локально:  "
