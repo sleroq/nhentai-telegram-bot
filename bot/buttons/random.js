@@ -54,7 +54,7 @@ module.exports.randomButton = async function (ctx) {
   */
   if (message.current < message.history.length) {
     manga = await saveAndGetManga(message.history[message.current]);
-    if (!manga) {
+    if (!manga || manga == 404) {
       ctx.reply("couldn't get manga")
       console.log("couldn't get manga so return")
 
@@ -66,7 +66,7 @@ module.exports.randomButton = async function (ctx) {
     */
   } else {
     manga = await saveAndGetManga(undefined, user);
-    if (!manga) {
+    if (!manga || manga == 404) {
       ctx.reply("couldn't get manga")
       console.log("couldn't get manga so return")
 

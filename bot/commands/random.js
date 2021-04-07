@@ -15,11 +15,11 @@ module.exports.randomCommand = async function (ctx) {
   let telegraph_url, manga;
 
   manga = await saveAndGetManga(undefined, user);
-      if(!manga){
-        console.log("couldn't get manga so return")
-      ctx.reply("couldn't get manga")
-      return
-    }
+  if (!manga || manga == 404) {
+    console.log("couldn't get manga so return")
+    ctx.reply("couldn't get manga")
+    return
+  }
   telegraph_url = manga.telegraph_fixed_url
     ? manga.telegraph_fixed_url
     : manga.telegraph_url;

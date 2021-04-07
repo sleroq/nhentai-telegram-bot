@@ -21,12 +21,12 @@ module.exports.prevButton = async function (ctx) {
   message.save();
 
   let manga = await saveAndGetManga(message.history[message.current]);
-      if(!manga){
-                console.log("couldn't get manga so return")
+  if (!manga || manga == 404) {
+    console.log("couldn't get manga so return")
 
-      ctx.reply("couldn't get manga")
-      return
-    }
+    ctx.reply("couldn't get manga")
+    return
+  }
   let telegraph_url = manga.telegraph_fixed_url
     ? manga.telegraph_fixed_url
     : manga.telegraph_url;

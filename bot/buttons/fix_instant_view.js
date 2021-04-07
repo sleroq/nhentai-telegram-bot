@@ -24,7 +24,7 @@ module.exports.fixInstantView = async function (ctx) {
   }
 
   let manga_db = await saveAndGetManga(manga_id)
-  if (!manga_db) {
+  if (!manga_db || manga == 404) {
     console.log("couldn't get manga in fixinstant so return")
     return
   }

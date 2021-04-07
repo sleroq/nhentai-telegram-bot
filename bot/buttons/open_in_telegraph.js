@@ -30,12 +30,12 @@ module.exports.openiInTelegraph = async function (ctx) {
   }
   //get manga from database
   let savedManga = await saveAndGetManga(manga_id)
-        if(!manga){
-                console.log("couldn't get manga so return")
+  if (!manga || manga == 404) {
+    console.log("couldn't get manga so return")
 
-      ctx.reply("couldn't get manga")
-      return
-    }
+    ctx.reply("couldn't get manga")
+    return
+  }
   let telegraph_url = savedManga.telegraph_fixed_url
     ? savedManga.telegraph_fixed_url
     : savedManga.telegraph_url;
@@ -66,7 +66,7 @@ module.exports.openiInTelegraph = async function (ctx) {
     reply_markup: {
       inline_keyboard: inline_keyboard,
     },
-  }).catch(err=>{
+  }).catch(err => {
     console.log(err)
   })
 }
