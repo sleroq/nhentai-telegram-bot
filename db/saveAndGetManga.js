@@ -54,10 +54,14 @@ module.exports.saveAndGetManga = async function (id, user) {
     });
     if (!manga) {
       manga = await nhentai.getDoujin(id).catch((err) => {
-      })
-        ;
+        return err.status
+      });
+      if (manga == 404) {
+        // console.log("!manga - 404");
+        return 404;
+      }
       if (!manga) {
-        console.log("!manga");
+        // console.log("!manga");
         return;
       }
       // here telegraph page:
