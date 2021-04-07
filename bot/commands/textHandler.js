@@ -20,7 +20,7 @@ module.exports.textHandler = async function (ctx) {
   }
   let message_text = ctx.message.text,
     // find numbers, remove duplicates:
-    match = Array.from(new Set(message_text.match(/\d+/gm))); 
+    match = Array.from(new Set(message_text.match(/\d+/gm)));
   if (match && match[0]) {
     for (let i = 0; i < match.length; i++) {
       let manga_id = match[i],
@@ -32,11 +32,14 @@ module.exports.textHandler = async function (ctx) {
         console.log(err)
       })
       if (manga == 404) {
-        await ctx.reply(ctx.i18n.t("manga_does_not_exist") + "\n(" + manga_id+ ")")
+        await ctx.reply(ctx.i18n.t("manga_does_not_exist") + "\n(" + manga_id + ")")
         console.log("no manga in textHandler 404, continue")
         continue;
       }
       if (!manga) {
+        await ctx.reply(ctx.i18n.t("failed_to_get") + "\n(`" + manga_id + "`)", {
+          parse_mode: "Markdown",
+        });
         console.log("no manga in textHandler, continue")
         continue;
       }
