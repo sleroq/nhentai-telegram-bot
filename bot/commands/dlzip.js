@@ -13,49 +13,58 @@ module.exports.dlzip = async function (ctx) {
   let msg = ctx.message.text,
     mangaId = msg.match(/\d+/) ? msg.match(/\d+/)[0] : null;
   if (!mangaId) {
-    await ctx.reply("Yuo have to specify a code: `/zip 234638`", {
+    await ctx.reply(ctx.i18n.t("zip_tip"), {
       parse_mode: "Markdown",
-    }).catch((err)=>{
-      return
-    })
+    }).catch((err)=>{})
     return;
   }
   let manga = await nhentai.getDoujin(mangaId).catch((err) => {
     console.log(err.status);
+    return err.status
   });
+  if (manga == 404) {
+    await ctx.reply(ctx.i18n.t("manga_does_not_exist") + "\n(`" + mangaId+ "`)",{
+      parse_mode: "Markdown",
+    })
+    return;
+  }
   if (!manga) {
-    await ctx.reply("Failed to get doujin `" + mangaId + "` :/", {
+    await ctx.reply(ctx.i18n.t("failed_to_get") + "\n(`" + mangaId + "`)", {
       parse_mode: "Markdown",
     });
     return;
   }
-  if (manga.details.pages > 100) {
-    await ctx.reply("Sorry, that's too many pages :(", {
+  if (manga.details.pages > 150) {
+    await ctx.reply(ctx.i18n.t("too_many_pages"), {
       parse_mode: "Markdown",
     });
     return;
   }
-  await ctx.reply("wait a bit");
+  await ctx.reply(ctx.i18n.t("waitabit_button"));
+  await ctx.replyWithChatAction("upload_document");
 
   let messageText = getMangaMessage(manga, undefined, ctx.i18n);
 
   await nhdl(mangaId).then((buffer) => {
     fs.writeFileSync(`./${mangaId}.zip`, buffer);
+  }).catch(err=>{
+    console.log(err)
+    ctx.reply(ctx.i18n.t("something_went_wrong") + "\nError status: " + err.status, {
+      parse_mode: "Markdown",
+    });
+    return;
   });
+  await ctx.replyWithChatAction("upload_document");
   let stats = await fs.statSync(`./${mangaId}.zip`),
     fileSizeB = stats["size"],
-    fileSizeMB = fileSizeB / 1000000.0;
-  console.log(fileSizeMB);
+    fileSizeMB = fileSizeB / 1048576.0;
+  console.log(fileSizeMB + " fileSizeMB");
+  console.log(fileSizeB + " fileSizeB");
 
   if (fileSizeMB > 50) {
     await ctx.reply(
-      "Sorry, file is too big, for bots telegram allow " +
-      "sending files only less then 50 mb, when this file is " +
-      fileSizeMB +
-      ":(",
-      {
-        parse_mode: "Markdown",
-      }
+      ctx.i18n.t("file_is_too_big") +
+      "Your file size: " + fileSizeMB,
     );
   } else {
     await ctx.telegram
