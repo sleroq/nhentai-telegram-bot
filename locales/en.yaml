@@ -29,6 +29,7 @@ failed_to_get: Failed to get doujin!
 zip_tip: "You have to specify a code: `/zip 234638`"
 something_went_wrong: "Something went wrong :("
 file_is_too_big: "Sorry, I can't send files larger than 50 MB due to telegram's restrictions."
+size_of_your_file: "Size of your file: "
 # inline search
 history_tip_title: History!
 history_tip_desctiption: "This is your history:"

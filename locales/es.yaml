@@ -29,6 +29,7 @@ failed_to_get: ¡No pude conseguir doujin!
 zip_tip: "Tienes que especificar un código: `/zip 234638`"
 something_went_wrong: "Algo salió mal :("
 file_is_too_big: "No puedo enviar archivos de más de 50 MB debido a restricciones."
+size_of_your_file: "Tamaño de su archivo: "
 # inline search
 history_tip_title: ¡Historia!
 history_tip_desctiption: "Este es tu historial:"

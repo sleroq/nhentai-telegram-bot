@@ -63,8 +63,9 @@ module.exports.dlzip = async function (ctx) {
 
   if (fileSizeMB > 50) {
     await ctx.reply(
-      ctx.i18n.t("file_is_too_big") +
-      "Your file size: " + fileSizeMB,
+      ctx.i18n.t("file_is_too_big") + "\n" +
+      ctx.i18n.t("size_of_your_file") +
+      Math.round(fileSizeMB) + "mb",
     );
   } else {
     await ctx.telegram
