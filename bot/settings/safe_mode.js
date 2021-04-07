@@ -7,6 +7,8 @@ const awfulTags = [
     "mind break",
     "incest",
     "futanari",
+    "shotacon",
+    "lolicon"
 ]
 async function toggle_safe_mode(user) {
     let tags = user.ignored_random_tags
