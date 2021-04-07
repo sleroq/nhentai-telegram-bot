@@ -263,7 +263,7 @@ module.exports.inlineSearch = async function (ctx) {
   const nothingIsFound_result = {
     id: 6969696969,
     type: searchType,
-    title: "Nothing is found ¯_(ツ)_/¯",
+    title: ctx.i18n.t("nothing_is_found"),
     description: ``,
     photo_url: "https://i.imgur.com/j2zt4j7.png",
     thumb_url: "https://i.imgur.com/j2zt4j7.png",
@@ -301,7 +301,7 @@ module.exports.inlineSearch = async function (ctx) {
       telegraph_url,
       manga = await saveAndGetManga(manga_id);
     // if nothing is found
-    if (!manga) {
+    if (!manga || manga == 404) {
       result.push(nothingIsFound_result);
       await ctx.answerInlineQuery(result).catch((err) => console.log(err));
       return;
