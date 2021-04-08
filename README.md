@@ -20,7 +20,7 @@
     <img src="https://i.postimg.cc/G36TNCVw/image.png" alt="Instant preview">
   </details>
 * Discover new doujins with /rand command.
-* Open doujins usind code or link, send multiple codes in one message.
+* Open doujins using code or link, send multiple codes in one message.
 * Database - Bot works even if nhentai is down (more then 170k doujins are saved).
 * <details>
     <summary>
