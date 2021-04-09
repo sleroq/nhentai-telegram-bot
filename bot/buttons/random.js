@@ -19,14 +19,12 @@ module.exports.randomButton = async function (ctx) {
   /* if something breaks (nhentai is down)
      user still can go back to prev opend mangas: */
   let waiting_keyboard = [
-    [{ text: ctx.i18n.t("waitabit_button"), callback_data: "wait" }],
-  ];
-  if (message && message.current != 0) {
-    waiting_keyboard[0].unshift({
+    [{
       text: ctx.i18n.t("previous_button"),
       callback_data: "prev_",
-    });
-  }
+    },
+    { text: ctx.i18n.t("waitabit_button"), callback_data: "wait" }],
+  ];
   ctx
     .editMessageReplyMarkup({
       inline_keyboard: waiting_keyboard,
