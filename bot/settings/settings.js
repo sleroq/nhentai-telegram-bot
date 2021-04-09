@@ -1,5 +1,7 @@
 const { saveAndGetUser } = require("../../db/saveAndGetUser");
 const { isSafeModeOn } = require("./safe_mode");
+const api = require('../../api');
+const nhentai = require("../../nhentai");
 
 module.exports.settings = async function (ctx) {
   let user = await saveAndGetUser(ctx),
@@ -11,12 +13,13 @@ module.exports.settings = async function (ctx) {
       user.search_sorting == "date" ?
         ctx.i18n.t("date") :
         ctx.i18n.t("popular"),
-    random_localy = user.random_localy ? ctx.i18n.t("yes") : ctx.i18n.t("no"),
+    random_locally = user.random_localy ? ctx.i18n.t("yes") : ctx.i18n.t("no"),
     can_repeat_in_random = user.can_repeat_in_random ?
       ctx.i18n.t("yes") :
       ctx.i18n.t("no"),
     language = ctx.i18n.t("current_language"),
     safe_mode_text = ctx.i18n.t("safe_mode") + (isSafeModeOn(user) ? ctx.i18n.t("enabled") : ctx.i18n.t("disabled"))
+
   await ctx
     .reply(ctx.i18n.t("settings"), {
       parse_mode: "HTML",
@@ -25,27 +28,27 @@ module.exports.settings = async function (ctx) {
           [{
             text: ctx.i18n.t("search_appearance") + search_type,
             callback_data: "change_search_type",
-          },],
+          }],
           [{
             text: ctx.i18n.t("search_sorting") + search_sorting,
             callback_data: "change_search_sorting",
           },],
           [{
-            text: ctx.i18n.t("random_localy") + random_localy,
+            text: ctx.i18n.t("random_localy") + random_locally,
             callback_data: "changa_rangom_localy",
-          },],
-          [{
-            text: ctx.i18n.t("allow_repeat_in_random") + can_repeat_in_random,
-            callback_data: "can_repeat_in_random",
-          },],
+          }],
           [{
             text: safe_mode_text,
             callback_data: "toggle_safe_mode",
-          },],
+          }],
+          [{
+            text: ctx.i18n.t("about_settings"),
+            url: "https://telegra.ph/Settings-04-09",
+          }],
           [{
             text: language,
             callback_data: "change_language",
-          },],
+          }],
         ],
       },
     })

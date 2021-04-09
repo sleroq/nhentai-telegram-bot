@@ -10,6 +10,7 @@ waitabit_button: Wait a bit
 search_tips_button: Search tips
 settings_button: settings
 next_page_button: Next page
+tap_to_open_history: "Tap to open history"
 # manga related text:
 pages: pages
 tags: "Tags: "
@@ -34,21 +35,20 @@ size_of_your_file: "Size of your file: "
 history_tip_title: History!
 history_tip_desctiption: "This is your history:"
 history_is_empty: Your history is empty..
-tap_to_open_history: "Tap to open history"
 
 favorites: Favorites!
 favorites_tip_desctiption: "This is your favorites:"
 favorites_is_empty: "You haven't liked anything yet"
 tap_to_open_favorites: Tap to open favorites
 # settings:
-settings: |
-  <b>Settings:</b>
-  If Random locally is turned on bot will randomize not between all nhentai doujins (>360k), but only between >180k already saved in bot's database. But these preloaded doujins opens faster and you don't have to wait for 'instant view' page to be generated.
+settings: <b>Settings:</b>
 search_appearance: "Search appearance:  "
 search_sorting: "Search sorting by "
 random_localy: "Random Locally:  "
 allow_repeat_in_random: "Allow repeat in random:  "
 safe_mode: "Safe mode is "
+about_settings: "What does settings mean?"
+about_settings_url: ""
 
 current_language: "Lang: 🇺🇸" # this is emoji
 choose_a_language: Choose a language

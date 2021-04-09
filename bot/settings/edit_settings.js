@@ -1,5 +1,7 @@
 const { saveAndGetUser } = require("../../db/saveAndGetUser");
 const { isSafeModeOn, toggle_safe_mode } = require("./safe_mode");
+const api = require('../../api');
+const nhentai = require("../../nhentai");
 
 async function edit_message(user, ctx) {
   let search_type =
@@ -16,6 +18,7 @@ async function edit_message(user, ctx) {
       ctx.i18n.t("no"),
     language = ctx.i18n.t("current_language"),
     safe_mode_text = ctx.i18n.t("safe_mode") + (isSafeModeOn(user) ? ctx.i18n.t("enabled") : ctx.i18n.t("disabled"))
+
   await ctx
     .editMessageText(ctx.i18n.t("settings"), {
       parse_mode: "HTML",
@@ -24,23 +27,23 @@ async function edit_message(user, ctx) {
           [{
             text: ctx.i18n.t("search_appearance") + search_type,
             callback_data: "change_search_type",
-          },],
+          }],
           [{
             text: ctx.i18n.t("search_sorting") + search_sorting,
             callback_data: "change_search_sorting",
-          },],
+          }],
           [{
             text: ctx.i18n.t("random_localy") + random_localy,
             callback_data: "changa_rangom_localy",
-          },],
-          [{
-            text: ctx.i18n.t("allow_repeat_in_random") + can_repeat_in_random,
-            callback_data: "can_repeat_in_random",
-          },],
+          }],
           [{
             text: safe_mode_text,
             callback_data: "toggle_safe_mode",
-          },],
+          }],
+          [{
+            text: ctx.i18n.t("about_settings"),
+            url: "https://telegra.ph/Settings-04-09",
+          }],
           [{
             text: language,
             callback_data: "change_language",
