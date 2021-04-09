@@ -2,15 +2,16 @@ const nhentai = require("../nhentai");
 const Manga = require("../models/manga.model");
 
 async function getRandomManga() {
-  /* get the newest possible id from homepage
-     assuming there are latest added doujins  */
-  let homepage = await nhentai.getHomepage().catch(err => {
-    new Error("failed to get Homepage in getRandomManga()")
-  }),
-    newestMangaId = +homepage.results[0].id;
-
-  // trying to get manga 10 times (to be sure)
-  for (let i = 0; i < 10; i++) {
+  /* get the newest possible id */
+  let search_popular_tag = await nhentai
+     .search('"big breasts"')
+     .catch((err) => {
+       console.log("search error in settings");
+       console.log(err);
+     });
+    newestMangaId = +search_popular_tag.results[0].id;
+  // trying to get manga 5 times (to be sure)
+  for (let i = 0; i < 5; i++) {
     let randomId = Math.floor(Math.random() * newestMangaId) + 1,
       manga = await nhentai.getDoujin(randomId).catch((err) => {
         console.log("failed to get Doujin in getRandomManga(), but that's ok - continue")
