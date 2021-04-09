@@ -16,8 +16,9 @@ module.exports.inlineSearch = async function (ctx) {
 
   // favorites: 
 
-  if (!ctx.inlineQuery.query || ctx.inlineQuery.query.startsWith("/fav")) {
-    let searchType = "article",
+  if (!ctx.inlineQuery.query || (ctx.inlineQuery.query.match(/\/p\d+/g) && ctx.inlineQuery.query.match(/\/p\d+/g)[0] && ctx.inlineQuery.query.replace(ctx.inlineQuery.query.match(/\/p\d+/g)[0], "").trim() === '')) {
+    let inlineQuery = ctx.inlineQuery.query,
+      searchType = "article",
       favorites = user.favorites,
       results = [],
       favorites_reply_markup = {
@@ -29,8 +30,15 @@ module.exports.inlineSearch = async function (ctx) {
             },
           ],
         ],
-      }
-
+      },
+      pageNumber = 1,
+      pageNumberMatch = inlineQuery.match(/\/p\d+/g) // check if page specified
+        ? inlineQuery.match(/\/p\d+/g)[0]
+        : undefined;
+    if (pageNumberMatch) { // for example "@bot /f /p2" 
+      pageNumber = pageNumberMatch.slice(2);
+      inlineQuery = inlineQuery.replace(pageNumberMatch, "").trim();
+    }
     if (!Array.isArray(favorites) || favorites.length === 0) {
       // favorites is empty
       results.push({
@@ -47,11 +55,11 @@ module.exports.inlineSearch = async function (ctx) {
         reply_markup: favorites_reply_markup,
       });
       await ctx
-      .answerInlineQuery(results, {
-        cache_time: 0,
-        is_personal: true,
-      })
-      .catch((err) => console.log(err));
+        .answerInlineQuery(results, {
+          cache_time: 0,
+          is_personal: true,
+        })
+        .catch((err) => console.log(err));
       return;
     }
     for (let i = 0; i < favorites.length; i++) {
@@ -97,7 +105,16 @@ module.exports.inlineSearch = async function (ctx) {
         inline_keyboard: manga.inline_keyboard,
       },
     }));
-    results.push({
+    results.reverse()
+    //splice pages some pages
+    results.splice(0, 48 * (pageNumber - 1))
+    // rm old favorites cause of telegram limit
+    if (results.length > 48) {
+      let num_of_superfluous = results.length - 48
+      results.splice(48, num_of_superfluous)
+    }
+    let nextPageSwitch = `/p${+pageNumber + 1} ${inlineQuery}`;
+    results.unshift({
       id: Math.floor(Math.random() * 10000000),
       type: searchType,
       title: ctx.i18n.t("favorites"),
@@ -110,13 +127,34 @@ module.exports.inlineSearch = async function (ctx) {
       },
       reply_markup: favorites_reply_markup,
     });
-    // rm old favorites cause of telegram limit
-    if (results.length > 50) {
-      let num_of_superfluous = results.length - 50
-      results.splice(0, num_of_superfluous)
+    if (pageNumber < Math.ceil(results.length / 48)) {
+      results.push({
+        id: 9696969696,
+        type: searchType,
+        title: "Next page",
+        description: `TAP HERE or Just add "/p${+pageNumber + 1
+          }" to search qerry: (@nhentai_mangabot ${nextPageSwitch})`,
+        photo_url: "https://i.imgur.com/3AMTdoA.png",
+        thumb_url: "https://i.imgur.com/3AMTdoA.png",
+        input_message_content: {
+          message_text:
+            "To view specific page you can *add /p*`n` to the search query, where `n` is page number",
+          parse_mode: "Markdown",
+        },
+        reply_markup: {
+          inline_keyboard: [
+            [
+              {
+                text: ctx.i18n.t("next_page_button"),
+                switch_inline_query_current_chat: nextPageSwitch,
+              },
+            ],
+          ],
+        },
+      });
     }
     await ctx
-      .answerInlineQuery(results.reverse(), {
+      .answerInlineQuery(results, {
         cache_time: 0,
         is_personal: true,
       })
@@ -156,19 +194,19 @@ module.exports.inlineSearch = async function (ctx) {
         reply_markup: history_reply_markup,
       });
       await ctx
-      .answerInlineQuery(results, {
-        cache_time: 0,
-        is_personal: true,
-      })
-      .catch((err) => console.log(err));
+        .answerInlineQuery(results, {
+          cache_time: 0,
+          is_personal: true,
+        })
+        .catch((err) => console.log(err));
       return;
     }
 
     // get all info about manga from database in the same order 
-    history = await Manga.find({ 'id' : { $in: user.manga_history } })
-    history.sort(function(a, b) {
+    history = await Manga.find({ 'id': { $in: user.manga_history } })
+    history.sort(function (a, b) {
       // Sort docs by the order of their _id values in ids.
-      return user.manga_history.indexOf(a.id) - user.manga_history.indexOf( b.id);
+      return user.manga_history.indexOf(a.id) - user.manga_history.indexOf(b.id);
     })
 
     for (let i = 0; i < history.length; i++) {
