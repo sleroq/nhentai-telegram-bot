@@ -1,4 +1,5 @@
 const nhentai = require("../nhentai");
+const config = require('../config.json');
 
 const {
   getMessageInline,
@@ -18,7 +19,7 @@ module.exports.inlineSearch = async function (ctx) {
 
   if (!ctx.inlineQuery.query || (ctx.inlineQuery.query.match(/\/p\d+/g) && ctx.inlineQuery.query.match(/\/p\d+/g)[0] && ctx.inlineQuery.query.replace(ctx.inlineQuery.query.match(/\/p\d+/g)[0], "").trim() === '')) {
     let inlineQuery = ctx.inlineQuery.query,
-      searchType = "article",
+      searchType = config.show_favorites_as_gallery ? "gallery" : "article",
       favorites = user.favorites,
       results = [],
       favorites_reply_markup = {
@@ -46,8 +47,8 @@ module.exports.inlineSearch = async function (ctx) {
         type: searchType,
         title: ctx.i18n.t("favorites"),
         description: ctx.i18n.t("favorites_tip_desctiption"),
-        photo_url: "https://i.imgur.com/TmxG1Qr.png",
-        thumb_url: "https://i.imgur.com/TmxG1Qr.png",
+        photo_url: config.favorites_icon_inline,
+        thumb_url: config.favorites_icon_inline,
         input_message_content: {
           message_text: ctx.i18n.t("favorites_is_empty"),
           parse_mode: "Markdown",
@@ -71,7 +72,7 @@ module.exports.inlineSearch = async function (ctx) {
         ctx.i18n
       );
       favorites[i].description = sliceByHalf(favorites[i].title);
-      let heart = user.favorites.id(favorites[i].id) ? "♥️" : "🖤";
+      let heart = user.favorites.id(favorites[i].id) ? config.like_button_true : config.like_button_false;
       favorites[i].inline_keyboard = [
         [
           { text: "Telegra.ph", url: favorites[i].telegraph_url },
@@ -119,8 +120,8 @@ module.exports.inlineSearch = async function (ctx) {
       type: searchType,
       title: ctx.i18n.t("favorites"),
       description: ctx.i18n.t("favorites_tip_desctiption"),
-      photo_url: "https://i.imgur.com/TmxG1Qr.png",
-      thumb_url: "https://i.imgur.com/TmxG1Qr.png",
+      photo_url: config.favorites_icon_inline,
+      thumb_url: config.favorites_icon_inline,
       input_message_content: {
         message_text: ctx.i18n.t("tap_to_open_favorites"),
         parse_mode: "Markdown",
@@ -131,14 +132,14 @@ module.exports.inlineSearch = async function (ctx) {
       results.push({
         id: 9696969696,
         type: searchType,
-        title: "Next page",
+        title: ctx.i18n.t("next_page_tip_title"),
         description: `TAP HERE or Just add "/p${+pageNumber + 1
           }" to search qerry: (@nhentai_mangabot ${nextPageSwitch})`,
-        photo_url: "https://i.imgur.com/3AMTdoA.png",
-        thumb_url: "https://i.imgur.com/3AMTdoA.png",
+        photo_url: config.next_page_icon_inline,
+        thumb_url: config.next_page_icon_inline,
         input_message_content: {
           message_text:
-            "To view specific page you can *add /p*`n` to the search query, where `n` is page number",
+            ctx.i18n.t("next_page_tip_message"),
           parse_mode: "Markdown",
         },
         reply_markup: {
@@ -185,8 +186,8 @@ module.exports.inlineSearch = async function (ctx) {
         type: searchType,
         title: ctx.i18n.t("history_tip_title"),
         description: ctx.i18n.t("history_is_empty"),
-        photo_url: "https://i.imgur.com/vQxvN28.jpeg",
-        thumb_url: "https://i.imgur.com/vQxvN28.jpeg",
+        photo_url: config.history_icon_inline,
+        thumb_url: config.history_icon_inline,
         input_message_content: {
           message_text: ctx.i18n.t("tap_to_open_history"),
           parse_mode: "Markdown",
@@ -216,7 +217,7 @@ module.exports.inlineSearch = async function (ctx) {
         ctx.i18n
       );
       history[i].description = sliceByHalf(history[i].title);
-      const heart = user.favorites.id(history[i].id) ? "♥️" : "🖤";
+      const heart = user.favorites.id(history[i].id) ? config.like_button_true : config.like_button_false;
       history[i].inline_keyboard = [
         [
           { text: "Telegra.ph", url: history[i].telegraph_url },
@@ -255,8 +256,8 @@ module.exports.inlineSearch = async function (ctx) {
       type: searchType,
       title: ctx.i18n.t("history_tip_title"),
       description: ctx.i18n.t("history_tip_desctiption"),
-      photo_url: "https://i.imgur.com/vQxvN28.jpeg",
-      thumb_url: "https://i.imgur.com/vQxvN28.jpeg",
+      photo_url: config.history_icon_inline,
+      thumb_url: config.history_icon_inline,
       input_message_content: {
         message_text: ctx.i18n.t("tap_to_open_history"),
         parse_mode: "Markdown",
@@ -303,8 +304,8 @@ module.exports.inlineSearch = async function (ctx) {
     type: searchType,
     title: ctx.i18n.t("nothing_is_found"),
     description: ``,
-    photo_url: "https://i.imgur.com/j2zt4j7.png",
-    thumb_url: "https://i.imgur.com/j2zt4j7.png",
+    photo_url: config.help_icon_inline,
+    thumb_url: config.help_icon_inline,
     input_message_content: {
       message_text: ctx.i18n.t("help"),
       parse_mode: "Markdown",
@@ -452,8 +453,9 @@ module.exports.inlineSearch = async function (ctx) {
       sortingParametr == "popular" ? "new" : "popularity",
       reverseSortingPhotoUrl =
         sortingParametr == "popular"
-          ? "https://i.imgur.com/wmHyvQk.png"
-          : "https://i.imgur.com/kMsyvIX.png",
+          ? config.sort_by_new_icon_inline
+          : config.sort_by_popular_icon_inline,
+          sorting_tip_title = sortingParametr == "popular" ? ctx.i18n.t("sorting_by_new_tip_title") : ctx.i18n.t("sorting_by_popularity_tip_title"),
       reverseSortingParametr = reverseSortingWord.charAt(0),
       searchSortingSwitch = isPageModified
         ? `/p${pageNumber} /s${reverseSortingParametr} ${inlineQuery}`
@@ -462,7 +464,7 @@ module.exports.inlineSearch = async function (ctx) {
     results.unshift({
       id: 69696969420,
       type: searchType,
-      title: "To sort results by " + reverseSortingWord,
+      title: sorting_tip_title,
       description: `Just add "/s${reverseSortingParametr}" to search qerry: (@nhentai_mangabot ${searchSortingSwitch})`,
       photo_url: reverseSortingPhotoUrl,
       thumb_url: reverseSortingPhotoUrl,
@@ -493,14 +495,13 @@ module.exports.inlineSearch = async function (ctx) {
     results.push({
       id: 9696969696,
       type: searchType,
-      title: "Next page",
+      title: ctx.i18n.t("next_page_tip_title"),
       description: `TAP HERE or Just add "/p${+pageNumber + 1
         }" to search qerry: (@nhentai_mangabot ${nextPageSwitch})`,
-      photo_url: "https://i.imgur.com/3AMTdoA.png",
-      thumb_url: "https://i.imgur.com/3AMTdoA.png",
+      photo_url: config.next_page_icon_inline,
+      thumb_url: config.next_page_icon_inline,
       input_message_content: {
-        message_text:
-          "To view specific page you can *add /p*`n` to the search query, where `n` is page number",
+        message_text: ctx.i18n.t("next_page_tip_message"),
         parse_mode: "Markdown",
       },
       reply_markup: {

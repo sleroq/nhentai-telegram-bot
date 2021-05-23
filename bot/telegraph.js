@@ -1,10 +1,11 @@
 const Telegraph = require("telegra.ph");
 const client = new Telegraph(process.env.TELEGRAPH_TOKEN);
+const config = require('../config.json');
 
 async function telegraphCreatePage(
   manga,
   images,
-  username = "nhentai_mangabot"
+  username = config.bot_username
 ) {
   return client.createPage(
     `${manga.title}`,
@@ -18,7 +19,7 @@ async function telegraphCreatePage(
       .concat([
         {
           tag: "a",
-          children: ["Thanks for reading this chapter!"],
+          children: [config.text_at_the_end_of_telegraph_page],
         },
       ]),
     "@" + username,

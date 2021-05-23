@@ -1,6 +1,7 @@
 const { saveAndGetUser } = require("../../db/saveAndGetUser");
 const Manga = require("../../models/manga.model");
 const nhentai = require("../../nhentai");
+const config = require('../../config.json');
 
 module.exports.likeButton = async function (ctx) {
   let user = await saveAndGetUser(ctx),
@@ -16,7 +17,7 @@ module.exports.likeButton = async function (ctx) {
     keyboard = [
       [
         { text: "Telegra.ph", url: manga.telegraph_url },
-        { text: "🖤", callback_data: "like_" + manga.id },
+        { text: config.like_button_false, callback_data: "like_" + manga.id },
       ],
     ];
   }
@@ -48,7 +49,7 @@ module.exports.likeButton = async function (ctx) {
     await user.save();
     console.log("Added to favorites!");
     // keyboard[0].push({ text: "♥️", callback_data: "like_" + manga.id });
-    keyboard[0][keyboard[0].length - 1].text = "♥️";
+    keyboard[0][keyboard[0].length - 1].text = config.like_button_true;
     await ctx
       .answerCbQuery("Added to favorites!")
       .catch((err) => console.log(err));
@@ -63,7 +64,7 @@ module.exports.likeButton = async function (ctx) {
       .answerCbQuery("Removed from favorites!")
       .catch((err) => console.log(err));
 
-    keyboard[0][keyboard[0].length - 1].text = "🖤";
+    keyboard[0][keyboard[0].length - 1].text = config.like_button_false;
     await ctx
       .editMessageReplyMarkup({ inline_keyboard: keyboard })
       .catch((err) => console.log(err));

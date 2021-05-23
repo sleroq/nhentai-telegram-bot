@@ -1,4 +1,5 @@
 const nhentai = require("../../nhentai");
+const config = require('../../config.json');
 
 const {
   telegraphCreatePage,
@@ -174,7 +175,7 @@ module.exports.fixInstantView = async function (ctx) {
   manga_db.fixed_pages = [];
   manga_db.save();
 
-  let heart = user.favorites.id(manga.id) ? "♥️" : "🖤",
+  let heart = user.favorites.id(manga.id) ? config.like_button_true : config.like_button_false,
     messageText = getMangaMessage(manga, telegraph_fixed_url, ctx.i18n),
     inline_keyboard = [
       [

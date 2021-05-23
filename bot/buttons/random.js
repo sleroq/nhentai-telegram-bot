@@ -1,4 +1,5 @@
 const nhentai = require("../../nhentai");
+const config = require('../../config.json');
 
 const {
   getMangaMessage,
@@ -94,7 +95,7 @@ module.exports.randomButton = async function (ctx) {
     : manga.telegraph_url;
 
   let messageText = getMangaMessage(manga, telegraph_url, ctx.i18n),
-    heart = user.favorites.id(manga.id) ? "♥️" : "🖤";
+    heart = user.favorites.id(manga.id) ? config.like_button_true : config.like_button_false;
   inline_keyboard = [
     [
       { text: "Telegra.ph", url: telegraph_url },

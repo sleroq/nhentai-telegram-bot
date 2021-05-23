@@ -1,4 +1,5 @@
 const nhentai = require("../../nhentai");
+const config = require('../../config.json');
 
 const { getMangaMessage, isFullColor } = require("../someFuncs.js");
 const { saveAndGetUser } = require("../../db/saveAndGetUser");
@@ -40,7 +41,7 @@ module.exports.openiInTelegraph = async function (ctx) {
     ? savedManga.telegraph_fixed_url
     : savedManga.telegraph_url;
 
-  let heart = user.favorites.id(manga_id) ? "♥️" : "🖤",
+  let heart = user.favorites.id(manga_id) ? config.like_button_true : config.like_button_false,
     inline_keyboard = [
       [
         { text: "Telegra.ph", url: telegraph_url },

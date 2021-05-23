@@ -7,6 +7,7 @@ const { searchtips } = require("./help_searchtips.js");
 const { help_back } = require("./help_back.js");
 const { saveAndGetUser } = require("../../db/saveAndGetUser");
 const { edit_settings } = require("../settings/edit_settings");
+const config = require('../../config.json');
 
 module.exports.cb_query = async function (ctx, next) {
   // await ctx.answerCbQuery().catch((err) => {
@@ -71,7 +72,7 @@ async function editLangs(user, ctx) {
   // add ✅ to currently selected language
   langs.forEach((x) => {
     if (x.code == user.language_code) {
-      x.name += " ✅";
+      x.name += " " + config.check_mark;
       check = true;
     }
     inline_keyboard.push([
@@ -84,7 +85,7 @@ async function editLangs(user, ctx) {
   /* if language code was not specified in the setings,
      then it's english: */
   if (!check) {
-    inline_keyboard[1].text = +" ✅";
+    inline_keyboard[1].text += " " + config.check_mark;
   }
   inline_keyboard.push([
     {

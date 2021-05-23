@@ -1,0 +1,36 @@
+{
+ "bot_username": "nhentai_searchbot",
+ "express_get_slash": "Hello, love <3",
+ "text_at_the_end_of_telegraph_page": "Thanks for reading this chapter!",
+ 
+ "show_favorites_as_gallery": false,
+ "search_sorting_by_default" : "date",
+ "search_appearance_by_default": "photo",
+ "random_localy_by_default": true,
+ "can_repeat_in_random_by_default": true,
+
+ "like_button_false": "🖤",
+ "like_button_true": "♥️",
+ "check_mark": "✅",
+
+ "favorites_icon_inline": "https://i.imgur.com/TmxG1Qr.png",
+ "history_icon_inline": "https://i.imgur.com/vQxvN28.jpeg",
+ "next_page_icon_inline": "https://i.imgur.com/3AMTdoA.png",
+ "help_icon_inline": "https://i.imgur.com/j2zt4j7.png",
+ "sort_by_new_icon_inline": "https://i.imgur.com/j2zt4j7.png",
+ "sort_by_popular_icon_inline": "https://i.imgur.com/j2zt4j7.png",
+
+ "most_popular_tag": "big breasts",
+ "awful_tags": [
+    "rape",
+    "gure",
+    "scat",
+    "torture",
+    "moral degeneration",
+    "mind break",
+    "incest",
+    "futanari",
+    "shotacon",
+    "lolicon"
+]
+}

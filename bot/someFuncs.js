@@ -1,10 +1,11 @@
 const nhentai = require("../nhentai");
 const Manga = require("../models/manga.model");
+const config = require('../config.json');
 
 async function getRandomManga() {
   /* get the newest possible id */
   let search_popular_tag = await nhentai
-     .search('"big breasts"')
+     .search(`"${config.most_popular_tag}"`)
      .catch((err) => {
        console.log("search error in settings");
        console.log(err);
