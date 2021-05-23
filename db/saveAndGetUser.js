@@ -1,5 +1,5 @@
 const User = require("../models/user.model");
-const { awful_tags } = require("../confg.json");
+const { awful_tags } = require("../config.json");
 const config = require('../config.json');
 
 module.exports.saveAndGetUser = async function (ctx) {
