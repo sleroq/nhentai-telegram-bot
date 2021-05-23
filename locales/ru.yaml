@@ -36,6 +36,12 @@ history_tip_title: История!
 history_tip_desctiption: "Это твоя история:"
 history_is_empty: Твоя история пуста!
 
+next_page_tip_title: Следующая страница
+next_page_tip_message: "Чтобы просмотреть определенную страницу, вы можете *добавить /p*`n` к поисковому запросу, где `n` - номер страницы"
+
+sorting_by_popularity_tip_title: "Для сортировки по популярности"
+sorting_by_new_tip_title: "Для сортировке по новому"
+
 favorites: Избранные!
 favorites_tip_desctiption: "Это твои избранные:"
 favorites_is_empty: "Ты еще ничего не лайкнул"
