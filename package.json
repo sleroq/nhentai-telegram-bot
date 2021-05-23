@@ -20,7 +20,9 @@
     "telegra.ph": "^1.0.1",
     "telegraf": "^3.38.0",
     "telegraf-i18n": "^6.6.0",
-    "telegraph-uploader": "^2.0.0"
+    "telegraph-uploader": "^2.0.0",
+    "node-fetch": ">=2.6.1"
+    
   },
   "engines": {
     "node": "15.x"
