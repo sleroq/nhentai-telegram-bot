@@ -10,10 +10,10 @@ module.exports.textHandler = async function (ctx) {
   let user = await saveAndGetUser(ctx);
   if (
     // if in group chat                  and  user not replying bot's message   and  not mentioning bot
-    (ctx.message.chat.type != "private") && !("reply_to_message" in ctx.message) && !(ctx.message.text.includes('@' + ctx.botInfo.username)) ||
+    (ctx.message.chat.type != "private") && !("reply_to_message" in ctx.message) && !(ctx.message.text.includes('@' + ctx.me)) ||
     // or message was sent via this bot
     (("via_bot" in ctx.message) &&
-      (ctx.message.via_bot.username == ctx.botInfo.username))
+      (ctx.message.via_bot.username == ctx.me))
   ) {
     return;
   }
