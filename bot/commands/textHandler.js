@@ -8,13 +8,12 @@ const Message = require("../../models/message.model");
 
 module.exports.textHandler = async function (ctx) {
   let user = await saveAndGetUser(ctx);
-  /* I don't want it to work in group chats because
-     it will trigger at every numbers, that somebody sent */
   if (
-    ctx.message.chat.type != "private" ||
-    (ctx.message.via_bot &&
-      (ctx.message.via_bot.username == "nhentai_mangabot" ||
-        ctx.message.via_bot.username == "nhentai_searchbot"))
+    // if in group chat                  and  user not replying bot's message   and  not mentioning bot
+    (ctx.message.chat.type != "private") && !("reply_to_message" in ctx.message) && !(ctx.message.text.includes('@' + ctx.botInfo.username)) ||
+    // or message was sent via this bot
+    (("via_bot" in ctx.message) &&
+      (ctx.message.via_bot.username == ctx.botInfo.username))
   ) {
     return;
   }
