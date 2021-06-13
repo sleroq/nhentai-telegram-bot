@@ -108,7 +108,7 @@ async function start_bot_with_webhook(bot) {
     },
     dropPendingUpdates: true
   })
-  require("./express").startListen(process.env.PORT)
+  //require("./express").startListen(process.env.PORT)
 }
 async function start_bot_with_polling(bot) {
   await bot.launch({dropPendingUpdates: true})

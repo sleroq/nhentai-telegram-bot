@@ -5,8 +5,8 @@ const cors = require('cors');
 
 
 function startListen(PORT) {
-  const port = PORT || 3000;
-  
+  const port = 3000;
+
   // for api with statistics (./api.js):
   expressApp.use(cors())
   expressApp.get("/", (req, res) => {
