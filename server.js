@@ -1,6 +1,6 @@
 require("dotenv").config();
 
-const { Telegraf } = require("telegraf");
+const { Telegraf, session } = require("telegraf");
 const I18n = require("telegraf-i18n");
 const path = require("path");
 const bot = new Telegraf(process.env.BOT_TOKEN);
@@ -14,8 +14,7 @@ const i18n = new I18n({
     uppercase: (value) => value.toUpperCase(),
   },
 });
-bot.use(Telegraf.session());
-bot.use(i18n.middleware());
+bot.use(i18n.middleware())
 
 //coonnect to the database
 const mongoose = require("mongoose");
@@ -56,7 +55,7 @@ bot.start(async (ctx) => {
   }).catch((err) => {
     console.log(err);
     return
-  });;
+  });
 });
 
 bot.help(async (ctx) => {
@@ -101,27 +100,17 @@ if (process.env.REPL_URL || process.env.HEROKU_URL) {
 }
 
 async function start_bot_with_webhook(bot) {
-  bot.polling.offset = await clearOldMessages(bot);
-  require("./express.js").startListen(bot, process.env.PORT);
+  const domain = process.env.REPL_URL || process.env.HEROKU_URL
+  await bot.launch({
+    webhook: {
+      domain,
+      port: Number(process.env.PORT),
+    },
+    dropPendingUpdates: true
+  })
+  require("./express").startListen(process.env.PORT)
 }
 async function start_bot_with_polling(bot) {
-  bot.polling.offset = await clearOldMessages(bot)
-  await bot.launch()
+  await bot.launch({dropPendingUpdates: true})
   console.log("Bot is started polling!")
-}
-
-async function clearOldMessages(tgBot) {
-  // Delete webhook (with webhook you can't use getUpdates())
-  await bot.telegram.deleteWebhook()
-  console.log("webhook deleted")
-  // Get updates for the bot
-  const updates = await tgBot.telegram.getUpdates(0, 100, -1);
-
-  // Add 1 to the ID of the last one, if there is one
-  let newOffset = updates.length > 0
-    ? updates[updates.length - 1].update_id + 1
-    : 0
-    ;
-  console.log("new offset is " + newOffset);
-  return newOffset
 }

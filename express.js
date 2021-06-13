@@ -4,24 +4,9 @@ const api = require('./api.js');
 const cors = require('cors');
 
 
-function startListen(bot, PORT) {
+function startListen(PORT) {
   const port = PORT || 3000;
-  const url_for_webhook = process.env.REPL_URL || process.env.HEROKU_URL;
-
-  let current_url
-  if (process.env.REPL_URL2) {
-    // for switching webhook between 2 servers to awoid "TOO_MANY_REQUESTS" errors (not tested)
-    setInterval(() => {
-      current_url = current_url == url_for_webhook ? process.env.REPL_URL2 : url_for_webhook
-      console.log("url changed ---" + current_url)
-      bot.telegram.setWebhook(current_url + "/secret-path");
-    }, 100000)
-
-  } else {
-    bot.telegram.setWebhook(url_for_webhook + "/secret-path").then((x) => { console.log('webhook set - ' + url_for_webhook + " " + x) })
-  }
-  expressApp.use(bot.webhookCallback("/secret-path"));
-
+  
   // for api with statistics (./api.js):
   expressApp.use(cors())
   expressApp.get("/", (req, res) => {
