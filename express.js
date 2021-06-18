@@ -20,7 +20,7 @@ function startListen(PORT, domain, bot) {
     expressApp.use(bot.webhookCallback(secretPath))
 
 
-    expressApp.get("/", (req, res) => { res.send("Hello, love <3"); });
+    expressApp.get("/", (req, res) => { res.send(config.express_get_slash); });
 
     // for api with statistics (./api.js):
     if (config.api_enabled == true) {
