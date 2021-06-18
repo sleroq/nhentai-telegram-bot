@@ -5,29 +5,26 @@ const I18n = require("telegraf-i18n");
 const path = require("path");
 const bot = new Telegraf(process.env.BOT_TOKEN);
 const i18n = new I18n({
-  directory: path.resolve(__dirname, "locales"),
-  defaultLanguage: "en",
-  sessionName: "session",
-  useSession: true,
-  templateData: {
-    pluralize: I18n.pluralize,
-    uppercase: (value) => value.toUpperCase(),
-  },
+    directory: path.resolve(__dirname, "locales"),
+    defaultLanguage: "en",
+    sessionName: "session",
+    useSession: true,
+    templateData: {
+        pluralize: I18n.pluralize,
+        uppercase: (value) => value.toUpperCase(),
+    },
 });
 bot.use(i18n.middleware())
-
 //coonnect to the database
 const mongoose = require("mongoose");
 mongoose.connect(process.env.DATABASE_URL, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
 });
 
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
-db.once("open", function () {
-  console.log("mongoose is connected!");
-});
+db.once("open", function () { console.log("mongoose is connected!"); });
 
 const { saveAndGetUser } = require("./db/saveAndGetUser");
 // import all commands
@@ -43,74 +40,70 @@ const { textHandler } = require("./bot/commands/textHandler.js");
 // commands that always work (without nhentai/telegraph connections)
 
 bot.start(async (ctx) => {
-  const user = await saveAndGetUser(ctx);
-  let message = ctx.i18n.t("greeting");
-  ctx.reply(message, {
-    parse_mode: "HTML",
-    reply_markup: {
-      inline_keyboard: [
-        [{ text: ctx.i18n.t("random_button"), callback_data: "r" }],
-      ],
-    },
-  }).catch((err) => {
-    console.log(err);
-    return
-  });
+    await saveAndGetUser(ctx);
+    let message = ctx.i18n.t("greeting");
+    try {
+        ctx.reply(message, {
+            parse_mode: "HTML",
+            reply_markup: {
+                inline_keyboard: [
+                    [{
+                        text: ctx.i18n.t("random_button"),
+                        callback_data: "r"
+                    }],
+                ],
+            },
+        })
+    } catch (err) {
+        console.log(err);
+    };
 });
 
 bot.help(async (ctx) => {
-  await help(ctx);
+    await help(ctx);
 });
 bot.command("code", async (ctx) => {
-  await ctx.reply("Just send me a code").catch((err) => { return });
+    try {
+        await ctx.reply("Just send me a code")
+    } catch (err) {
+        return
+    }
 });
-bot.command("settings", async (ctx) => {
-  await settings(ctx);
-});
+bot.command("settings", async (ctx) => { await settings(ctx); });
 bot.command("id", async (ctx) => {
-  await ctx.reply("`" + ctx.from.id + "`", { parse_mode: "Markdown" });
+    try {
+        await ctx.reply("`" + ctx.from.id + "`", { parse_mode: "Markdown" });
+    } catch (err) {
+        return
+    }
 });
 
 // commands with nhentai
-bot.command("rand", async (ctx) => {
-  await randomCommand(ctx);
-});
-bot.command("zip", async (ctx) => {
-  await dlzip(ctx);
-});
+bot.command("rand", async (ctx) => { await randomCommand(ctx); });
+bot.command("zip", async (ctx) => { await dlzip(ctx); });
 // non-text
-bot.on("callback_query", async (ctx, next) => {
-  await cb_query(ctx);
-});
-bot.on("inline_query", async (ctx) => {
-  await inlineSearch(ctx);
-});
+bot.on("callback_query", async (ctx) => { await cb_query(ctx); });
+bot.on("inline_query", async (ctx) => { await inlineSearch(ctx); });
 
 // get with id
-bot.on("text", async (ctx, next) => {
-  await textHandler(ctx);
-});
+bot.on("text", async (ctx) => { await textHandler(ctx); });
 
 // start the bot 
 
-if (process.env.REPL_URL || process.env.HEROKU_URL) { 
-  start_bot_with_webhook(bot) // with webhook
-} else {                    
-  start_bot_with_polling(bot) // with polling
+if (process.env.REPL_URL || process.env.HEROKU_URL) {
+    start_bot_with_webhook(bot) // with webhook
+} else {
+    start_bot_with_polling(bot) // with polling
 }
 
 async function start_bot_with_webhook(bot) {
-  const domain = process.env.REPL_URL || process.env.HEROKU_URL
-  await bot.launch({
-    webhook: {
-      domain,
-      port: Number(process.env.PORT),
-    },
-    dropPendingUpdates: true
-  })
-  //require("./express").startListen(process.env.PORT)
+    const domain = process.env.REPL_URL || process.env.HEROKU_URL
+    const port = Number(process.env.PORT) || 3000
+    require("./express").startListen(port, domain, bot)
 }
 async function start_bot_with_polling(bot) {
-  await bot.launch({dropPendingUpdates: true})
-  console.log("Bot is started polling!")
+    await bot.launch({
+        dropPendingUpdates: true
+    })
+    console.log("Bot is started polling!")
 }

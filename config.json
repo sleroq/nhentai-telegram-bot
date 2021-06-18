@@ -1,5 +1,6 @@
 {
  "bot_username": "nhentai_searchbot",
+ "api_enabled": true,
  "express_get_slash": "Hello, love <3",
  "text_at_the_end_of_telegraph_page": "Thanks for reading this chapter!",
  
