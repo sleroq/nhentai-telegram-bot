@@ -1,5 +1,10 @@
+const config = require('../../config.json');
 module.exports.help = async function (ctx) {
-  await ctx.reply(ctx.i18n.t("help"), {
+  let help_text = ctx.i18n.t("help")
+  if (config.donation_wallets != "") {
+    help_text += "\n" + ctx.i18n.t("donation_message") + config.donation_wallets
+  }
+  await ctx.reply(help_text, {
     parse_mode: "Markdown",
     disable_web_page_preview: true,
     reply_markup: {
@@ -24,5 +29,5 @@ module.exports.help = async function (ctx) {
         ],
       ],
     },
-  }).catch((err)=>{return})
+  }).catch((err) => { return })
 };
