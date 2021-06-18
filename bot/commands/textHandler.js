@@ -22,6 +22,10 @@ module.exports.textHandler = async function (ctx) {
     match = Array.from(new Set(message_text.match(/\d+/gm)));
   if (match && match[0]) {
     for (let i = 0; i < match.length; i++) {
+      if (i >29){
+        console.log("textHandler finished work - limit 30 codes")
+        return
+      }
       let manga_id = match[i],
         manga,
         telegraph_url;
