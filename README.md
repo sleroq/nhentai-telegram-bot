@@ -21,7 +21,7 @@
   </details>
 * Discover new doujins with /rand command.
 * Open doujins using code or link, send multiple codes in one message.
-* Database - Bot works even if nhentai is down (more then 170k doujins are saved).
+* Database - Bot works even if nhentai is down (more than 170k doujins are saved).
 * <details>
     <summary>
       Translated into Russian and Spanish
