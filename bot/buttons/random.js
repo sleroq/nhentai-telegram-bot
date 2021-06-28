@@ -1,6 +1,6 @@
 const nhentai = require("../../nhentai");
 const config = require('../../config.json');
-
+const { isFullColor } = require("../someFuncs.js");
 const {
   getMangaMessage,
 } = require("../someFuncs.js");
@@ -114,7 +114,7 @@ module.exports.randomButton = async function (ctx) {
   let num_of_pages = manga.details ? manga.details.pages : manga.pages;
   /* for those who click buttons without any reason
      show fix button only if there is really a lot of pages: */
-  if (!manga.telegraph_fixed_url && num_of_pages > 150) {
+  if (!manga.telegraph_fixed_url && (num_of_pages > config.pages_to_show_fix_button || isFullColor(manga))) {
     inline_keyboard[0].unshift({
       text: ctx.i18n.t("fix_button"),
       callback_data: "fix_" + manga.id,

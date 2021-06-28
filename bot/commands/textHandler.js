@@ -4,6 +4,8 @@ const { getMangaMessage, isFullColor } = require("../someFuncs.js");
 const { saveAndGetUser } = require("../../db/saveAndGetUser");
 const { saveAndGetManga } = require("../../db/saveAndGetManga");
 
+const config = require('../../config.json');
+
 const Message = require("../../models/message.model");
 
 module.exports.textHandler = async function (ctx) {
@@ -77,7 +79,7 @@ module.exports.textHandler = async function (ctx) {
         ];
       let num_of_pages = manga.details ? manga.details.pages : manga.pages;
 
-      if (!manga.telegraph_fixed_url && (num_of_pages > 100 || isFullColor(manga))) {
+      if (!manga.telegraph_fixed_url && (num_of_pages > config.pages_to_show_fix_button || isFullColor(manga))) {
         inline_keyboard[0].unshift({
           text: ctx.i18n.t("fix_button"),
           callback_data: "fix_" + manga.id,

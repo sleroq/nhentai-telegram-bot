@@ -51,7 +51,7 @@ module.exports.prevButton = async function (ctx) {
 
   /*  for those who click buttons without any reason
       show fix button only if there is really alot of pages: */
-  if (!manga.telegraph_fixed_url && num_of_pages > 150) {
+  if (!manga.telegraph_fixed_url && num_of_pages > config.pages_to_show_fix_button) {
     inline_keyboard[0].unshift({
       text: ctx.i18n.t("fix_button"),
       callback_data: "fix_" + manga.id,

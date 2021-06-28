@@ -1,5 +1,7 @@
 const { TelegraphUploadByUrls } = require("../telegraph.js");
 
+const config = require('../../config.json');
+
 const {
   getRandomMangaLocaly,
   getRandomManga,
@@ -51,7 +53,7 @@ module.exports.randomCommand = async function (ctx) {
       [{ text: ctx.i18n.t("next_button"), callback_data: "r_" + manga.id }],
     ];
   let num_of_pages = manga.details ? manga.details.pages : manga.pages;
-  if (!manga.telegraph_fixed_url && num_of_pages > 150) {
+  if (!manga.telegraph_fixed_url && num_of_pages > config.pages_to_show_fix_button) {
     inline_keyboard[0].unshift({
       text: ctx.i18n.t("fix"),
       callback_data: "fix_" + manga.id,
