@@ -24,8 +24,8 @@ module.exports.textHandler = async function (ctx) {
     match = Array.from(new Set(message_text.match(/\d+/gm)));
   if (match && match[0]) {
     for (let i = 0; i < match.length; i++) {
-      if (i >29){
-        console.log("textHandler finished work - limit 30 codes")
+      if (i >config.maximum_codes_from_one_message){
+        console.log("textHandler finished work - limit" + maximum_codes_from_one_message + " codes")
         return
       }
       let manga_id = match[i],
