@@ -7,6 +7,7 @@
     "start": "node server.js"
   },
   "dependencies": {
+    "@types/i18n": "^0.13.1",
     "adm-zip": "^0.5.5",
     "axios": "^0.21.1",
     "axios-retry": "^3.1.9",
@@ -14,16 +15,19 @@
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "got": "^11.8.2",
+    "i18n": "^0.13.3",
     "moment": "^2.29.1",
-    "mongoose": "^5.12.3",
+    "mongoose": "^5.13.5",
     "superagent": "^6.1.0",
     "telegra.ph": "^1.0.1",
     "telegraf": "4.3",
     "telegraf-i18n": "^6.6.0",
-    "telegraph-uploader": "^2.0.0"
+    "telegraph-uploader": "^2.0.0",
+    "verror": "^1.10.0"
   },
   "engines": {
-    "node": "15.x"
+    "node": ">=14.x"
   },
   "repository": {
     "url": "https://github.com/iamdowner/nhentai-telegram-bot"
@@ -33,5 +37,9 @@
     "nhentai",
     "telegram",
     "bot"
-  ]
+  ],
+  "devDependencies": {
+    "@types/verror": "^1.10.5",
+    "typescript": "^4.3.5"
+  }
 }
