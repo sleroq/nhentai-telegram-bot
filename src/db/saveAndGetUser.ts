@@ -1,0 +1,33 @@
+import User from "../models/user.model";
+import { awful_tags } from "../config.json";
+import config from "../../config.json";
+import { Context } from "telegraf";
+
+module.exports.saveAndGetUser = async function (ctx: Context) {
+  if (!ctx.from) {
+    return;
+  }
+  let user = await User.findById(ctx.from.id, function (err) {
+    if (err) console.log(err);
+  });
+  if (!user) {
+    user = new User({
+      _id: ctx.from.id,
+      username: ctx.from.username,
+      first_name: ctx.from.first_name,
+      last_name: ctx.from.last_name,
+      language_code: ctx.from.language_code,
+      search_sorting: config.search_sorting_by_default,
+      search_type: config.search_appearance_by_default,
+      ignored_random_tags: awful_tags,
+      random_localy: config.random_localy_by_default,
+      can_repeat_in_random: config.can_repeat_in_random_by_default,
+    })
+
+    await user.save(function (err) {
+      if (err) return console.error(err);
+      console.log("user saved");
+    })
+  }
+  return user;
+};
