@@ -2,7 +2,8 @@ import Verror from "verror";
 import Manga, { MangaSchema } from "../models/manga.model";
 import { Doujin, LightDoujin } from "../nhentai";
 import { Document } from "mongoose";
-import { I18n } from "i18n";
+import i18n from "../i18n";
+import { Favorite } from "../models/user.model";
 
 export async function getRandomMangaLocally(includedTags: string[] | undefined, excludedTags: string[] | undefined): Promise<MangaSchema & Document<any, any, MangaSchema> | null> {
   let query = {
@@ -23,15 +24,15 @@ export async function getRandomMangaLocally(includedTags: string[] | undefined, 
   return result;
 }
 export function getMangaMessage(
-  manga: Doujin | MangaSchema & Document<any, any, MangaSchema>,
-  i18n: I18n,
+  manga: Doujin | MangaSchema & Document<any, any, MangaSchema> | Favorite,
   telegraphLink?: string
 ): string {
   const title = getTitle(manga),
-    tags = tagString(manga, i18n),
+    tags = tagString(manga),
     pages_word = i18n.__("pages"),
     pages = Array.isArray(manga.pages) ? manga.pages.length : manga.pages,
-    mangaUrl = `https://nhentai.net/g/${manga.id}/`;
+    mangaUrl = `https://nhentai.net/g/${id}/`,
+    id = "id" in manga ? manga.id : manga._id
   let link: string | undefined = telegraphLink;
   if (!link) {
     if ("telegraph_fixed_url" in manga && manga.telegraph_fixed_url) {
@@ -42,11 +43,10 @@ export function getMangaMessage(
   }
   return `
 <a href="${link}">${title}</a> (${pages} ${pages_word})
-${tags}\n<a href="${mangaUrl}">nhentai.net</a> | <code>${manga.id}</code>`;
+${tags}\n<a href="${mangaUrl}">nhentai.net</a> | <code>${id}</code>`;
 }
 function tagString(
-  manga: Doujin | MangaSchema & Document<any, any, MangaSchema>,
-  i18n: I18n
+  manga: Doujin | MangaSchema & Document<any, any, MangaSchema> | Favorite
 ): string {
   let tags = i18n.__("tags");
   let tagsArray: string[] = [];
@@ -87,7 +87,7 @@ export function getMessageInline(manga: LightDoujin) {
     title = manga.title;
   return `<a href="${link}">${title}</a>`;
 }
-export function getTitle(manga: Doujin | MangaSchema & Document<any, any, MangaSchema>): string {
+export function getTitle(manga: Doujin | MangaSchema & Document<any, any, MangaSchema> | Favorite): string {
   let title;
   if (typeof manga.title === "string") {
     title = manga.title;
