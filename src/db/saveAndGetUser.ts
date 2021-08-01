@@ -2,15 +2,16 @@ import User, { UserSchema } from "../models/user.model";
 import config, { awful_tags } from "../../config.json";
 import { Context } from "telegraf";
 import { Document } from "mongoose";
+import i18n from "../i18n";
 
-export default async function saveAndGetUser (ctx: Context): Promise<UserSchema & Document<any, any, UserSchema>|null> {
+export default async function saveAndGetUser(ctx: Context): Promise<UserSchema & Document<any, any, UserSchema> | null> {
   if (!ctx.from) {
     return null;
   }
   let user: UserSchema & Document<any, any, UserSchema> | null = null;
   try {
     user = await User.findById(ctx.from.id);
-  } catch (error){
+  } catch (error) {
     console.log("Error when getting user");
     console.log(error);
   }
@@ -30,11 +31,17 @@ export default async function saveAndGetUser (ctx: Context): Promise<UserSchema 
 
     try {
       await user.save();
-    } catch (error){
+    } catch (error) {
       console.log("Error saving user");
       console.log(error);
     }
     console.log("New user saved!")
+  }
+  if (user.language_code == "ru") {
+    i18n.setLocale("ru");
+  }
+  if (user.language_code == "es") {
+    i18n.setLocale("es");
   }
   return user;
 };
