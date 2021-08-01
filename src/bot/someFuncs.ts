@@ -1,51 +1,73 @@
-import { Verror } from "verror";
+import Verror from "verror";
 import Manga, { MangaSchema } from "../models/manga.model";
-import { Doujin } from "../nhentai";
+import { Doujin, LightDoujin } from "../nhentai";
+import { Document } from "mongoose";
+import { I18n } from "i18n";
 
-export async function getRandomMangaLocally(includedTags: string[] | undefined, excludedTags: string[] | undefined): Promise<MangaSchema> {
+export async function getRandomMangaLocally(includedTags: string[] | undefined, excludedTags: string[] | undefined): Promise<MangaSchema & Document<any, any, MangaSchema> | null> {
   let query = {
     tags: {
       $in: includedTags,
       $nin: excludedTags
     }
   };
-  let count = await Manga.countDocuments(query),
-    random = Math.floor(Math.random() * count),
-    result = await Manga.findOne(query).skip(random);
-  if(!result){
+  const count = await Manga.countDocuments(query);
+  if (count === 0 || count === null) {
+    return null;
+  }
+  const random = Math.floor(Math.random() * count);
+  const result = await Manga.findOne(query).skip(random);
+  if (!result) {
     throw new Verror("Could not get random doujin locally")
   }
   return result;
 }
-export function getMangaMessage(manga: Doujin | MangaSchema, telegraphLink: string, i18n: I18n): string {
+export function getMangaMessage(
+  manga: Doujin | MangaSchema & Document<any, any, MangaSchema>,
+  i18n: I18n,
+  telegraphLink?: string
+): string {
   const title = getTitle(manga),
     tags = tagString(manga, i18n),
-    pages_word = i18n.t("pages"),
+    pages_word = i18n.__("pages"),
     pages = Array.isArray(manga.pages) ? manga.pages.length : manga.pages,
-    link = telegraphLink ? telegraphLink : manga.url,
-
-    caption = `
-<a href="${link}">${title}</a> (${pages} ${pages_word})
-${tags}\n<a href="${manga.link}">nhentai.net</a> | <code>${manga.id}</code>`;
-  return caption;
-}
-function tagString(manga, i18n) {
-  let tags = i18n.t("tags");
-  tagsArray = manga.details ? manga.details.tags : manga.tags;
-  if (!tagsArray || !tagsArray[0]) {
-    return "";
-  }
-  for (let i = 0; i < tagsArray.length; i++) {
-    if (i != tagsArray.length - 1) {
-      tags += "#" + tagsArray[i].replace(/\s/, "_").replace(/-/, "_");
+    mangaUrl = `https://nhentai.net/g/${manga.id}/`;
+  let link: string | undefined = telegraphLink;
+  if (!link) {
+    if ("telegraph_fixed_url" in manga && manga.telegraph_fixed_url) {
+      link = manga.telegraph_fixed_url;
+    } else if ("telegraph_url" in manga && manga.telegraph_url) {
+      link = manga.telegraph_url;
     }
-    if (i != tagsArray.length - 2) {
+  }
+  return `
+<a href="${link}">${title}</a> (${pages} ${pages_word})
+${tags}\n<a href="${mangaUrl}">nhentai.net</a> | <code>${manga.id}</code>`;
+}
+function tagString(
+  manga: Doujin | MangaSchema & Document<any, any, MangaSchema>,
+  i18n: I18n
+): string {
+  let tags = i18n.__("tags");
+  let tagsArray: string[] = [];
+  if ("tags" in manga && manga.tags) {
+    tagsArray = manga.tags;
+  } else if ("details" in manga) {
+    manga.details.tags?.forEach((tag) => {
+      tagsArray.push(tag.name);
+    });
+  }
+  tagsArray.forEach((tag, index) => {
+    if (index !== tagsArray.length - 1) {
+      tags += "#" + tag.replace(/\s/, "_").replace(/-/, "_");
+    }
+    if (index < tagsArray.length - 2) {
       tags += ", ";
     }
-  }
+  });
   return tags;
 }
-function sliceByHalf(s) {
+export function sliceByHalf(s: string): string {
   let middle = Math.floor(s.length / 2);
   let before = s.lastIndexOf(" ", middle);
   let after = s.indexOf(" ", middle + 1);
@@ -60,45 +82,39 @@ function sliceByHalf(s) {
   let s2 = s.substr(middle + 1);
   return s2;
 }
-function getMessageInline(manga) {
+export function getMessageInline(manga: LightDoujin) {
   let link = "https://nhentai.net/g/" + manga.id + "/",
-    title = getTitle(manga),
-    message_text = `<a href="${link}">${title}</a>`;
-  return message_text;
+    title = manga.title;
+  return `<a href="${link}">${title}</a>`;
 }
-function getTitle(manga) {
+export function getTitle(manga: Doujin | MangaSchema & Document<any, any, MangaSchema>): string {
   let title;
-  if (manga.title) {
-    if (manga.title.pretty) {
-      title = manga.title.pretty;
-    } else if (manga.title.english) {
-      title = manga.title.english;
-    } else if (manga.title.japanese) {
-      title = manga.title.japanese;
-    } else if (manga.title.chinese) {
-      title = manga.title.chinese;
-    } else {
-      title = manga.title;
+  if (typeof manga.title === "string") {
+    title = manga.title;
+  } else {
+    if (manga.title.translated && manga.title.translated.pretty) {
+      title = manga.title.translated.pretty;
+    } else if (manga.title.original && manga.title.original.pretty) {
+      title = manga.title.original.pretty;
     }
   }
-  return title
-    .replace(/>/g, " ")
-    .replace(/</g, " ");
-}
-function isFullColor(manga) {
-  if (manga.tags || (manga.details && manga.details.tags)) {
-    let answer = manga.tags ? manga.tags.includes('full color') : manga.details.tags.includes('full color');
-    return answer
-  } else {
-    return false
+  if (!title) {
+    return "";
   }
+  return title
+    .replace(/>/g, "]")
+    .replace(/</g, "[");
 }
-module.exports = {
-  getRandomManga,
-  getMangaMessage,
-  getMessageInline,
-  getRandomMangaLocaly,
-  sliceByHalf,
-  tagString,
-  isFullColor,
-};
+export function isFullColor(manga: Doujin | MangaSchema & Document<any, any, MangaSchema>): boolean {
+  let result = false;
+  if ("tags" in manga && manga.tags) {
+    result = manga.tags.includes('full color') || manga.tags.includes('full_color')
+  } else if ("details" in manga && manga.details.tags) {
+    manga.details.tags.forEach((tag) => {
+      if (tag.name.includes('full color') || tag.name.includes('full_color')) {
+        result = true;
+      }
+    });
+  }
+  return result;
+}
