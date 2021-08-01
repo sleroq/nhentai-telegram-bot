@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "build": "tsc",
-    "start": "node built/server.js"
+    "start": "node built/src/server"
   },
   "engines": {
     "node": ">=14.x"
