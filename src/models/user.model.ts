@@ -26,13 +26,13 @@ export interface UserSchema {
 }
 
 export interface Favorite {
-      _id: string,
-      title?: string,
-      description?: string,
-      tags?: string[],
-      pages?: number,
-      thumbnail?: string,
-      telegraph_url?: string,
+  _id: string,
+  title: string,
+  description?: string,
+  tags?: string[],
+  pages?: number,
+  thumbnail?: string,
+  telegraph_url?: string,
 }
 
 const userSchema = new mongoose.Schema({
