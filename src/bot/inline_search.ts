@@ -1,56 +1,66 @@
-const nhentai = require("../nhentai");
-const config = require('../config.json');
+import nhentai from "../nhentai";
+import config from '../../config.json';
 
-const {
+import {
   getMessageInline,
   sliceByHalf,
   getMangaMessage,
   isFullColor,
-} = require("./someFuncs.js");
-const { saveAndGetUser } = require("../db/saveAndGetUser");
-const { saveAndGetManga } = require("../db/saveAndGetManga");
-const Manga = require("../models/manga.model.js");
+} from "./someFuncs.js";
+import saveAndGetUser from "../db/saveAndGetUser";
+import saveAndGetManga from "../db/saveAndGetManga";
+import Manga from "../models/manga.model.js";
+import Context from "telegraf/typings/context";
+import i18n from "../i18n";
+import { InlineQueryResultArticle, InlineQueryResultPhoto } from "typegram";
 
-
-module.exports.inlineSearch = async function (ctx) {
+module.exports.inlineSearch = async function (ctx: Context) {
   let user = await saveAndGetUser(ctx);
+  if (!user || !ctx.inlineQuery) {
+    return;
+  }
+  // Favorites: 
 
-  // favorites: 
-
-  if (!ctx.inlineQuery.query || (ctx.inlineQuery.query.match(/\/p\d+/g) && ctx.inlineQuery.query.match(/\/p\d+/g)[0] && ctx.inlineQuery.query.replace(ctx.inlineQuery.query.match(/\/p\d+/g)[0], "").trim() === '')) {
+  const matchPage = ctx.inlineQuery.query.match(/\/p\d+/g)
+  if (
+    !ctx.inlineQuery.query
+    || (
+      matchPage
+      && matchPage[0]
+      && ctx.inlineQuery.query.replace(matchPage[0], "").trim() === ''
+    )
+  ) {
     let inlineQuery = ctx.inlineQuery.query,
-      searchType = config.show_favorites_as_gallery ? "gallery" : "article",
+      searchType: "photo" | "article" = config.show_favorites_as_gallery ? "photo" : "article",
       favorites = user.favorites,
-      results = [],
+      results: InlineQueryResultPhoto[] | InlineQueryResultArticle[] = [],
       favorites_reply_markup = {
         inline_keyboard: [
           [
             {
-              text: ctx.i18n.t("favorites"),
+              text: i18n.__("favorites"),
               switch_inline_query_current_chat: "",
             },
           ],
         ],
       },
       pageNumber = 1,
-      pageNumberMatch = inlineQuery.match(/\/p\d+/g) // check if page specified
-        ? inlineQuery.match(/\/p\d+/g)[0]
-        : undefined;
+      pageNumberMatch = matchPage ? matchPage[0] : undefined; // check if page specified
     if (pageNumberMatch) { // for example "@bot /f /p2" 
-      pageNumber = pageNumberMatch.slice(2);
+      pageNumber = Number(pageNumberMatch.slice(2));
       inlineQuery = inlineQuery.replace(pageNumberMatch, "").trim();
     }
     if (!Array.isArray(favorites) || favorites.length === 0) {
       // favorites is empty
       results.push({
-        id: 69696969696969,
-        type: searchType,
-        title: ctx.i18n.t("favorites"),
-        description: ctx.i18n.t("favorites_tip_desctiption"),
+        id: String(69696969696969),
+        type: "article",
+        title: i18n.__("favorites"),
+        description: i18n.__("favorites_tip_desctiption"),
         photo_url: config.favorites_icon_inline,
         thumb_url: config.favorites_icon_inline,
         input_message_content: {
-          message_text: ctx.i18n.t("favorites_is_empty"),
+          message_text: i18n.__("favorites_is_empty"),
           parse_mode: "Markdown",
         },
         reply_markup: favorites_reply_markup,
@@ -66,6 +76,13 @@ module.exports.inlineSearch = async function (ctx) {
     for (let i = 0; i < favorites.length; i++) {
       /* it's in for loop and not in .map below
            because maybe i'will add functions with promises */
+
+      results.push({
+        caption: getMangaMessage(
+          favorites[i],
+          favorites[i].telegraph_url,
+        )
+      })
       favorites[i].message_text = getMangaMessage(
         favorites[i],
         favorites[i].telegraph_url,
@@ -455,7 +472,7 @@ module.exports.inlineSearch = async function (ctx) {
         sortingParametr == "popular"
           ? config.sort_by_new_icon_inline
           : config.sort_by_popular_icon_inline,
-          sorting_tip_title = sortingParametr == "popular" ? ctx.i18n.t("sorting_by_new_tip_title") : ctx.i18n.t("sorting_by_popularity_tip_title"),
+      sorting_tip_title = sortingParametr == "popular" ? ctx.i18n.t("sorting_by_new_tip_title") : ctx.i18n.t("sorting_by_popularity_tip_title"),
       reverseSortingParametr = reverseSortingWord.charAt(0),
       searchSortingSwitch = isPageModified
         ? `/p${pageNumber} /s${reverseSortingParametr} ${inlineQuery}`
