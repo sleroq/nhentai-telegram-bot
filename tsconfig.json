@@ -4,7 +4,7 @@
     "module": "commonjs",                           /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', 'es2020', or 'ESNext'. */
     // "lib": [],                                   /* Specify library files to be included in the compilation. */
     "allowJs": true,                             /* Allow javascript files to be compiled. */
-    "checkJs": true,                             /* Report errors in .js files. */
+    "checkJs": false,                             /* Report errors in .js files. */
     "sourceMap": true,                           /* Generates corresponding '.map' file. */
 
     "outDir": "built",                              /* Redirect output structure to the directory. */
@@ -15,7 +15,7 @@
     "noImplicitAny": true,                       /* Raise error on expressions and declarations with an implied 'any' type. */
 
     "noUnusedLocals": true,                      /* Report errors on unused locals. */
-    "noUnusedParameters": true,                  /* Report errors on unused parameters. */
+    // "noUnusedParameters": true,                  /* Report errors on unused parameters. */
     "noImplicitReturns": true,                   /* Report error when not all code paths in function return a value. */
     "noFallthroughCasesInSwitch": true,          /* Report errors for fallthrough cases in switch statement. */
     "noImplicitOverride": true,                  /* Ensure overriding members in derived classes are marked with an 'override' modifier. */
