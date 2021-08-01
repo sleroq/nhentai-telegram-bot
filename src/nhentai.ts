@@ -66,13 +66,28 @@ export default class nHentai {
       throw Error('You have to specify id');
     }
     const id = getIdfromUrl(identifier);
-
-    const response = await got(`https://nhentai.net/g/${id}/`);
+    let response: Response<string> | undefined; 
+    try {
+      response = await got(`https://nhentai.net/g/${id}/`);
+    } catch (error) {
+      if (error.message === "Response code 404 (Not Found)") {
+        throw new Error("Not found")
+      }
+      throw new Error(error);
+    }
 
     return assembleDoujin(response);
   }
   static async getRandomDoujin(): Promise<Doujin> {
-    const response = await got("https://nhentai.net/random");
+    let response: Response<string> | undefined; 
+    try {
+      response = await got(`https://nhentai.net/random/`);
+    } catch (error) {
+      if (error.message === "Response code 404 (Not Found)") {
+        throw new Error("Not found")
+      }
+      throw new Error(error);
+    }
 
     return assembleDoujin(response);
   }
@@ -148,10 +163,10 @@ export default class nHentai {
       await got("https://nhentai.net/g/" + id + "/");
     } catch (error) {
       if (error.message === "Response code 404 (Not Found)") {
-        false
+        return false;
       }
     }
-    return true
+    return true;
   }
 }
 function getIdfromUrl(idOrUrl: string | number): number {
