@@ -5,6 +5,8 @@ export interface MessageSchema {
   message_id: number
   current?: number
   history?: number[]
+  createdAt?: Date
+  updatedAt?: Date
 }
 
 const messageSchema = new Schema({
@@ -14,4 +16,4 @@ const messageSchema = new Schema({
   history: [Number],
 }, { timestamps: true });
 
-export default model("Message", messageSchema);
+export default model<MessageSchema>("Message", messageSchema);

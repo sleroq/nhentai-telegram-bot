@@ -21,6 +21,8 @@ export interface UserSchema {
   favorites: Favorite[]
   manga_history: number[]
   search_history: string[]
+  createdAt?: Date
+  updatedAt?: Date
 }
 
 export interface Favorite {
@@ -66,4 +68,4 @@ const userSchema = new mongoose.Schema({
   search_history: [String],
 }, { timestamps: true });
 
-export default mongoose.model("User", userSchema);
+export default mongoose.model<UserSchema>("User", userSchema);

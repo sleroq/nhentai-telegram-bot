@@ -2,7 +2,7 @@ import { Schema, model } from "mongoose";
 
 export interface MangaSchema {
   id: number
-  title?: string
+  title: string
   description?: string
   tags?: string[]
   pages: number
@@ -11,6 +11,8 @@ export interface MangaSchema {
   telegraph_url?: string
   telegraph_fixed_url?: string
   fixed_pages: string[]
+  createdAt?: Date
+  updatedAt?: Date
 }
 const mangaSchema = new Schema({
   id: { type: Number, required: true },
@@ -25,4 +27,4 @@ const mangaSchema = new Schema({
   fixed_pages: [String],
 }, { timestamps: true });
 
-export default model("Manga", mangaSchema);
+export default model<MangaSchema>("Manga", mangaSchema);
