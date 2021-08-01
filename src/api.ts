@@ -1,36 +1,42 @@
-const moment = require("moment");
-const Manga = require("./models/manga.model");
-const User = require("./models/user.model");
-const Message = require("./models/message.model");
+import moment from "moment";
+import Manga, { MangaSchema } from "./models/manga.model";
+import User from "./models/user.model";
+import Message from "./models/message.model";
 
-function numberWithCommas(x) {
+function numberWithCommas(x: number): string {
   var parts = x.toString().split(".");
   parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   return parts.join(",");
 }
 
-class api {
-  static async countManga() {
+interface Count {
+  count: {
+    number: number, string: string
+  }
+}
+
+export default class api {
+  static async countManga(): Promise<Count> {
     const count = await Manga.countDocuments({});
     return {
       count: { number: count, string: numberWithCommas(count) }
     }
   }
-  static async countUsers() {
+  static async countUsers(): Promise<Count> {
     const count = await User.countDocuments({});
     return {
       count: { number: count, string: numberWithCommas(count) }
     }
   }
-  static async countMessages() {
+  static async countMessages(): Promise<Count> {
     const count = await Message.countDocuments({});
     return {
       count: { number: count, string: numberWithCommas(count) }
     }
   }
-  static async messagesToday() {
-    const date_now = moment().format("YYYY-MM-DD");
-    const date_tomorrow = moment().add(1, "d").format("YYYY-MM-DD");
+  static async messagesToday(): Promise<Count> {
+    const date_now = moment().toDate();
+    const date_tomorrow = moment().add(1, "d").toDate();
     const count = await Message.countDocuments({
       updatedAt: {
         $gte: date_now,
@@ -41,9 +47,9 @@ class api {
       count: { number: count, string: numberWithCommas(count) }
     }
   }
-  static async usersToday() {
-    const date_now = moment().format("YYYY-MM-DD");
-    const date_tomorrow = moment().add(1, "d").format("YYYY-MM-DD");
+  static async usersToday(): Promise<Count> {
+    const date_now = moment().toDate();
+    const date_tomorrow = moment().add(1, "d").toDate();
     const count = await User.countDocuments({
       createdAt: {
         $gte: date_now,
@@ -54,9 +60,9 @@ class api {
       count: { number: count, string: numberWithCommas(count) }
     }
   }
-  static async mangaToday() {
-    const date_now = moment().format("YYYY-MM-DD");
-    const date_tomorrow = moment().add(1, "d").format("YYYY-MM-DD");
+  static async mangaToday(): Promise<Count> {
+    const date_now = moment().toDate();
+    const date_tomorrow = moment().add(1, "d").toDate();
     const count = await Manga.countDocuments({
       createdAt: {
         $gte: date_now,
@@ -67,10 +73,12 @@ class api {
       count: { number: count, string: numberWithCommas(count) }
     }
   }
-  static async lastManga() {
+  static async lastManga(): Promise<{ manga: MangaSchema }|void> {
     const manga = await Manga.findOne({}, {}, { sort: { _id: -1 } });
-    return {
-      manga: manga
+    if(manga){
+      return {
+        manga: manga
+      }
     }
   }
   static async allinfo() {
@@ -92,5 +100,3 @@ class api {
     }
   }
 }
-
-module.exports = api;
