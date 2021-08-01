@@ -1,26 +1,22 @@
 {
-    "name": "Nhentai telegram bot",
-    "description": "A simple Nodejs telegram bot for reading doujings from nhentai, instantly up and running (not always).",
-    "repository": "https://github.com/iamdowner/nhentai-telegram-bot",
-    "keywords": [
-        "Nodejs",
-        "Heroku",
-        "Telegram"
-    ],
-    "env": {
-        "HEROKU_URL": {
-            "description": "<App Name as entered above>.herokuapp.com. For Example: my-heroku-app-name.herokuapp.com",
-            "value": "REPLACE ME.herokuapp.com"
-        },
-        "BOT_TOKEN": {
-            "description": "Your bot token from @Botfather"
-        },
-        "DATABASE_URL": {
-            "description": "URL to connect to your database https://www.freecodecamp.org/news/get-started-with-mongodb-atlas/",
-            "value": "mongodb+srv://<username>:<password>@<cluster-name>.mongodb.net/<db-name>?retryWrites=true&w=majority"
-        },
-        "TELEGRAPH_TOKEN": {
-            "description": "https://telegra.ph/api#createAccount"
-        }
+  "name": "Nhentai telegram bot",
+  "description": "A simple Nodejs telegram bot for reading doujings from nhentai, instantly up and running (not always).",
+  "repository": "https://github.com/iamdowner/nhentai-telegram-bot",
+  "keywords": ["Nodejs", "Heroku", "Telegram"],
+  "env": {
+    "HEROKU_URL": {
+      "description": "<App Name as entered above>.herokuapp.com. For Example: my-heroku-app-name.herokuapp.com",
+      "value": "REPLACE ME.herokuapp.com"
+    },
+    "BOT_TOKEN": {
+      "description": "Your bot token from @Botfather"
+    },
+    "DATABASE_URL": {
+      "description": "URL to connect to your database https://www.freecodecamp.org/news/get-started-with-mongodb-atlas/",
+      "value": "mongodb+srv://<username>:<password>@<cluster-name>.mongodb.net/<db-name>?retryWrites=true&w=majority"
+    },
+    "TELEGRAPH_TOKEN": {
+      "description": "https://telegra.ph/api#createAccount"
     }
+  }
 }
