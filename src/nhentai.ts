@@ -257,13 +257,15 @@ function assembleDoujin(response: Response<string>): Doujin {
 
   $(".thumbnail-container .thumbs").children(".thumb-container").each((index, element) => {
     const thumbnailElement = $(element).children('a')
-    const relativeImageUrl = thumbnailElement.attr("href");
-    if (relativeImageUrl) {
-      pages.push(new URL(relativeImageUrl, "https://nhentai.net").toString());
-    }
     const thumbnailUrl = thumbnailElement.children("img").attr("src")
     if (thumbnailUrl) {
       thumbnails.push(thumbnailUrl);
+    }
+    const relativeImageUrl = thumbnailElement.attr("href");
+    if (relativeImageUrl && thumbnailUrl) {
+      const absolute = new URL(relativeImageUrl, "https://i.nhentai.net/galleries/").toString().replace(/\/$/, '');
+      const complete = absolute + thumbnailUrl.slice(thumbnailUrl.lastIndexOf('.'))
+      pages.push(complete);
     }
   })
 
