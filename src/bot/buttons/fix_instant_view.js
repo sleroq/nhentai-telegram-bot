@@ -4,10 +4,10 @@ const config = require('../../config.json');
 const {
   telegraphCreatePage,
 } = require("../telegraph.js");
-const { getMangaMessage } = require("../someFuncs.js");
-const { saveAndGetUser } = require("../../db/saveAndGetUser");
+const { getMangaMessage } = require("../some_functions.js");
+const { saveAndGetUser } = require("../../db/save_and_get_user");
 const { uploadByUrl } = require("telegraph-uploader");
-const { saveAndGetManga } = require("../../db/saveAndGetManga");
+const { saveAndGetManga } = require("../../db/save_and_get_manga");
 
 const Message = require("../../models/message.model");
 

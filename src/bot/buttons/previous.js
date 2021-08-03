@@ -1,9 +1,9 @@
 const nhentai = require("../../nhentai");
 const config = require('../../config.json');
 
-const { getMangaMessage } = require("../someFuncs.js");
-const { saveAndGetUser } = require("../../db/saveAndGetUser");
-const { saveAndGetManga } = require("../../db/saveAndGetManga");
+const { getMangaMessage } = require("../some_functions.js");
+const { saveAndGetUser } = require("../../db/save_and_get_user");
+const { saveAndGetManga } = require("../../db/save_and_get_manga");
 
 const Message = require("../../models/message.model");
 

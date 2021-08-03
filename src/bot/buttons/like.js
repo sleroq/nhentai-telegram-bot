@@ -1,4 +1,4 @@
-const { saveAndGetUser } = require("../../db/saveAndGetUser");
+const { saveAndGetUser } = require("../../db/save_and_get_user");
 const Manga = require("../../models/manga.model");
 const nhentai = require("../../nhentai");
 const config = require('../../config.json');

@@ -6,9 +6,9 @@ import {
   sliceByHalf,
   getMangaMessage,
   isFullColor,
-} from "./someFuncs.js";
-import saveAndGetUser from "../db/saveAndGetUser";
-import saveAndGetManga from "../db/saveAndGetManga";
+} from "./some_functions.js";
+import saveAndGetUser from "../db/save_and_get_user";
+import saveAndGetManga from "../db/save_and_get_manga";
 import Manga from "../models/manga.model.js";
 import Context from "telegraf/typings/context";
 import i18n from "../i18n";

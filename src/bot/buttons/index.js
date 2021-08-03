@@ -5,7 +5,7 @@ const { openiInTelegraph } = require("./open_in_telegraph.js");
 const { fixInstantView } = require("./fix_instant_view.js");
 const { searchtips } = require("./help_searchtips.js");
 const { help_back } = require("./help_back.js");
-const { saveAndGetUser } = require("../../db/saveAndGetUser");
+const { saveAndGetUser } = require("../../db/save_and_get_user");
 const { edit_settings } = require("../settings/edit_settings");
 const config = require('../../config.json');
 

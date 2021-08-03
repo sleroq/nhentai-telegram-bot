@@ -1,6 +1,6 @@
 const nhentai = require("../../nhentai");
-const { saveAndGetUser } = require("../../db/saveAndGetUser");
-const { getMangaMessage } = require("../someFuncs.js");
+const { saveAndGetUser } = require("../../db/save_and_get_user");
+const { getMangaMessage } = require("../some_functions.js");
 const fs = require("fs");
 const nhdl = require("../../nhentaidownloader");
 
