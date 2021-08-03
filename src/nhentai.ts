@@ -70,10 +70,10 @@ export default class nHentai {
     try {
       response = await got(`https://nhentai.net/g/${id}/`)
     } catch (error) {
-      if (error.message === 'Response code 404 (Not Found)') {
+      if (error instanceof Error && error.message === 'Response code 404 (Not Found)') {
         throw new Error('Not found')
       }
-      throw new Error(error)
+      throw error
     }
 
     return assembleDoujin(response)
@@ -83,10 +83,10 @@ export default class nHentai {
     try {
       response = await got('https://nhentai.net/random/')
     } catch (error) {
-      if (error.message === 'Response code 404 (Not Found)') {
+      if (error instanceof Error && error.message === 'Response code 404 (Not Found)') {
         throw new Error('Not found')
       }
-      throw new Error(error)
+      throw error
     }
 
     return assembleDoujin(response)
@@ -162,7 +162,7 @@ export default class nHentai {
     try {
       await got('https://nhentai.net/g/' + id + '/')
     } catch (error) {
-      if (error.message === 'Response code 404 (Not Found)') {
+      if (error instanceof Error && error.message === 'Response code 404 (Not Found)') {
         return false
       }
     }
