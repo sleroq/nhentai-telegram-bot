@@ -1,4 +1,4 @@
-const { saveAndGetUser } = require("../../db/saveAndGetUser");
+const { saveAndGetUser } = require("../../db/save_and_get_user");
 const { isSafeModeOn } = require("./safe_mode");
 const api = require('../../api');
 const nhentai = require("../../nhentai");
