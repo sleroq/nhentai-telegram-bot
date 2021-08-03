@@ -1,6 +1,6 @@
 import got, { Response } from 'got'
 import cheerio, { CheerioAPI } from 'cheerio'
-
+import { Element } from 'cheerio'
 export interface Doujin {
   id: number
   url: string
@@ -173,7 +173,7 @@ export function getIdfromUrl(idOrUrl: string | number): number {
   const urlToId = /\/g\/(\d+)\/?.*/
   return Number(String(idOrUrl).replace(urlToId, '$2'))
 }
-function getLightDoujin($: CheerioAPI, element: any) {
+function getLightDoujin($: CheerioAPI, element: Element) {
   const cover = $(element).children('.cover')
   const relativeUrl = cover.attr('href')
   const absoluteUrl = relativeUrl
