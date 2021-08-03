@@ -2,7 +2,7 @@ import nhentai, { Doujin } from "../nhentai";
 import Manga, { MangaSchema } from "../models/manga.model.js";
 import TelegraphUploadByUrls from "../bot/telegraph.js"
 
-import { getRandomMangaLocally } from "../bot/someFuncs";
+import getRandomMangaLocally from "../db/get_manga_random_locally";
 import { UserSchema } from "../models/user.model";
 import Verror from "verror";
 import { Document } from "mongoose";
