@@ -14,17 +14,17 @@
   "pages_to_show_fix_button": 100,
   "//comment3": "the number of pages in the manga required to add 'fix' button to message.",
 
-	"maximum_codes_from_one_message": 30,
+  "maximum_codes_from_one_message": 30,
 
   "show_favorites_as_gallery": false,
   "search_sorting_by_default": "date",
   "//comment5": "date / popular",
 
   "search_appearance_by_default": "photo",
-	"//comment6": "article (same as gallery) / photo",
+  "//comment6": "article (same as gallery) / photo",
 
   "random_localy_by_default": true,
-	"//comment7": "about random loacaly https://telegra.ph/Settings-04-09",
+  "//comment7": "about random loacaly https://telegra.ph/Settings-04-09",
 
   "can_repeat_in_random_by_default": true,
 
