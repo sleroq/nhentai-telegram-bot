@@ -1,28 +1,9 @@
-import Verror from "verror";
-import Manga, { MangaSchema } from "../models/manga.model";
+import { MangaSchema } from "../models/manga.model";
 import { Doujin, LightDoujin } from "../nhentai";
 import { Document } from "mongoose";
 import i18n from "../i18n";
 import { Favorite } from "../models/user.model";
 
-export async function getRandomMangaLocally(includedTags: string[] | undefined, excludedTags: string[] | undefined): Promise<MangaSchema & Document<any, any, MangaSchema> | null> {
-  let query = {
-    tags: {
-      $in: includedTags,
-      $nin: excludedTags
-    }
-  };
-  const count = await Manga.countDocuments(query);
-  if (count === 0 || count === null) {
-    return null;
-  }
-  const random = Math.floor(Math.random() * count);
-  const result = await Manga.findOne(query).skip(random);
-  if (!result) {
-    throw new Verror("Could not get random doujin locally")
-  }
-  return result;
-}
 export function getMangaMessage(
   manga: Doujin | MangaSchema & Document<any, any, MangaSchema> | Favorite,
   telegraphLink?: string
