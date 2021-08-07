@@ -99,7 +99,7 @@ export default class nHentai {
 
     const homepage: Homepage = {
       popular: [],
-      new: [],
+      new:     [],
     }
     const popularContainer = $('.container.index-container.index-popular')
     const newContainer = $('.container.index-container:contains(New)')
@@ -146,9 +146,9 @@ export default class nHentai {
       lastPageMatch ? lastPageMatch[1] : undefined
     )
     const searchresult: SearchResult = {
-      results: [],
+      results:            [],
       totalSearchResults: numberOfResults,
-      lastPage: lastPage,
+      lastPage:           lastPage,
     }
     $('.container.index-container .gallery').each((index, element) => {
       const doujin = getLightDoujin($, element)
@@ -193,8 +193,8 @@ function getLightDoujin($: CheerioAPI, element: Element) {
     }
   }
   return {
-    id: matchId ? Number(matchId[0]) : undefined,
-    url: absoluteUrl,
+    id:    matchId ? Number(matchId[0]) : undefined,
+    url:   absoluteUrl,
     thumbnail,
     title: cover.children('.caption').text(),
     language,
@@ -217,12 +217,12 @@ function assembleDoujin(response: Response<string>): Doujin {
     translated: {
       before: translated.children('.before').text(),
       pretty: translated.children('.pretty').text(),
-      after: translated.children('.after').text(),
+      after:  translated.children('.after').text(),
     },
     original: {
       before: original.children('.before').text(),
       pretty: original.children('.pretty').text(),
-      after: original.children('.after').text(),
+      after:  original.children('.after').text(),
     }
   }
 
@@ -232,9 +232,9 @@ function assembleDoujin(response: Response<string>): Doujin {
     const tags: Tag[] = []
     tagsContainer.children('a').each((index, element) => {
       tags.push({
-        name: $(element).children('.name').text(),
+        name:  $(element).children('.name').text(),
         count: $(element).children('.count').text(),
-        id: Number($(element).attr('class')?.split(/tag\stag-/g)[1])
+        id:    Number($(element).attr('class')?.split(/tag\stag-/g)[1])
       })
     })
     if (tags.length !== 0) {
@@ -248,7 +248,7 @@ function assembleDoujin(response: Response<string>): Doujin {
     const datetime = datetimeElement ? new Date(datetimeElement) : undefined
     return {
       datetime: datetime,
-      pretty: tagsContainer.children('time').text(),
+      pretty:   tagsContainer.children('time').text(),
     }
   }
 
@@ -270,15 +270,15 @@ function assembleDoujin(response: Response<string>): Doujin {
   })
 
   const details = {
-    parodies: getTag('Parodies:'),
+    parodies:   getTag('Parodies:'),
     characters: getTag('Characters:'),
-    tags: getTag('Tags:'),
-    artists: getTag('Artists:'),
-    groups: getTag('Groups:'),
-    languages: getTag('Languages:'),
+    tags:       getTag('Tags:'),
+    artists:    getTag('Artists:'),
+    groups:     getTag('Groups:'),
+    languages:  getTag('Languages:'),
     categories: getTag('Categories:'),
-    pages: pages.length,
-    uploaded: getUploaded('Uploaded:')
+    pages:      pages.length,
+    uploaded:   getUploaded('Uploaded:')
   }
 
   return {
