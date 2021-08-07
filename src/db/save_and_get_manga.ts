@@ -1,98 +1,102 @@
-import nhentai, { Doujin } from "../nhentai";
-import Manga, { MangaSchema } from "../models/manga.model.js";
-import TelegraphUploadByUrls from "../bot/telegraph.js"
+import nhentai, { Doujin } from '../nhentai'
+import Manga, { MangaSchema } from '../models/manga.model.js'
+import TelegraphUploadByUrls from '../bot/telegraph.js'
 
-import getRandomMangaLocally from "../db/get_manga_random_locally";
-import { UserSchema } from "../models/user.model";
-import Verror from "verror";
-import { Document } from "mongoose";
+import getRandomMangaLocally from '../db/get_manga_random_locally'
+import { UserSchema } from '../models/user.model'
+import Verror from 'verror'
+import { Document } from 'mongoose'
 
 export default async function saveAndGetManga(user: UserSchema, id: number | undefined): Promise<MangaSchema & Document<any, any, MangaSchema>> {
-  let manga: Doujin | MangaSchema & Document<any, any, MangaSchema> | null = null;
-  let images: string[] = [];
+  let savedManga: MangaSchema & Document<any, any, MangaSchema> | null = null
+  let newManga: Doujin | null = null
+  let images: string[] = []
 
   if (!id) {  // RANDOM NEW MANGA
     if (user.random_localy) {
       // (if randoming only in database records)
       try {
-        manga = await getRandomMangaLocally(
+        savedManga = await getRandomMangaLocally(
           user.default_random_tags,
           user.ignored_random_tags
         )
       } catch (error) {
-        throw new Verror(error, "Getting doujin locally");
+        throw new Verror(error, 'Getting doujin locally')
       }
-      if (manga === null) {
-        throw new Verror("Couldn't find manga with such tags")
+      if (savedManga === null) {
+        throw new Verror('Couldn\'t find manga with such tags')
       }
       console.log('got manga random localy')
     } else { // (not localy)
       try {
-        manga = await nhentai.getRandomDoujin();
-        images = manga.pages;
+        newManga = await nhentai.getRandomDoujin()
+        images = newManga.pages
       } catch (error) {
-        throw new Verror(error, "Getting random doujin from nhentai");
+        throw new Verror(error, 'Getting random doujin from nhentai')
       }
-      let sameMangaInDB: MangaSchema & Document<any, any, MangaSchema> | null = null;
+      let sameMangaInDB: MangaSchema & Document<any, any, MangaSchema> | null = null
       try {
-        sameMangaInDB = await Manga.findOne({ id: manga.id });
+        sameMangaInDB = await Manga.findOne({ id: newManga.id })
       } catch (error) {
-        console.log(error);
+        console.log(error)
       }
       if (sameMangaInDB) {
-        manga = sameMangaInDB;
+        savedManga = sameMangaInDB
       } else {
         try {
-          manga = await saveNewManga(manga);
+          savedManga = await saveNewManga(newManga)
         } catch (error) {
-          throw new Verror(error, "Saving doujin")
+          throw new Verror(error, 'Saving doujin')
         }
       }
       console.log('Got manga random locally!')
     }
   } else {
     try {
-      manga = await Manga.findOne({ id: id });
+      savedManga = await Manga.findOne({ id: id })
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
-    if (!manga) {
+    if (!savedManga) {
       try {
-        manga = await nhentai.getDoujin(id);
-        images = manga.pages;
+        newManga = await nhentai.getDoujin(id)
+        images = newManga.pages
       } catch (error) {
-        throw new Verror(error, "Getting doujin by id");
+        throw new Verror(error, 'Getting doujin by id')
       }
-      manga = await saveNewManga(manga);
+      savedManga = await saveNewManga(newManga)
     }
-    console.log('Got manga by id');
+    console.log('Got manga by id')
   }
 
   // Update old manga where telegraph_url was not saved for some reason
-  if (!manga.telegraph_url) {
+  if (!savedManga.telegraph_url) {
     if (images.length === 0) {
-      let mangaWithPages: Doujin | undefined;
+      let mangaWithPages: Doujin | undefined
       try {
-        mangaWithPages = await nhentai.getDoujin(manga.id);
+        mangaWithPages = await nhentai.getDoujin(savedManga.id)
       } catch (error) {
-        throw new Verror(error, "Getting images to update manga without telegra.ph url")
+        throw new Verror(error, 'Getting images to update manga without telegra.ph url')
       }
       images = mangaWithPages.pages
-      console.log("Got pages to fix manga from DB");
+      console.log('Got pages to fix manga from DB')
     }
     try {
-      manga.telegraph_url = await TelegraphUploadByUrls(manga);
+      savedManga.telegraph_url = await TelegraphUploadByUrls(savedManga)
     } catch (error) {
-      throw new Verror(error, "Posting doujin to telegra.ph to fix manga wothout telegra.pf url")
+      throw new Verror(error, 'Posting doujin to telegra.ph to fix manga wothout telegra.pf url')
     }
-    manga.save(function (err) {
-      if (err) return console.error(err);
-    });
+    try {
+      await savedManga.save()
+    } catch (error) {
+      console.log('Could not save manga with updated telegraph_url: ' + savedManga.id)
+      console.log(error)
+    }
   }
   // Update old manga where date was not specified
-  if (!manga.createdAt || !manga.updatedAt) {
+  if (!savedManga.createdAt || !savedManga.updatedAt) {
     await Manga.updateOne(
-      { id: manga.id },
+      { id: savedManga.id },
       {
         $set:
         {
@@ -101,62 +105,62 @@ export default async function saveAndGetManga(user: UserSchema, id: number | und
         },
       }
     )
-    console.log('Added date to ' + manga.id)
+    console.log('Added date to ' + savedManga.id)
   }
   // Add thumbnail and first page if was saved without them
-  if (!manga.thumbnail || !manga.page0) {
-    let mangaWithThumbnail: Doujin | undefined;
+  if (!savedManga.thumbnail || !savedManga.page0) {
+    let mangaWithThumbnail: Doujin | undefined
     try {
-      mangaWithThumbnail = await nhentai.getDoujin(manga.id);
+      mangaWithThumbnail = await nhentai.getDoujin(savedManga.id)
     } catch (error) {
-      throw new Verror("Getting manga with thumbnail");
+      throw new Verror('Getting manga with thumbnail')
     }
-    manga.thumbnail = mangaWithThumbnail.thumbnails[0];
-    manga.page0 = mangaWithThumbnail.pages[0];
+    savedManga.thumbnail = mangaWithThumbnail.thumbnails[0]
+    savedManga.page0 = mangaWithThumbnail.pages[0]
 
     try {
-      await manga.save()
+      await savedManga.save()
     } catch (error) {
-      console.log("Could not save manga with updated thumbnail and page0: " + manga.id);
+      console.log('Could not save manga with updated thumbnail and page0: ' + savedManga.id)
       console.log(error)
     }
-    console.log("Added thumbnail and page0 to " + manga.id);
+    console.log('Added thumbnail and page0 to ' + savedManga.id)
   }
-  console.log("returning manga");
-  return manga
+  console.log('returning manga')
+  return savedManga
 }
 async function saveNewManga(manga: Doujin): Promise<MangaSchema & Document<any, any, MangaSchema>> {
   const thumbnail = Array.isArray(manga.thumbnails) && manga.thumbnails[0]
     ? manga.thumbnails[0]
-    : undefined;
-  const page0 = manga.pages[0];
+    : undefined
+  const page0 = manga.pages[0]
   const launguage = manga.details.languages
     ? manga.details.languages[manga.details.languages.length - 1]
-    : undefined;
+    : undefined
 
-  let telegraphUrl: string | undefined;
+  let telegraphUrl: string | undefined
   try {
     telegraphUrl = await TelegraphUploadByUrls(manga)
   } catch (error) {
-    throw new Verror(error, "Posting doujin to telegra.ph")
+    throw new Verror(error, 'Posting doujin to telegra.ph')
   }
 
   const mangaDB = new Manga({
-    id: manga.id,
-    title: manga.title,
-    description: launguage,
-    tags: manga.details.tags,
+    id:            manga.id,
+    title:         manga.title,
+    description:   launguage,
+    tags:          manga.details.tags,
     telegraph_url: telegraphUrl,
-    pages: manga.details.pages,
+    pages:         manga.details.pages,
     thumbnail,
     page0,
-  });
+  })
   try {
-    await mangaDB.save();
+    await mangaDB.save()
   } catch (error) {
-    console.log("Could not save new manga :(");
-    console.log(error);
+    console.log('Could not save new manga :(')
+    console.log(error)
   }
-  console.log("Doujin saved");
+  console.log('Doujin saved')
   return mangaDB
 }
