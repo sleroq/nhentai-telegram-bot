@@ -31,7 +31,8 @@
   </details>
 
 ## One-Click Deploy Button
-
+Since now I am working on a complete transition to typescript, the bot may not work at all or just be unstable, if you want a stable version, then use the code from the latest javascript release<br>
+Also with new version you don't need telegra.ph token
 ### Pre-reqs for deploying this project to Heroku:
 
 - Create a free [Heroku account](https://signup.heroku.com/)
