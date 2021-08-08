@@ -1,4 +1,4 @@
-import config from '../config.json'
+import config from '../config'
 
 import express from 'express'
 import Verror from 'verror'
@@ -13,7 +13,7 @@ import { Update } from 'telegraf/typings/core/types/typegram'
 async function clearQueue(token: string) {
   try {
     await got(`https://api.telegram.org/bot${token}/getUpdates?offset=-1`)
-  } catch (error: any) {
+  } catch (error) {
     throw new Verror(error, 'Clearing queue by setting offset -1')
   }
 }

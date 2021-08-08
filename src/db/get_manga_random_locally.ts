@@ -1,4 +1,6 @@
-import Manga from '../models/manga.model'
+import Manga, { MangaSchema } from '../models/manga.model'
+import { Document } from 'mongoose'
+
 export default async function getRandomMangaLocally(includedTags: string[] | undefined, excludedTags: string[] | undefined): Promise<MangaSchema & Document<any, any, MangaSchema> | null> {
   const query = {
     tags: {
