@@ -43,7 +43,7 @@
     "mongoose": "^5.13.5",
     "superagent": "^6.1.0",
     "telegra.ph": "^1.0.1",
-    "telegraf": "4.3",
+    "telegraf": "^4.4.1",
     "telegraph-uploader": "^2.0.0",
     "verror": "^1.10.0"
   }
