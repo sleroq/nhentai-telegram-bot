@@ -1,75 +1,76 @@
-import config from "../../config.json";
-import { Doujin } from "../nhentai";
-import Telegraph from "telegra.ph";
-import { Node, Page } from "telegra.ph/typings/telegraph";
-import { Document } from "mongoose";
-import { MangaSchema } from "../models/manga.model";
+import config from '../../config'
+import { Doujin } from '../nhentai'
+import Telegraph from 'telegra.ph'
+import { Node, Page } from 'telegra.ph/typings/telegraph'
+import { Document } from 'mongoose'
+import { MangaSchema } from '../models/manga.model'
 
 let token: string | undefined;
 
 (async () => {
   if (!process.env.TELEGRAPH_TOKEN) {
-    console.error("No token for telegra.ph");
-    token = await createAccount();
+    console.error('No token for telegra.ph')
+    token = await createAccount()
   } else {
     token = process.env.TELEGRAPH_TOKEN
   }
-})();
+})()
+
 if (!token) {
-  throw new Error("This can't happen cause Error whould be thrown, but typescript thinks it can.")
+  throw new Error('This can\'t happen, but typescript thinks it can.')
 }
-const client = new Telegraph(token);
+const client = new Telegraph(token)
 
 export async function createAccount(): Promise<string> {
-  const account = await client.createAccount(config.bot_username, config.bot_username);
+  const account = await client.createAccount(config.bot_username, config.bot_username)
   if (!account.access_token) {
-    throw new Error("Could not create an account for telega.ph: no access_token")
+    throw new Error('Could not create an account for telega.ph: no access_token')
   }
-  return account.access_token;
+  return account.access_token
 }
 
 export async function telegraphCreatePage(
   manga: Doujin | MangaSchema & Document<any, any, MangaSchema>,
   images: string[],
   username = config.bot_username
-) {
-  const page: Node[] = [];
+): Promise<Page> {
+  const page: Node[] = []
   return client.createPage(
     `${manga.title}`,
     page
       .concat(
         images.map((image) => ({
-          tag: "img",
+          tag:   'img',
           attrs: { src: `${image}` },
         }))
       )
       .concat([
         {
-          tag: "a",
+          tag:      'a',
           children: [config.text_at_the_end_of_telegraph_page],
         },
       ]),
-    "@" + username,
-    "https://t.me/" + username,
+    '@' + username,
+    'https://t.me/' + username,
     true
-  );
+  )
 }
 export default async function TelegraphUploadByUrls(
   manga: Doujin | MangaSchema & Document<any, any, MangaSchema>,
   images?: string[]
 ) {
-  console.log("start uploaing url")
-  const pages = images || manga.pages;
+  console.log('start uploaing url')
+  const pages = images || manga.pages
   if(typeof pages === 'number'){
-    throw new Error("You have to provide pages, or Doujin with them")
+    throw new Error('You have to provide pages, or Doujin with them')
   }
-  let articlePage: Page | undefined;
+  let articlePage: Page | undefined
 
   articlePage = await telegraphCreatePage(manga, pages)
 
   if (!articlePage || articlePage.url) {
-    throw new Error("Could not create a page: no page url")
+    throw new Error('Could not create a page: no page url')
   }
-  console.log("returning uploaded url")
-  return articlePage.url;
+  console.log('returning uploaded url')
+  return articlePage.url
 }
