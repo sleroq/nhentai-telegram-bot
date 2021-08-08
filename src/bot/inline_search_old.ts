@@ -21,11 +21,11 @@ import { Document } from 'mongoose'
 async function getFavoritesUniversal(favorites: Favorite[], type: 'photo'| 'article') {
   const results = []
   for (const favorite of favorites){
-    const caption = getMangaMessage(
-      favorite,
-      favorite.telegraph_url
-    )
+    const caption = getMangaMessage(favorite, favorite.telegraph_url)
     const description = sliceByHalf(favorite.title)
+      .replace('<', '\\<')
+      .replace('>', '\\>')
+      .trim()
     const heart = config.like_button_true
     const InlineKeyboardMarkup: InlineKeyboardMarkup = {
       inline_keyboard: [
@@ -43,10 +43,9 @@ async function getFavoritesUniversal(favorites: Favorite[], type: 'photo'| 'arti
       id:    favorite._id,
       type:  type,
       title: favorite.title
-      // .split(/\[.*?\]/)
-      // .join('')
+        .replace('<', '\\<')
+        .replace('>', '\\>')
         .trim(),
-      // caption,
       description: description,
       thumb_url:   favorite.thumbnail,
       photo_url:   favorite.thumbnail,
@@ -111,14 +110,14 @@ export default async function (ctx: Context): Promise<void> {
 
     results.unshift({
       id:                    String(Math.floor(Math.random() * 10000000)),
-      type:                  'photo',
+      type:                  searchType,
       title:                 i18n.__('favorites'),
       description:           i18n.__('favorites_tip_desctiption'),
       photo_url:             config.favorites_icon_inline,
       thumb_url:             config.favorites_icon_inline,
       input_message_content: {
         message_text: i18n.__('tap_to_open_favorites'),
-        parse_mode:   'Markdown',
+        parse_mode:   'HTML',
       },
       reply_markup: favoritesReplyMarkup,
     })
@@ -135,7 +134,7 @@ export default async function (ctx: Context): Promise<void> {
         input_message_content: {
           message_text:
             i18n.__('next_page_tip_message'),
-          parse_mode: 'Markdown',
+          parse_mode: 'HTML',
         },
         reply_markup: {
           inline_keyboard: [
@@ -150,12 +149,16 @@ export default async function (ctx: Context): Promise<void> {
       })
     }
 
-    await ctx // @ts-ignore
-      .answerInlineQuery(results, {
-        cache_time:  0,
-        is_personal: true,
-      })
-      .catch((err) => console.log(err))
+    try {
+      await ctx // @ts-ignore
+        .answerInlineQuery(results, {
+          cache_time:  0,
+          is_personal: true,
+        })
+    } catch (error) {
+      console.log(results)
+      throw new Verror(error, 'Answer inline favorites')
+    }
     return
   }
 
@@ -531,7 +534,7 @@ export default async function (ctx: Context): Promise<void> {
       inline_keyboard: [
         [
           {
-            text:                             ctx.i18n.t('next_page_button'),
+            text:                             i18n.__('next_page_button'),
             switch_inline_query_current_chat: nextPageSwitch,
           },
         ],
