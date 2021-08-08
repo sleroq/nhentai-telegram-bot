@@ -1,22 +1,24 @@
-// import nhentai from '../nhentai'
+import nhentai, { SearchResult, SortingType } from '../nhentai'
 import config from '../../config'
+import Verror from 'verror'
 
 import {
-  // getMessageInline,
+  getMessageInline,
   sliceByHalf,
   getMangaMessage,
-  // isFullColor,
+  isFullColor,
 } from './some_functions.js'
 
 import saveAndGetUser from '../db/save_and_get_user'
-// import saveAndGetManga from '../db/save_and_get_manga'
-import Manga from '../models/manga.model.js'
+import saveAndGetManga from '../db/save_and_get_manga'
+import Manga, { MangaSchema } from '../models/manga.model.js'
 import Context from 'telegraf/typings/context'
 import i18n from '../i18n'
-import { InlineKeyboardMarkup, InlineQueryResultArticle } from 'typegram'
+import { InlineKeyboardButton, InlineKeyboardMarkup, InlineQueryResultArticle } from 'typegram'
 import { Favorite } from '../models/user.model'
+import { Document } from 'mongoose'
 
-async function getFavoritesUniversal(favorites: Favorite[], type: 'article' | 'photo') {
+async function getFavoritesUniversal(favorites: Favorite[], type: 'photo'| 'article') {
   const results = []
   for (const favorite of favorites){
     const caption = getMangaMessage(
@@ -156,74 +158,6 @@ export default async function (ctx: Context): Promise<void> {
       .catch((err) => console.log(err))
     return
   }
-  // results = favorites.map((manga) => ({
-  //   id:    Math.floor(Math.random() * 10000000),
-  //   type:  searchType,
-  //   title: manga.title
-  //     .split(/\[.*?\]/)
-  //     .join('')
-  //     .trim(),
-  //   description: manga.description,
-  //   thumb_url:   manga.thumbnail,
-  //   photo_url:   manga.thumbnail,
-
-  //   input_message_content: {
-  //     message_text: manga.message_text,
-  //     parse_mode:   'HTML',
-  //   },
-  //   reply_markup: {
-  //     inline_keyboard: manga.inline_keyboard,
-  //   },
-  // }))
-  // results.reverse()
-  // //splice pages some pages
-  // results.splice(0, 48 * (pageNumber - 1))
-  // // rm old favorites cause of telegram limit
-  // if (results.length > 48) {
-  //   const num_of_superfluous = results.length - 48
-  //   results.splice(48, num_of_superfluous)
-  // }
-  // const nextPageSwitch = `/p${+pageNumber + 1} ${inlineQuery}`
-  // results.unshift({
-  //   id:                    Math.floor(Math.random() * 10000000),
-  //   type:                  searchType,
-  //   title:                 ctx.i18n.t('favorites'),
-  //   description:           ctx.i18n.t('favorites_tip_desctiption'),
-  //   photo_url:             config.favorites_icon_inline,
-  //   thumb_url:             config.favorites_icon_inline,
-  //   input_message_content: {
-  //     message_text: ctx.i18n.t('tap_to_open_favorites'),
-  //     parse_mode:   'Markdown',
-  //   },
-  //   reply_markup: favorites_reply_markup,
-  // })
-  // if (pageNumber < Math.ceil(results.length / 48)) {
-  //   results.push({
-  //     id:          9696969696,
-  //     type:        searchType,
-  //     title:       ctx.i18n.t('next_page_tip_title'),
-  //     description: `TAP HERE or Just add "/p${+pageNumber + 1
-  //     }" to search qerry: (@nhentai_mangabot ${nextPageSwitch})`,
-  //     photo_url:             config.next_page_icon_inline,
-  //     thumb_url:             config.next_page_icon_inline,
-  //     input_message_content: {
-  //       message_text:
-  //         ctx.i18n.t('next_page_tip_message'),
-  //       parse_mode: 'Markdown',
-  //     },
-  //     reply_markup: {
-  //       inline_keyboard: [
-  //         [
-  //           {
-  //             text:                             ctx.i18n.t('next_page_button'),
-  //             switch_inline_query_current_chat: nextPageSwitch,
-  //           },
-  //         ],
-  //       ],
-  //     },
-  //   })
-  // }
-  // }
 
   // history
   if (inlineQuery.startsWith('/h')) {
@@ -275,60 +209,52 @@ export default async function (ctx: Context): Promise<void> {
         doujin,
         doujin.telegraph_url,
       )
-      const description = sliceByHalf(history[i].title)
-      const heart = user.favorites.id(history[i].id) ? config.like_button_true : config.like_button_false
-    }
-    for (let i = 0; i < history.length; i++) {
-      history[i].description = sliceByHalf(history[i].title)
-      const heart = user.favorites.id(history[i].id) ? config.like_button_true : config.like_button_false
-      history[i].inline_keyboard = [
+      const description = sliceByHalf(doujin.title)
+      const heart = user.favorites.findIndex(item => item._id === doujin._id) ? config.like_button_true : config.like_button_false
+      const inline_keyboard = [
         [
-          { text: 'Telegra.ph', url: history[i].telegraph_url },
-          { text: heart, callback_data: 'like_' + history[i].id },
+          { text: 'Telegra.ph', url: String(doujin.telegraph_url) },
+          { text: heart, callback_data: 'like_' + doujin.id },
         ],
       ]
-      if (!history[i].telegraph_fixed_url && (history[i].pages > config.pages_to_show_fix_button || isFullColor(history[i]))) {
-        history[i].inline_keyboard[0].unshift({
-          text:          ctx.i18n.t('fix_button'),
-          callback_data: 'fix_' + history[i].id,
+      if (!doujin.telegraph_fixed_url && (doujin.pages > config.pages_to_show_fix_button || isFullColor(doujin))) {
+        inline_keyboard[0].unshift({
+          text:          i18n.__('fix_button'),
+          callback_data: 'fix_' + doujin.id,
         })
       }
+      results.push({
+        id:    doujin._id,
+        type:  searchType,
+        title: doujin.title
+        // .split(/\[.*?\]/)
+        // .join('')
+          .trim(),
+        description:           description,
+        input_message_content: {
+          message_text: message_text,
+          parse_mode:   'HTML',
+        },
+        reply_markup: {
+          inline_keyboard: inline_keyboard,
+        },
+      })
     }
-
-    results = history.map((manga) => ({
-      id:    Math.floor(Math.random() * 10000000),
-      type:  searchType,
-      title: manga.title
-        .split(/\[.*?\]/)
-        .join('')
-        .trim(),
-      description: manga.description,
-      thumb_url:   manga.thumbnail,
-      photo_url:   manga.thumbnail,
-
-      input_message_content: {
-        message_text: manga.message_text,
-        parse_mode:   'HTML',
-      },
-      reply_markup: {
-        inline_keyboard: manga.inline_keyboard,
-      },
-    }))
     results.push({
-      id:                    69696969696969,
+      id:                    String(69696969696969),
       type:                  searchType,
-      title:                 ctx.i18n.t('history_tip_title'),
-      description:           ctx.i18n.t('history_tip_desctiption'),
-      photo_url:             config.history_icon_inline,
+      title:                 i18n.__('history_tip_title'),
+      description:           i18n.__('history_tip_desctiption'),
       thumb_url:             config.history_icon_inline,
       input_message_content: {
-        message_text: ctx.i18n.t('tap_to_open_history'),
+        message_text: i18n.__('tap_to_open_history'),
         parse_mode:   'Markdown',
       },
       reply_markup: history_reply_markup,
     })
+    results.reverse()
     await ctx
-      .answerInlineQuery(results.reverse(), {
+      .answerInlineQuery(results, {
         cache_time:  0,
         is_personal: true,
       })
@@ -336,55 +262,69 @@ export default async function (ctx: Context): Promise<void> {
     return
   }
 
-  // // search:
+  // search:
 
-  // // variables
+  // variables
 
-  // let inlineQuery = ctx.inlineQuery.query,
-  //   pageNumber = 1,
-  //   pageMatch = inlineQuery.match(/\/p\d+/g) // check if page specified
-  //     ? inlineQuery.match(/\/p\d+/g)[0]
-  //     : undefined,
-  //   isPageModified = false,
-  //   searchType = user.search_type ? user.search_type : 'article'
-  // if (pageMatch) { // for example "@bot /p35 smth" 
-  //   isPageModified = true // need this to add tips based on user's query
-  //   pageNumber = pageMatch.slice(2)
-  //   inlineQuery = inlineQuery.replace(pageMatch, '').trim()
-  // }
-  // let sortingParametr = user.search_sorting ? user.search_sorting : 'date',
-  //   sortMatch = inlineQuery.match(/\/s[pn]/) // check if results order specified
-  //     ? inlineQuery.match(/\/s[pn]/)[0]
-  //     : undefined,
-  //   isSearchModified = false
-  // if (sortMatch) { // for example "@bot /sp smth"
-  //   isSearchModified = true // need this to add tips based on user's query
-  //   sortingParametr = sortMatch.slice(2) == 'p' ? 'popular' : 'date'
-  //   inlineQuery = inlineQuery.replace(sortMatch, '').trim()
-  // }
-  // const nothingIsFound_result = {
-  //   id:                    6969696969,
-  //   type:                  searchType,
-  //   title:                 ctx.i18n.t('nothing_is_found'),
-  //   description:           '',
-  //   photo_url:             config.help_icon_inline,
-  //   thumb_url:             config.help_icon_inline,
-  //   input_message_content: {
-  //     message_text: ctx.i18n.t('help'),
-  //     parse_mode:   'Markdown',
-  //   },
-  //   reply_markup: {
-  //     inline_keyboard: [
-  //       [
-  //         {
-  //           text:          ctx.i18n.t('search_tips_button'),
-  //           callback_data: 'searchtips',
-  //         },
-  //       ],
-  //       [{ text: ctx.i18n.t('settings_button'), callback_data: 'settings' }],
-  //     ],
-  //   },
-  // }
+  let pageNumber = 1
+  const pageMatch = matchPage // check if page specified
+    ? matchPage[0]
+    : undefined
+
+  if (pageMatch) { // for example "@bot /p35 smth" 
+    pageNumber = Number(pageMatch.slice(2))
+    inlineQuery = inlineQuery.replace(pageMatch, '').trim()
+  }
+  const searchType: 'photo' | 'article' = user.search_type === 'photo' ? user.search_type : 'article'
+
+  let sortingParametr: SortingType = ''
+
+  const matchSorting = inlineQuery.match(/\/s[pn]/)
+
+  let isSearchModified = false
+  if (matchSorting) { // for example "@bot /sp smth"
+    isSearchModified = true // need this to add tips based on user's query
+
+    switch (matchSorting[0].slice(2)) {
+    case 'popular': 
+      sortingParametr = 'popular'
+      break
+    case 'popular-today':
+      sortingParametr = 'popular-today'
+      break
+    case 'popular-week':
+      sortingParametr = 'popular-week'
+      break
+    case 'date':
+      break
+    default:
+      console.error('Not allowed sorting ' + user.search_sorting)
+    }
+    inlineQuery = inlineQuery.replace(matchSorting[0], '').trim()
+  }
+
+  const nothingIsFound_result: InlineQueryResultArticle = {
+    id:                    String(6969696969),
+    type:                  'article',
+    title:                 i18n.__('nothing_is_found'),
+    description:           '',
+    thumb_url:             config.help_icon_inline,
+    input_message_content: {
+      message_text: i18n.__('help'),
+      parse_mode:   'Markdown',
+    },
+    reply_markup: {
+      inline_keyboard: [
+        [
+          {
+            text:          i18n.__('search_tips_button'),
+            callback_data: 'searchtips',
+          },
+        ],
+        [{ text: i18n.__('settings_button'), callback_data: 'settings' }],
+      ],
+    },
+  }
 
   // console.log(
   //   'Someone is searching for ' +
@@ -395,191 +335,213 @@ export default async function (ctx: Context): Promise<void> {
   //   sortingParametr
   // )
 
-  // // search for id if there is only numbers in query
+  // search for id if there is only numbers in query
+  const matchNumbers = inlineQuery.match(/\d+/)
+  if (matchNumbers && inlineQuery.replace(/\d+/, '').trim() === '') {
+    const manga_id = Number(matchNumbers[0])
+    const results = []
+    let manga: MangaSchema & Document<any, any, MangaSchema> | undefined
+    try {
+      manga = await saveAndGetManga(user, manga_id)
+    } catch (error) {
+    // if nothing is found
+      if(error.cause() && error.cause().message === 'Not found') {
+        results.push(nothingIsFound_result)
+        try {
+          await ctx.answerInlineQuery(results).catch((err) => console.log(err))
+        } catch (error) {
+          throw new Verror(error, 'Answer Inline Nothing is found')
+        }
+        return
+      }
+      throw new Verror(error, 'Getting doujin by id inline ' + manga_id)
+    }
+    const telegraph_url = manga.telegraph_fixed_url
+      ? manga.telegraph_fixed_url
+      : manga.telegraph_url
 
-  // if (inlineQuery.match(/\d+/) && inlineQuery.replace(/\d+/, '').trim() === '') {
-  //   const manga_id = inlineQuery.match(/\d+/)[0]
-  //   let result = [],
-  //     telegraph_url,
-  //     manga = await saveAndGetManga(manga_id)
-  //   // if nothing is found
-  //   if (!manga || manga == 404) {
-  //     result.push(nothingIsFound_result)
-  //     await ctx.answerInlineQuery(result).catch((err) => console.log(err))
-  //     return
-  //   }
-  //   telegraph_url = manga.telegraph_fixed_url
-  //     ? manga.telegraph_fixed_url
-  //     : manga.telegraph_url
+    const messageText = getMangaMessage(manga, telegraph_url)
+    const inline_keyboard: InlineKeyboardButton[][] = [[{ text: 'Telegra.ph', url: String(telegraph_url) }]]
 
-  //   const messageText = getMangaMessage(manga, telegraph_url, ctx.i18n),
-  //     inline_keyboard = [[{ text: 'Telegra.ph', url: telegraph_url }]]
+    if (!manga.telegraph_fixed_url && (manga.pages > config.pages_to_show_fix_button || isFullColor(manga))) {
+      inline_keyboard[0].unshift({
+        text:          i18n.__('fix_button'),
+        callback_data: 'fix_' + manga.id,
+      })
+    }
+    const description = manga.description || sliceByHalf(manga.title)
+    if (searchType === 'photo'){
+      results.push({
+        id:    String(manga.id),
+        type:  'photo',
+        title: manga.title
+          .split(/\[.*?\]/)
+          .join('')
+          .trim(),
+        description:           description,
+        thumb_url:             manga.thumbnail,
+        photo_url:             manga.page0,
+        input_message_content: {
+          message_text: messageText,
+          parse_mode:   'HTML',
+        },
+        reply_markup: {
+          inline_keyboard: inline_keyboard,
+        },
+      })
+    } else {
+      results.push({
+        id:    String(manga.id),
+        type:  'article',
+        title: manga.title
+          .split(/\[.*?\]/)
+          .join('')
+          .trim(),
+        description:           description,
+        thumb_url:             manga.thumbnail,
+        input_message_content: {
+          message_text: messageText,
+          parse_mode:   'HTML',
+        },
+        reply_markup: {
+          inline_keyboard: inline_keyboard,
+        },
+      })
+    }
+  
+    try { // @ts-ignore
+      await ctx.answerInlineQuery(results)
+    } catch (error) {
+      throw new Verror(error, 'Answer Inline search by id')
+    }
+    return
+  }
+  if (!inlineQuery) {
+    /* incase there is only search specifications
+       and no actual search query */
+    return
+  }
+    
+  const results = []
 
-  //   if (!manga.telegraph_fixed_url && (manga.pages > config.pages_to_show_fix_button || isFullColor(manga))) {
-  //     inline_keyboard[0].unshift({
-  //       text:          ctx.i18n.t('fix_button'),
-  //       callback_data: 'fix_' + manga.id,
-  //     })
-  //   }
-  //   let description
-  //   // show manga language in the description if any
-  //   if (manga.details &&
-  //     Array.isArray(manga.details.languages) &&
-  //     manga.details.languages.length !== 0
-  //   ) {
-  //     description = ''
-  //     for (let t = 0; t < manga.details.languages.length - 1; t++) {
-  //       description += manga.details.languages[t] + ' '
-  //     }
-  //   } else {
-  //     description = sliceByHalf(manga.title)
-  //   }
-  //   result.push({
-  //     id:    manga.id,
-  //     type:  searchType,
-  //     title: manga.title
-  //       .split(/\[.*?\]/)
-  //       .join('')
-  //       .trim(),
-  //     description:           description,
-  //     thumb_url:             manga.thumbnail,
-  //     photo_url:             manga.page0,
-  //     input_message_content: {
-  //       message_text: messageText,
-  //       parse_mode:   'HTML',
-  //     },
-  //     reply_markup: {
-  //       inline_keyboard: inline_keyboard,
-  //     },
-  //   })
-  //   await ctx.answerInlineQuery(result).catch((err) => console.log(err))
-  //   return
-  // }
-  // if (!inlineQuery) {
-  //   /* incase there is only search specifications
-  //      and no actual search query */
-  //   return
-  // }
-  // const search = await nhentai
-  //   .search(inlineQuery, pageNumber, sortingParametr)
-  //   .catch((err) => {
-  //     console.log('search error in inline_search')
-  //     console.log(err)
-  //   })
-  // if (!search) {
-  //   // if err or something
-  //   console.log('!search in inline_search - return')
-  //   return
-  // }
-  // const books = search.results
-  // let results = []
-  // if (books && books.length) {
-  //   // incase we found something
+  let searchResult: SearchResult
+  try {
+    searchResult = await nhentai
+      .search(inlineQuery, pageNumber, sortingParametr)
+  } catch (error) {
+    throw new Verror(error, 'Searching inline')
+  }
+  if (searchResult.totalSearchResults === 0){
+    results.push(nothingIsFound_result)
+    try {
+      await ctx.answerInlineQuery(results).catch((err) => console.log(err))
+    } catch (error) {
+      throw new Verror(error, 'Answer Inline Nothing is found')
+    }
+    return
+  }
+  const doujins = searchResult.results
+  for (const doujin of doujins) {
+    const message_text = getMessageInline(doujin)
+    const description = doujin.language || sliceByHalf(String(doujin.title))
+    results.push({
+      id:    doujin.id,
+      type:  searchType,
+      title: String(doujin.title)
+        .split(/\[.*?\]/)
+        .join('')
+        .trim(),
+      description:           description,
+      thumb_url:             doujin.thumbnail,
+      photo_url:             doujin.thumbnail,
+      input_message_content: {
+        message_text: message_text,
+        parse_mode:   'HTML',
+      },
+      reply_markup: {
+        inline_keyboard: [
+          [
+            {
+              text:          'Open',
+              callback_data: 'open_' + doujin.id,
+            },
+          ],
+        ],
+      }
+    })
+  }
+  // Tips and buttons to help user with search:
 
-  //   for (let i = 0; i < books.length; i++) {
-  //     /* it's in for loop and not in .map below
-  //        because maybe there will be promises */
-  //     books[i].message_text = getMessageInline(books[i])
-  //     books[i].description = books[i].language
-  //       ? books[i].language
-  //       : sliceByHalf(books[i].title)
-  //   }
+  const reverseSortingWord =
+      sortingParametr.includes('popular') ? 'new' : 'popularity',
+    reverseSortingPhotoUrl =
+      sortingParametr.includes('popular')
+        ? config.sort_by_new_icon_inline
+        : config.sort_by_popular_icon_inline,
+    sorting_tip_title = sortingParametr == 'popular' ? i18n.__('sorting_by_new_tip_title') : i18n.__('sorting_by_popularity_tip_title'),
+    reverseSortingParametr = reverseSortingWord.charAt(0),
+    searchSortingSwitch = pageNumber > 1
+      ? `/p${pageNumber} /s${reverseSortingParametr} ${inlineQuery}`
+      : `/s${reverseSortingParametr} ${inlineQuery}`
 
-  //   results = books.map((manga) => ({
-  //     id:    manga.id,
-  //     type:  searchType,
-  //     title: manga.title
-  //       .split(/\[.*?\]/)
-  //       .join('')
-  //       .trim(),
-  //     description:           manga.description,
-  //     thumb_url:             manga.thumbnail,
-  //     photo_url:             manga.thumbnail,
-  //     input_message_content: {
-  //       message_text: manga.message_text,
-  //       parse_mode:   'HTML',
-  //     },
-  //     reply_markup: {
-  //       inline_keyboard: [
-  //         [
-  //           {
-  //             text:          'Open',
-  //             callback_data: 'open_' + manga.id,
-  //           },
-  //         ],
-  //       ],
-  //     },
-  //   }))
-  //   // Tips and buttons to help user with search:
-
-  //   const reverseSortingWord =
-  //     sortingParametr == 'popular' ? 'new' : 'popularity',
-  //     reverseSortingPhotoUrl =
-  //       sortingParametr == 'popular'
-  //         ? config.sort_by_new_icon_inline
-  //         : config.sort_by_popular_icon_inline,
-  //     sorting_tip_title = sortingParametr == 'popular' ? ctx.i18n.t('sorting_by_new_tip_title') : ctx.i18n.t('sorting_by_popularity_tip_title'),
-  //     reverseSortingParametr = reverseSortingWord.charAt(0),
-  //     searchSortingSwitch = isPageModified
-  //       ? `/p${pageNumber} /s${reverseSortingParametr} ${inlineQuery}`
-  //       : `/s${reverseSortingParametr} ${inlineQuery}`
-
-  //   results.unshift({
-  //     id:                    69696969420,
-  //     type:                  searchType,
-  //     title:                 sorting_tip_title,
-  //     description:           `Just add "/s${reverseSortingParametr}" to search qerry: (@nhentai_mangabot ${searchSortingSwitch})`,
-  //     photo_url:             reverseSortingPhotoUrl,
-  //     thumb_url:             reverseSortingPhotoUrl,
-  //     input_message_content: {
-  //       message_text:
-  //         'To sort search results by ' +
-  //         reverseSortingWord +
-  //         ' you can *add /s' +
-  //         reverseSortingParametr +
-  //         '*',
-  //       parse_mode: 'Markdown',
-  //     },
-  //     reply_markup: {
-  //       inline_keyboard: [
-  //         [
-  //           {
-  //             text:                             'Sort by ' + reverseSortingWord,
-  //             switch_inline_query_current_chat: searchSortingSwitch,
-  //           },
-  //         ],
-  //       ],
-  //     },
-  //   })
-  //   const sortingParametrLetter = sortingParametr == 'popular' ? 'p' : 'n',
-  //     nextPageSwitch = isSearchModified
-  //       ? `/p${+pageNumber + 1} /s${sortingParametrLetter} ${inlineQuery}`
-  //       : `/p${+pageNumber + 1} ${inlineQuery}`
-  //   results.push({
-  //     id:          9696969696,
-  //     type:        searchType,
-  //     title:       ctx.i18n.t('next_page_tip_title'),
-  //     description: `TAP HERE or Just add "/p${+pageNumber + 1
-  //     }" to search qerry: (@nhentai_mangabot ${nextPageSwitch})`,
-  //     photo_url:             config.next_page_icon_inline,
-  //     thumb_url:             config.next_page_icon_inline,
-  //     input_message_content: {
-  //       message_text: ctx.i18n.t('next_page_tip_message'),
-  //       parse_mode:   'Markdown',
-  //     },
-  //     reply_markup: {
-  //       inline_keyboard: [
-  //         [
-  //           {
-  //             text:                             ctx.i18n.t('next_page_button'),
-  //             switch_inline_query_current_chat: nextPageSwitch,
-  //           },
-  //         ],
-  //       ],
-  //     },
-  //   })
-  // } else {
-  //   results.push(nothingIsFound_result)
-  // }
-  // await ctx.answerInlineQuery(results).catch((err) => console.log(err))
+  results.unshift({
+    id:                    69696969420,
+    type:                  searchType,
+    title:                 sorting_tip_title,
+    description:           `Just add "/s${reverseSortingParametr}" to search qerry: (@nhentai_mangabot ${searchSortingSwitch})`,
+    photo_url:             reverseSortingPhotoUrl,
+    thumb_url:             reverseSortingPhotoUrl,
+    input_message_content: {
+      message_text:
+          'To sort search results by ' +
+          reverseSortingWord +
+          ' you can *add /s' +
+          reverseSortingParametr +
+          '*',
+      parse_mode: 'Markdown',
+    },
+    reply_markup: {
+      inline_keyboard: [
+        [
+          {
+            text:                             'Sort by ' + reverseSortingWord,
+            switch_inline_query_current_chat: searchSortingSwitch,
+          },
+        ],
+      ],
+    },
+  })
+  const sortingParametrLetter = sortingParametr == 'popular' ? 'p' : 'n',
+    nextPageSwitch = isSearchModified
+      ? `/p${+pageNumber + 1} /s${sortingParametrLetter} ${inlineQuery}`
+      : `/p${+pageNumber + 1} ${inlineQuery}`
+  results.push({
+    id:          9696969696,
+    type:        searchType,
+    title:       i18n.__('next_page_tip_title'),
+    description: `TAP HERE or Just add "/p${+pageNumber + 1
+    }" to search qerry: (@nhentai_mangabot ${nextPageSwitch})`,
+    photo_url:             config.next_page_icon_inline,
+    thumb_url:             config.next_page_icon_inline,
+    input_message_content: {
+      message_text: i18n.__('next_page_tip_message'),
+      parse_mode:   'Markdown',
+    },
+    reply_markup: {
+      inline_keyboard: [
+        [
+          {
+            text:                             ctx.i18n.t('next_page_button'),
+            switch_inline_query_current_chat: nextPageSwitch,
+          },
+        ],
+      ],
+    },
+  })
+  try {
+    // @ts-ignore
+    await ctx.answerInlineQuery(results)
+  } catch (error) {
+    throw new Verror(error, 'Anser inline search')
+  }
 }
