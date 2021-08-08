@@ -1,20 +1,27 @@
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 dotenv.config();
 
-import Verror from 'verror';
-import { Context, Telegraf } from "telegraf";
-import path from "path";
+import Verror from "verror";
+import { Telegraf } from "telegraf";
 
-import { I18n } from "i18n";
-const i18n = new I18n();
-i18n.configure({
-    locales: ['en', 'de'],
-    defaultLocale: 'en',
-    directory: path.join(__dirname, 'locales')
-})
+import startWithWebhook from './express';
 
+import saveAndGetUser from "./db/save_and_get_user";
+// Import all commands
+import randomCommand from "./bot/commands/random.js";
+import dlzip from "./bot/commands/dlzip.js";
+import help from "./bot/commands/help.js";
+import settings from "./bot/settings/settings.js";
+
+import cb_query from "./bot/buttons/index.js";
+import inlineSearch from "./bot/inline_search.js";
+import textHandler from "./bot/commands/textHandler.js";
+
+let token: string | undefined;
 if (!process.env.BOT_TOKEN) {
     throw new Verror('No BOT_TOKEN in .env')
+} else {
+    token = process.env.BOT_TOKEN
 }
 if (!process.env.DATABASE_URL) {
     throw new Verror('No DATABASE_URL in env')
@@ -24,7 +31,7 @@ const bot = new Telegraf(process.env.BOT_TOKEN);
 
 //coonnect to the database
 import mongoose from "mongoose";
-import { Update } from 'typegram';
+
 mongoose.connect(process.env.DATABASE_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -32,28 +39,6 @@ mongoose.connect(process.env.DATABASE_URL, {
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
 db.once("open", function () { console.log("mongoose is connected!"); });
-
-const { saveAndGetUser } = require("./db/saveAndGetUser");
-// import all commands
-const { randomCommand } = require("./bot/commands/random.js");
-const { dlzip } = require("./bot/commands/dlzip.js");
-const { help } = require("./bot/commands/help.js");
-const { settings } = require("./bot/settings/settings.js");
-
-const { cb_query } = require("./bot/buttons/index.js");
-const { inlineSearch } = require("./bot/inline_search.js");
-const { textHandler } = require("./bot/commands/textHandler.js");
-
-// set locale
-bot.use(async (ctx) => {
-    const user = await saveAndGetUser(ctx);
-    if (user.language_code == "ru") {
-        i18n.setLocale("ru");
-    }
-    if (user.language_code == "es") {
-        i18n.setLocale("es");
-    }
-});
 
 // commands that always work (without nhentai/telegraph connections)
 
@@ -96,32 +81,23 @@ bot.command("id", async (ctx) => {
     }
 });
 
-// commands with nhentai
-bot.command("rand", async (ctx) => { await randomCommand(ctx); });
-bot.command("zip", async (ctx) => { await dlzip(ctx); });
-// non-text
-bot.on("callback_query", async (ctx) => { await cb_query(ctx); });
-bot.on("inline_query", async (ctx) => { await inlineSearch(ctx); });
+// // commands with nhentai
+// bot.command("rand", async (ctx) => { await randomCommand(ctx); });
+// bot.command("zip", async (ctx) => { await dlzip(ctx); });
+// // non-text
+// bot.on("callback_query", async (ctx) => { await cb_query(ctx); });
+// bot.on("inline_query", async (ctx) => { await inlineSearch(ctx); });
 
-// get with id
-bot.on("text", async (ctx) => { await textHandler(ctx); });
+// // get with id
+// bot.on("text", async (ctx) => { await textHandler(ctx); });
 
 // start the bot 
-
-if (process.env.REPL_URL || process.env.HEROKU_URL) {
-    start_bot_with_webhook(bot) // with webhook
-} else {
-    start_bot_with_polling(bot) // with polling
-}
-
-async function start_bot_with_webhook(bot: Telegraf<Context<Update>>) {
-    const domain = process.env.REPL_URL || process.env.HEROKU_URL
-    const port = Number(process.env.PORT) || 3000
-    require("./express").startListen(port, domain, bot)
-}
-async function start_bot_with_polling(bot: Telegraf<Context<Update>>) {
-    await bot.launch({
-        dropPendingUpdates: true
-    })
-    console.log("Bot is started polling!")
-}
+(async()=>{
+    if (process.env.REPL_URL || process.env.HEROKU_URL) {
+        await startWithWebhook(bot, token)
+        console.log("Bot is started webhook!")
+    } else {
+        await bot.launch({ dropPendingUpdates: true })
+        console.log("Bot is started polling!")
+    }
+})();
