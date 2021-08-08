@@ -65,7 +65,10 @@ export function sliceByHalf(s: string): string {
 }
 export function getMessageInline(manga: LightDoujin): string {
   const link = 'https://nhentai.net/g/' + manga.id + '/',
-    title = manga.title
+    title = manga.title ? manga.title
+      .replace('<', ']')
+      .replace('>', '[')
+      .trim() : 'Some manga'
   return `<a href="${link}">${title}</a>`
 }
 export function getTitle(manga: Doujin | MangaSchema & Document<any, any, MangaSchema> | Favorite): string {
