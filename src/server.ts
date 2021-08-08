@@ -7,15 +7,16 @@ import { Telegraf } from 'telegraf'
 import startWithWebhook from './express'
 
 import saveAndGetUser from './db/save_and_get_user'
+import i18n from './i18n'
 // Import all commands
-import randomCommand from './bot/commands/random.js'
-import dlzip from './bot/commands/dlzip.js'
-import help from './bot/commands/help.js'
-import settings from './bot/settings/settings.js'
+// import randomCommand from './bot/commands/random.js'
+// import dlzip from './bot/commands/dlzip.js'
+// import help from './bot/commands/help.js'
+// import settings from './bot/settings/settings.js'
 
-import cb_query from './bot/buttons/index.js'
-import inlineSearch from './bot/inline_search.js'
-import textHandler from './bot/commands/textHandler.js'
+// import cb_query from './bot/buttons/index.js'
+import inlineSearch from './bot/inline_search/index'
+// import textHandler from './bot/commands/textHandler.js'
 
 let token: string | undefined
 if (!process.env.BOT_TOKEN) {
@@ -62,9 +63,9 @@ bot.start(async (ctx) => {
   }
 })
 
-bot.help(async (ctx) => {
-  await help(ctx)
-})
+// bot.help(async (ctx) => {
+//   await help(ctx)
+// })
 bot.command('code', async (ctx) => {
   try {
     await ctx.reply('Just send me a code')
@@ -72,21 +73,27 @@ bot.command('code', async (ctx) => {
     return
   }
 })
-bot.command('settings', async (ctx) => { await settings(ctx) })
+// bot.command('settings', async (ctx) => { await settings(ctx) })
 bot.command('id', async (ctx) => {
   try {
     await ctx.reply('`' + ctx.from.id + '`', { parse_mode: 'Markdown' })
   } catch (err) {
     return
   }
-});
+})
 
 // // commands with nhentai
 // bot.command("rand", async (ctx) => { await randomCommand(ctx); });
 // bot.command("zip", async (ctx) => { await dlzip(ctx); });
 // // non-text
 // bot.on("callback_query", async (ctx) => { await cb_query(ctx); });
-// bot.on("inline_query", async (ctx) => { await inlineSearch(ctx); });
+bot.on('inline_query', async (ctx) => { 
+  try { 
+    await inlineSearch(ctx) 
+  } catch (error) {
+    console.error('Inline search: ', error)
+  } 
+});
 
 // // get with id
 // bot.on("text", async (ctx) => { await textHandler(ctx); });
