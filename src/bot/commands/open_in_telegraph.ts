@@ -1,73 +1,87 @@
-const nhentai = require("../../nhentai");
-const config = require('../../config.json');
+import config from '../../../config'
+import {Context} from 'telegraf'
+import saveAndGetUser from '../../db/save_and_get_user'
+import {Document} from 'mongoose'
+import {UserSchema} from '../../models/user.model'
+import Verror from 'verror'
+import saveAndGetManga from '../../db/save_and_get_manga'
+import {MangaSchema} from '../../models/manga.model'
+import {getMangaMessage, isFullColor} from '../some_functions'
 
-const { getMangaMessage, isFullColor } = require("../some_functions.ts");
-const { saveAndGetUser } = require("../../db/save_and_get_user");
-const { saveAndGetManga } = require("../../db/save_and_get_manga");
-
-
-module.exports.openiInTelegraph = async function (ctx) {
-  let user = await saveAndGetUser(ctx);
-  ctx
-    .editMessageReplyMarkup({
-      inline_keyboard: [
-        [{ text: ctx.i18n.t("waitabit_button"), callback_data: "wait" }],
-      ],
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-  let manga_id = ctx.update.callback_query.data.split("_")[1],
-    manga = await nhentai.getDoujin(manga_id).catch((er) => {
-      if (er.status == 404) {
-        console.log(er.satus);
-        return;
-      }
-      console.log(er);
-    });
-  if (!manga) {
-    console.log("!manga");
-    return;
-  }
-  //get manga from database
-  let savedManga = await saveAndGetManga(manga_id)
-  if (!manga || manga == 404) {
-    console.log("couldn't get manga so return")
-
-    ctx.reply("couldn't get manga")
+export default async function openIInTelegraph (ctx: Context) {
+  if(!('callback_query' in ctx.update)
+  || !('data' in ctx.update.callback_query)){
     return
   }
-  let telegraph_url = savedManga.telegraph_fixed_url
-    ? savedManga.telegraph_fixed_url
-    : savedManga.telegraph_url;
+  let user: UserSchema & Document<any, any, UserSchema> | undefined
+  try {
+    user = await saveAndGetUser(ctx)
+  } catch (error) {
+    throw new Verror(error, 'Getting user in callbackHandler')
+  }
 
-  let heart = user.favorites.id(manga_id) ? config.like_button_true : config.like_button_false,
-    inline_keyboard = [
+  try {
+    await ctx.editMessageReplyMarkup({
+      inline_keyboard: [
+        [
+          {
+            text: i18n.__('waitabit_button'),
+            callback_data: 'wait'
+          }
+        ],
+      ],
+    })
+  } catch (error) {
+    console.error('openInTelegraph: Edit buttons before starting: ' + error)
+  }
+
+  const mangaId = ctx.update.callback_query.data.split('_')[1];
+  let manga: MangaSchema & Document<any, any, MangaSchema> | undefined
+  try {
+    manga = await saveAndGetManga(user, Number(mangaId))
+  } catch (error) {
+    if(error.message === 'Not found') {
+      try {
+        await ctx.reply(i18n.__('manga_does_not_exist') + '\n(' + mangaId + ')')
+      } catch (error) {
+        console.error('Replying \'404\'' + error)
+      }
+    }
+    throw new Verror(error, 'Getting manga by id')
+  }
+  const telegraphUrl = manga.telegraph_fixed_url
+    ? manga.telegraph_fixed_url
+    : manga.telegraph_url
+
+  const heart = user.favorites.includes(manga.id) ? config.like_button_true : config.like_button_false
+  const inline_keyboard = [
       [
-        { text: "Telegra.ph", url: telegraph_url },
-        { text: heart, callback_data: "like_" + manga_id },
+        {text: 'Telegra.ph', url: String(telegraphUrl)},
+        {text: heart, callback_data: 'like_' + manga.id},
       ],
     ],
-    messageText = getMangaMessage(manga, telegraph_url, ctx.i18n);
+    messageText = getMangaMessage(manga, telegraphUrl);
 
-  user.manga_history.push(manga.id); //save to history
-  user.save();
+  user.manga_history.push(manga.id) // save to history
+  await user.save()
   /* if the manga is too big, the telegram might refuse to create an instant view,
      so here is a button that can magically fix that */
-  let num_of_pages = manga.details ? manga.details.pages : manga.pages;
-  if (!manga.telegraph_fixed_url &&
-    (num_of_pages > config.pages_to_show_fix_button || isFullColor(manga))) {
+  const numberOfPages = manga.pages
+  if (!manga.telegraph_fixed_url
+    && (numberOfPages > config.pages_to_show_fix_button || isFullColor(manga))) {
     inline_keyboard[0].unshift({
-      text: ctx.i18n.t("fix_button"),
-      callback_data: "fix_" + manga.id,
-    });
+      text:          i18n.__('fix_button'),
+      callback_data: 'fix_' + manga.id,
+    })
   }
-  await ctx.editMessageText(messageText, {
-    parse_mode: "HTML",
-    reply_markup: {
-      inline_keyboard: inline_keyboard,
-    },
-  }).catch(err => {
-    console.log(err)
-  })
+  try {
+    await ctx.editMessageText(messageText, {
+      parse_mode:   'HTML',
+      reply_markup: {
+        inline_keyboard: inline_keyboard,
+      },
+    })
+  } catch (error){
+    throw new Verror(error, 'Editing opened in telegraph')
+  }
 }
