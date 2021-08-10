@@ -58,8 +58,6 @@ export function sliceByHalf(s: string): string {
   } else {
     middle = before
   }
-
-  // let s1 = s.substr(0, middle);
   const s2 = s.substr(middle + 1)
   return s2
 }
