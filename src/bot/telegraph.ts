@@ -24,7 +24,7 @@ const client = new Telegraph(token)
 export async function createAccount(): Promise<string> {
   const account = await client.createAccount(config.bot_username, config.bot_username)
   if (!account.access_token) {
-    throw new Error('Could not create an account for telega.ph: no access_token')
+    throw new Error('Could not create an account for telegra.ph: no access_token')
   }
   return account.access_token
 }
@@ -58,15 +58,13 @@ export async function telegraphCreatePage(
 export default async function TelegraphUploadByUrls(
   manga: Doujin | MangaSchema & Document<any, any, MangaSchema>,
   images?: string[]
-) {
-  console.log('start uploaing url')
+): Promise<string> {
+  console.log('start uploading url')
   const pages = images || manga.pages
   if(typeof pages === 'number'){
     throw new Error('You have to provide pages, or Doujin with them')
   }
-  let articlePage: Page | undefined
-
-  articlePage = await telegraphCreatePage(manga, pages)
+  const articlePage = await telegraphCreatePage(manga, pages)
 
   if (!articlePage || articlePage.url) {
     throw new Error('Could not create a page: no page url')
