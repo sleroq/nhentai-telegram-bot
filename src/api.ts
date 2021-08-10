@@ -81,7 +81,7 @@ export default class api {
       }
     }
   }
-  static async allinfo() {
+  static async allInfo() {
     const users = await this.countUsers()
     const doujins = await this.countManga()
     const messagesTotal = await this.countMessages()
