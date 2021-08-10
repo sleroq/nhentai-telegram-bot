@@ -54,7 +54,6 @@ export default async function textHandler(ctx: Context): Promise<void> {
         } catch (error) {
           console.error('Replying \'404\'' + error)
         }
-        throw new Verror(error, 'Getting manga by id')
       } else {
         try {
           await ctx.reply(i18n.__('failed_to_get') + '\n(`' + id + '`)', {
@@ -112,9 +111,17 @@ export default async function textHandler(ctx: Context): Promise<void> {
       })
     }
     message.history.push(manga.id)
-    await message.save()
     user.manga_history.push(manga.id)
-    await user.save()
+    try {
+      await message.save()
+    } catch (error){
+      console.error('Cant save message: ' + error)
+    }
+    try {
+      await user.save()
+    } catch (error){
+      console.error('Cant save user: ' + error)
+    }
 
     try {
       await ctx.reply(messageText, {
