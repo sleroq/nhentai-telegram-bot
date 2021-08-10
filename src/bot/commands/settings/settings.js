@@ -1,7 +1,7 @@
-const { saveAndGetUser } = require("../../db/save_and_get_user");
+const { saveAndGetUser } = require("../../../db/save_and_get_user");
 const { isSafeModeOn } = require("./safe_mode");
-const api = require('../../api');
-const nhentai = require("../../nhentai");
+const api = require('../../../api');
+const nhentai = require("../../../nhentai");
 
 module.exports.settings = async function (ctx) {
   let user = await saveAndGetUser(ctx),
