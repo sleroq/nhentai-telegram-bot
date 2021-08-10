@@ -26,7 +26,7 @@ export default async function saveAndGetUser(ctx: Context): Promise<UserSchema &
       search_sorting:       config.search_sorting_by_default,
       search_type:          config.search_appearance_by_default,
       ignored_random_tags:  config.awful_tags,
-      random_localy:        config.random_localy_by_default,
+      random_localy:        config.random_locally_by_default,
       can_repeat_in_random: config.can_repeat_in_random_by_default,
     })
 
