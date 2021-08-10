@@ -8,6 +8,7 @@ import saveAndGetManga from '../../db/save_and_get_manga'
 import {getMangaMessage, isFullColor} from '../some_functions'
 import config from '../../../config'
 import {InlineKeyboardButton} from 'typegram'
+import saveAndGetUser from '../../db/save_and_get_user'
 
 async function createMessage(chat_id: string, message_id: string){
   return new Message({
@@ -17,7 +18,14 @@ async function createMessage(chat_id: string, message_id: string){
     history:    [],
   })
 }
-export default async function makeRandom(ctx: Context, user: UserSchema & Document<any, any, UserSchema>): Promise<void> {
+export default async function makeRandom(ctx: Context, mode: 'next' | 'previous'): Promise<void> {
+  let user: UserSchema & Document<any, any, UserSchema> | undefined
+  try {
+    user = await saveAndGetUser(ctx)
+  } catch (error) {
+    throw new Verror(error, 'Getting user in callbackHandler')
+  }
+
   let message: MessageSchema & Document<any, any, MessageSchema> | null = null
 
   if (('callback_query' in ctx.update)
@@ -37,16 +45,29 @@ export default async function makeRandom(ctx: Context, user: UserSchema & Docume
     if(!message){
       message = await createMessage(chat_id, String(message_id))
     }
-  } else if ('message' in ctx.update) {
-    message = await createMessage(String(ctx.update.message.from.id), String(ctx.update.message.message_id + 1))
+  } else if (ctx.message) {
+    message = await createMessage(String(ctx.message.from.id), String(ctx.message.message_id + 1))
   } else {
     throw new Verror('Cant get message_id and chat_id from context')
   }
   let manga: MangaSchema & Document<any, any, MangaSchema> | undefined
 
+
+  if (mode === 'previous') {
+    if (message.current === 0) {
+      return
+    }
+    try {
+      manga = await saveAndGetManga(user, message.history[message.current-1])
+    } catch (error) {
+      throw new Verror('Getting random manga')
+    }
+    message.current -= 1
+  } else
   /* if user at the and of history
-    [ 234, 123, 345, 1243, 356]  - history.length === 5
-                           usr     current        === 4                                     */
+     [ 234, 123, 345, 1243, 356]  - history.length === 5
+                            usr     current        === 4 */
+  // TODO: be able to work without database connection
   if (message.current === (message.history.length - 1)){
     try {
       manga = await saveAndGetManga(user)
@@ -61,16 +82,17 @@ export default async function makeRandom(ctx: Context, user: UserSchema & Docume
       }
     }
     message.current += 1
-    /* if user previously was clicking back button and he is not at the and of history
-    [ 234, 123, 345, 1243, 356]  - history.length === 5
-           usr                     current        === 1                                     */
-  } else {
+  } else
+  /* if user previously was clicking back button and he is not at the and of history
+     [ 234, 123, 345, 1243, 356]  - history.length === 5
+            usr                     current        === 1                             */
+  {
     try {
       manga = await saveAndGetManga(user, message.history[message.current])
     } catch (error) {
       throw new Verror('Getting random manga')
     }
-    message.current -= 1
+    message.current += 1
   }
   user.manga_history.push(manga.id)
   if (user.manga_history.length > 50) {
@@ -117,7 +139,7 @@ export default async function makeRandom(ctx: Context, user: UserSchema & Docume
   if (message.current > 0) {
     inline_keyboard[2].unshift({
       text:          i18n.__('previous_button'),
-      callback_data: 'prev_' + manga.id,
+      callback_data: 'previous',
     })
   }
 
