@@ -3,10 +3,11 @@ import config from '../../config'
 import { Context } from 'telegraf'
 import { Document } from 'mongoose'
 import i18n from '../i18n'
+import Verror from 'verror'
 
-export default async function saveAndGetUser(ctx: Context): Promise<UserSchema & Document<any, any, UserSchema> | null> {
+export default async function saveAndGetUser(ctx: Context): Promise<UserSchema & Document<any, any, UserSchema>> {
   if (!ctx.from) {
-    return null
+    throw new Verror('Saving user: !ctx.from')
   }
   let user: UserSchema & Document<any, any, UserSchema> | null = null
   try {
