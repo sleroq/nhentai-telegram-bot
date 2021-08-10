@@ -60,10 +60,13 @@ export default async function saveAndGetManga(user: UserSchema, id?: number): Pr
     if (!savedManga) {
       try {
         newManga = await nhentai.getDoujin(id)
-        images = newManga.pages
       } catch (error) {
+        if(error.message === 'Not found'){
+          throw new Error('Not found')
+        }
         throw new Verror(error, 'Getting doujin by id')
       }
+      images = newManga.pages
       savedManga = await saveNewManga(newManga)
     }
     console.log('Got manga by id')
@@ -76,6 +79,9 @@ export default async function saveAndGetManga(user: UserSchema, id?: number): Pr
       try {
         mangaWithPages = await nhentai.getDoujin(savedManga.id)
       } catch (error) {
+        if(error.message === 'Not found'){
+          throw new Error('Not found')
+        }
         throw new Verror(error, 'Getting images to update manga without telegra.ph url')
       }
       images = mangaWithPages.pages
@@ -113,6 +119,9 @@ export default async function saveAndGetManga(user: UserSchema, id?: number): Pr
     try {
       mangaWithThumbnail = await nhentai.getDoujin(savedManga.id)
     } catch (error) {
+      if(error.message === 'Not found'){
+        throw new Error('Not found')
+      }
       throw new Verror('Getting manga with thumbnail')
     }
     savedManga.thumbnail = mangaWithThumbnail.thumbnails[0]
