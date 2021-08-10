@@ -7,14 +7,14 @@ import { UserSchema } from '../models/user.model'
 import Verror from 'verror'
 import { Document } from 'mongoose'
 
-export default async function saveAndGetManga(user: UserSchema, id: number | undefined): Promise<MangaSchema & Document<any, any, MangaSchema>> {
+export default async function saveAndGetManga(user: UserSchema, id?: number): Promise<MangaSchema & Document<any, any, MangaSchema>> {
   let savedManga: MangaSchema & Document<any, any, MangaSchema> | null = null
   let newManga: Doujin | null = null
   let images: string[] = []
 
   if (!id) {  // RANDOM NEW MANGA
     if (user.random_localy) {
-      // (if randoming only in database records)
+      // (if randomizing only in database records)
       try {
         savedManga = await getRandomMangaLocally(
           user.default_random_tags,
@@ -26,8 +26,8 @@ export default async function saveAndGetManga(user: UserSchema, id: number | und
       if (savedManga === null) {
         throw new Verror('Couldn\'t find manga with such tags')
       }
-      console.log('got manga random localy')
-    } else { // (not localy)
+      console.log('got manga random locally')
+    } else { // (not locally)
       try {
         newManga = await nhentai.getRandomDoujin()
         images = newManga.pages
@@ -82,9 +82,9 @@ export default async function saveAndGetManga(user: UserSchema, id: number | und
       console.log('Got pages to fix manga from DB')
     }
     try {
-      savedManga.telegraph_url = await TelegraphUploadByUrls(savedManga)
+      savedManga.telegraph_url = await TelegraphUploadByUrls(savedManga, images)
     } catch (error) {
-      throw new Verror(error, 'Posting doujin to telegra.ph to fix manga wothout telegra.pf url')
+      throw new Verror(error, 'Posting doujin to telegra.ph to fix manga without telegra.pf url')
     }
     try {
       await savedManga.save()
@@ -134,7 +134,7 @@ async function saveNewManga(manga: Doujin): Promise<MangaSchema & Document<any, 
     ? manga.thumbnails[0]
     : undefined
   const page0 = manga.pages[0]
-  const launguage = manga.details.languages
+  const language = manga.details.languages
     ? manga.details.languages[manga.details.languages.length - 1]
     : undefined
 
@@ -148,7 +148,7 @@ async function saveNewManga(manga: Doujin): Promise<MangaSchema & Document<any, 
   const mangaDB = new Manga({
     id:            manga.id,
     title:         manga.title,
-    description:   launguage,
+    description:   language,
     tags:          manga.details.tags,
     telegraph_url: telegraphUrl,
     pages:         manga.details.pages,
