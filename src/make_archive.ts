@@ -2,7 +2,7 @@ import got from 'got'
 import archiver from 'archiver'
 import { Response } from 'got'
 import fs from 'fs'
-import { getIdfromUrl } from './nhentai'
+import { getIdFromUrl } from './nhentai'
 
 export default async function makeArchive(images: string[]): Promise<string> {
   const archive = archiver('zip', {
@@ -30,7 +30,7 @@ export default async function makeArchive(images: string[]): Promise<string> {
   })
   for(const image of images){
     let response: Response<Buffer> | undefined
-    const imageName = String(getIdfromUrl(image))
+    const imageName = String(getIdFromUrl(image))
     try {
       response = await got(image, { responseType: 'buffer' })
     } catch (error) {

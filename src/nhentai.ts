@@ -18,7 +18,7 @@ export interface Doujin {
   }
   details: {
     parodies?: Tag[]
-    charachters?: Tag[]
+    characters?: Tag[]
     tags?: Tag[]
     artists?: Tag[]
     groups?: Tag[]
@@ -65,7 +65,7 @@ export default class nHentai {
     if (!identifier) {
       throw Error('You have to specify id')
     }
-    const id = getIdfromUrl(identifier)
+    const id = getIdFromUrl(identifier)
     let response: Response<string> | undefined 
     try {
       response = await got(`https://nhentai.net/g/${id}/`)
@@ -145,20 +145,20 @@ export default class nHentai {
     const lastPage = Number(
       lastPageMatch ? lastPageMatch[1] : undefined
     )
-    const searchresult: SearchResult = {
+    const searchResult: SearchResult = {
       results:            [],
       totalSearchResults: numberOfResults,
       lastPage:           lastPage,
     }
     $('.container.index-container .gallery').each((index, element) => {
       const doujin = getLightDoujin($, element)
-      searchresult.results.push(doujin)
+      searchResult.results.push(doujin)
     })
-    return searchresult
+    return searchResult
   }
 
   static async exists(identifier: string | number): Promise<boolean> {
-    const id = getIdfromUrl(identifier)
+    const id = getIdFromUrl(identifier)
     try {
       await got('https://nhentai.net/g/' + id + '/')
     } catch (error) {
@@ -169,7 +169,7 @@ export default class nHentai {
     return true
   }
 }
-export function getIdfromUrl(idOrUrl: string | number): number {
+export function getIdFromUrl(idOrUrl: string | number): number {
   const urlToId = /\/g\/(\d+)\/?.*/
   return Number(String(idOrUrl).replace(urlToId, '$2'))
 }
@@ -205,7 +205,7 @@ function assembleDoujin(response: Response<string>): Doujin {
   const url = response.redirectUrls.length !== 0
     ? response.redirectUrls[response.redirectUrls.length - 1]
     : response.requestUrl
-  const id = getIdfromUrl(url)
+  const id = getIdFromUrl(url)
 
   const $ = cheerio.load(response.body)
   const doujinInfo = $('#info')

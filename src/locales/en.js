@@ -34,7 +34,7 @@ export default {
   size_of_your_file:       'Size of your file: ',
   // # inline search
   history_tip_title:       'History!',
-  history_tip_desctiption: 'This is your history:',
+  history_tip_description: 'This is your history:',
   history_is_empty:        'Your history is empty..',
 
   next_page_tip_title:   'Next page',
@@ -44,14 +44,14 @@ export default {
   sorting_by_new_tip_title:        'To sort results by new',
 
   favorites:                 'Favorites!',
-  favorites_tip_desctiption: 'This is your favorites:',
+  favorites_tip_description: 'This is your favorites:',
   favorites_is_empty:        'You haven\'t liked anything yet',
   tap_to_open_favorites:     'Tap to open favorites',
   // # settings:
   settings:                  '<b>Settings:</b>',
   search_appearance:         'Search appearance:  ',
   search_sorting:            'Search sorting by ',
-  random_localy:             'Random Locally:  ',
+  random_locally:             'Random Locally:  ',
   allow_repeat_in_random:    'Allow repeat in random:  ',
   safe_mode:                 'Safe mode is ',
   about_settings:            'What does settings mean?',
