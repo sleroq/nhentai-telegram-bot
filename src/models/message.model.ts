@@ -3,8 +3,8 @@ import { Schema, model } from 'mongoose'
 export interface MessageSchema {
   chat_id:    string
   message_id: number
-  current?:   number
-  history?:   number[]
+  current:    number
+  history:    number[]
   createdAt?: Date
   updatedAt?: Date
 }
