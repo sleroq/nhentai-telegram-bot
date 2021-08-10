@@ -1,7 +1,7 @@
 const nhentai = require("../../nhentai");
 const config = require('../../config.json');
 
-const { getMangaMessage, isFullColor } = require("../some_functions.js");
+const { getMangaMessage, isFullColor } = require("../some_functions.ts");
 const { saveAndGetUser } = require("../../db/save_and_get_user");
 const { saveAndGetManga } = require("../../db/save_and_get_manga");
 
