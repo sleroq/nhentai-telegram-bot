@@ -14,6 +14,7 @@ import { Document }    from 'mongoose'
 import { UserSchema }  from '../../models/user.model'
 import { MangaSchema } from '../../models/manga.model'
 import saveAndGetManga from '../../db/save_and_get_manga'
+import {InlineQueryResult} from 'typegram/inline'
 
 const nothingIsFoundResult: InlineQueryResultArticle = {
   id:                    String(6969696969),
@@ -65,9 +66,12 @@ export default async function replyWithFavoritesInline(
   const searchType: 'photo' | 'article' = config.show_favorites_as_gallery ? 'photo' : 'article'
 
   if (searchType === 'photo') {
-    const results: InlineQueryResultPhoto[] = await getDoujinAsPhoto(doujin)
+    const results: InlineQueryResult[] = await getDoujinUniversal(doujin)
+    results.forEach((result)=>{
+      result.type = 'photo'
+    })
     try {
-      ctx.answerInlineQuery(results, {
+      await ctx.answerInlineQuery(results, {
         cache_time:  0,
         is_personal: true,
       })
@@ -75,9 +79,12 @@ export default async function replyWithFavoritesInline(
       throw new Verror(error, 'Answer Inline Search by id Photo')
     }
   } else {
-    const results: InlineQueryResultArticle[] = await getDoujinAsArticle(doujin)
+    const results: InlineQueryResult[] = await getDoujinUniversal(doujin)
+    results.forEach((result)=>{
+      result.type = 'article'
+    })
     try {
-      ctx.answerInlineQuery(results, {
+      await ctx.answerInlineQuery(results, {
         cache_time:  0,
         is_personal: true,
       })
@@ -88,10 +95,10 @@ export default async function replyWithFavoritesInline(
 
 }
 
-async function getDoujinAsPhoto (
+async function getDoujinUniversal (
   doujin: MangaSchema & Document<any, any, MangaSchema>
-): Promise<InlineQueryResultPhoto[]> {
-  const results: InlineQueryResultPhoto[] = []
+): Promise<InlineQueryResult[]> {
+  const results: InlineQueryResult[] = []
 
   const telegraph_url = doujin.telegraph_fixed_url
     ? doujin.telegraph_fixed_url
@@ -120,48 +127,6 @@ async function getDoujinAsPhoto (
       .trim(),
     thumb_url:             String(doujin.thumbnail),
     photo_url:             String(doujin.page0),
-    input_message_content: {
-      message_text: messageText,
-      parse_mode:   'HTML',
-    },
-    reply_markup: {
-      inline_keyboard: inline_keyboard,
-    },
-  })
-  return results
-}
-
-async function getDoujinAsArticle (
-  doujin: MangaSchema & Document<any, any, MangaSchema>
-): Promise<InlineQueryResultArticle[]> {
-  const results: InlineQueryResultArticle[] = []
-  
-  const telegraph_url = doujin.telegraph_fixed_url
-    ? doujin.telegraph_fixed_url
-    : doujin.telegraph_url
-  
-  const messageText = getMangaMessage(doujin, telegraph_url)
-  const inline_keyboard: InlineKeyboardButton[][] = [[{ text: 'Telegra.ph', url: String(telegraph_url) }]]
-  
-  if (!doujin.telegraph_fixed_url && (doujin.pages > config.pages_to_show_fix_button || isFullColor(doujin))) {
-    inline_keyboard[0].unshift({
-      text:          i18n.__('fix_button'),
-      callback_data: 'fix_' + doujin.id,
-    })
-  }
-  const description = doujin.description || sliceByHalf(doujin.title)
-  results.push({
-    id:    String(doujin.id),
-    type:  'article',
-    title: doujin.title
-      .replace('<', '\\<')
-      .replace('>', '\\>')
-      .trim(),
-    description: description
-      .replace('<', '\\<')
-      .replace('>', '\\>')
-      .trim(),
-    thumb_url:             doujin.thumbnail,
     input_message_content: {
       message_text: messageText,
       parse_mode:   'HTML',
