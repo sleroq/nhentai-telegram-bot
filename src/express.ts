@@ -35,7 +35,7 @@ export default async function startWithWebhook(bot: Telegraf<Context<Update>>, t
   expressApp.get('/', (req, res) => { res.send(config.express_get_slash) })
 
   // for api with statistics (./api.js):
-  if (config.api_enabled == true) {
+  if (config.api_enabled) {
     expressApp.use(cors())
 
     expressApp.get('/api/countManga', async (req, res) => {
@@ -67,7 +67,7 @@ export default async function startWithWebhook(bot: Telegraf<Context<Update>>, t
       res.send(answer)
     })
     expressApp.get('/api', async (req, res) => {
-      const answer = await api.allinfo()
+      const answer = await api.allInfo()
       res.send(answer)
     })
   }
