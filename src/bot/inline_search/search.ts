@@ -7,11 +7,11 @@ import { getMessageInline, sliceByHalf } from '../some_functions'
 
 import {
   InlineQueryResultArticle,
-  InlineQueryResultPhoto,
 } 										from 'typegram'
 import { Document } 	from 'mongoose'
 import { UserSchema } from '../../models/user.model'
 import nHentai, { LightDoujin, SearchResult, SortingType } from '../../nhentai'
+import {InlineQueryResult} from 'typegram/inline'
 
 const nothingIsFoundResult: InlineQueryResultArticle = {
   id:                    String(6969696969),
@@ -92,31 +92,37 @@ export default async function replyWithSearchInline(
   }
 
   if (searchType === 'photo') {
-    const results: InlineQueryResultPhoto[] = await getResultsPhoto(user, searchResult.results, inlineQuery, isSearchModified, sortingParametr, pageNumber)
+    const results: InlineQueryResult[] = await getResultsUniversal(user, searchResult.results, inlineQuery, isSearchModified, sortingParametr, pageNumber)
+    results.forEach((result)=>{
+      result.type = 'photo'
+    })
     try {
-      ctx.answerInlineQuery(results)
+      await ctx.answerInlineQuery(results)
     } catch (error){
       throw new Verror(error, 'Answer Inline Favorites Photo')
     }
   } else {
-    const results: InlineQueryResultArticle[] = await getResultsArticle(user, searchResult.results, inlineQuery, isSearchModified, sortingParametr, pageNumber)
+    const results: InlineQueryResult[] = await getResultsUniversal(user, searchResult.results, inlineQuery, isSearchModified, sortingParametr, pageNumber)
+    results.forEach((result)=>{
+      result.type = 'article'
+    })
     try {
-      ctx.answerInlineQuery(results)
+      await ctx.answerInlineQuery(results)
     } catch (error){
       throw new Verror(error, 'Answer Inline Favorites Article')
     }
   }
 }
 
-async function getResultsPhoto(
+async function getResultsUniversal(
   user: UserSchema & Document<any, any, UserSchema>,
   doujins: LightDoujin[],
   inlineQuery: string,
   isSearchModified: boolean,
-  sortingParametr: SortingType,
+  sortingParameter: SortingType,
   pageNumber: number
-): Promise<InlineQueryResultPhoto[]> {
-  const results: InlineQueryResultPhoto[] = []
+): Promise<InlineQueryResult[]> {
+  const results: InlineQueryResult[] = []
   for (const doujin of doujins) {
     const message_text = getMessageInline(doujin)
     const description = doujin.language || sliceByHalf(String(doujin.title))
@@ -152,12 +158,12 @@ async function getResultsPhoto(
   // Tips and buttons to help user with search:
 
   const reverseSortingWord =
-      sortingParametr.includes('popular') ? 'new' : 'popularity',
+      sortingParameter.includes('popular') ? 'new' : 'popularity',
     reverseSortingPhotoUrl =
-      sortingParametr.includes('popular')
+      sortingParameter.includes('popular')
         ? config.sort_by_new_icon_inline
         : config.sort_by_popular_icon_inline,
-    sorting_tip_title = sortingParametr == 'popular' ? i18n.__('sorting_by_new_tip_title') : i18n.__('sorting_by_popularity_tip_title'),
+    sorting_tip_title = sortingParameter == 'popular' ? i18n.__('sorting_by_new_tip_title') : i18n.__('sorting_by_popularity_tip_title'),
     reverseSortingParametr = reverseSortingWord.charAt(0),
     searchSortingSwitch = pageNumber > 1
       ? `/p${pageNumber} /s${reverseSortingParametr} ${inlineQuery}`
@@ -190,9 +196,9 @@ async function getResultsPhoto(
       ],
     },
   })
-  const sortingParametrLetter = sortingParametr == 'popular' ? 'p' : 'n',
+  const sortingParameterLetter = sortingParameter == 'popular' ? 'p' : 'n',
     nextPageSwitch = isSearchModified
-      ? `/p${+pageNumber + 1} /s${sortingParametrLetter} ${inlineQuery}`
+      ? `/p${+pageNumber + 1} /s${sortingParameterLetter} ${inlineQuery}`
       : `/p${+pageNumber + 1} ${inlineQuery}`
   results.push({
     id:          String(9696969696),
@@ -201,114 +207,6 @@ async function getResultsPhoto(
     description: `TAP HERE or Just add "/p${+pageNumber + 1
     }" to search qerry: (@nhentai_mangabot ${nextPageSwitch})`,
     photo_url:             config.next_page_icon_inline,
-    thumb_url:             config.next_page_icon_inline,
-    input_message_content: {
-      message_text: i18n.__('next_page_tip_message'),
-      parse_mode:   'HTML',
-    },
-    reply_markup: {
-      inline_keyboard: [
-        [
-          {
-            text:                             i18n.__('next_page_button'),
-            switch_inline_query_current_chat: nextPageSwitch,
-          },
-        ],
-      ],
-    },
-  })
-  return results
-}
-async function getResultsArticle(
-  user: UserSchema & Document<any, any, UserSchema>,
-  doujins: LightDoujin[],
-  inlineQuery: string,
-  isSearchModified: boolean,
-  sortingParametr: SortingType,
-  pageNumber: number
-): Promise<InlineQueryResultArticle[]> {
-  const results: InlineQueryResultArticle[] = []
-  for (const doujin of doujins) {
-    const message_text = getMessageInline(doujin)
-    const description = doujin.language || sliceByHalf(String(doujin.title))
-    results.push({
-      id:    String(doujin.id),
-      type:  'article',
-      title: String(doujin.title)
-        .replace('<', '\\<')
-        .replace('>', '\\>')
-        .trim(),
-      description: description
-        .replace('<', '\\<')
-        .replace('>', '\\>')
-        .trim(),
-      thumb_url:             String(doujin.thumbnail),
-      input_message_content: {
-        message_text: message_text,
-        parse_mode:   'HTML',
-      },
-      reply_markup: {
-        inline_keyboard: [
-          [
-            {
-              text:          'Open',
-              callback_data: 'open_' + doujin.id,
-            },
-          ],
-        ],
-      }
-    })
-  }
-  // Tips and buttons to help user with search:
-
-  const reverseSortingWord =
-      sortingParametr.includes('popular') ? 'new' : 'popularity',
-    reverseSortingPhotoUrl =
-      sortingParametr.includes('popular')
-        ? config.sort_by_new_icon_inline
-        : config.sort_by_popular_icon_inline,
-    sorting_tip_title = sortingParametr == 'popular' ? i18n.__('sorting_by_new_tip_title') : i18n.__('sorting_by_popularity_tip_title'),
-    reverseSortingParametr = reverseSortingWord.charAt(0),
-    searchSortingSwitch = pageNumber > 1
-      ? `/p${pageNumber} /s${reverseSortingParametr} ${inlineQuery}`
-      : `/s${reverseSortingParametr} ${inlineQuery}`
-
-  results.unshift({
-    id:                    String(69696969420),
-    type:                  'article',
-    title:                 sorting_tip_title,
-    description:           `Just add "/s${reverseSortingParametr}" to search qerry: (@nhentai_mangabot ${searchSortingSwitch})`,
-    thumb_url:             reverseSortingPhotoUrl,
-    input_message_content: {
-      message_text:
-          'To sort search results by ' +
-          reverseSortingWord +
-          ' you can *add /s' +
-          reverseSortingParametr +
-          '*',
-      parse_mode: 'HTML',
-    },
-    reply_markup: {
-      inline_keyboard: [
-        [
-          {
-            text:                             'Sort by ' + reverseSortingWord,
-            switch_inline_query_current_chat: searchSortingSwitch,
-          },
-        ],
-      ],
-    },
-  })
-  const sortingParametrLetter = sortingParametr == 'popular' ? 'p' : 'n',
-    nextPageSwitch = isSearchModified
-      ? `/p${+pageNumber + 1} /s${sortingParametrLetter} ${inlineQuery}`
-      : `/p${+pageNumber + 1} ${inlineQuery}`
-  results.push({
-    id:          String(9696969696),
-    type:        'article',
-    title:       i18n.__('next_page_tip_title'),
-    description: `TAP HERE or Just add "/p${+pageNumber + 1
-    }" to search qerry: (@nhentai_mangabot ${nextPageSwitch})`,
     thumb_url:             config.next_page_icon_inline,
     input_message_content: {
       message_text: i18n.__('next_page_tip_message'),

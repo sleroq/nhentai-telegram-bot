@@ -6,12 +6,9 @@ import Manga   from '../../models/manga.model.js'
 
 import { getMangaMessage, isFullColor, sliceByHalf } from '../some_functions'
 
-import {
-  InlineQueryResultArticle,
-  // InlineQueryResultPhoto,
-} 										from 'typegram'
 import { Document } 	from 'mongoose'
 import { UserSchema } from '../../models/user.model'
+import {InlineQueryResult} from 'typegram/inline'
 
 const history_reply_markup = {
   inline_keyboard: [
@@ -27,34 +24,40 @@ export default async function replyWithHistoryInline(
   ctx: Context,
   user: UserSchema & Document<any, any, UserSchema>
 ): Promise<void> {
-  // const searchType = 'article'
-  // if (searchType === 'photo') {
-  //   const results: InlineQueryResultPhoto[] = await getFavotitesPhoto(user, specifiedPage, inlineQuery)
-  //   try {
-  //     ctx.answerInlineQuery(results, {
-  //       cache_time:  0,
-  //       is_personal: true,
-  //     })
-  //   } catch (error){
-  //     throw new Verror(error, 'Answer Inline Favorites Photo')
-  //   }
-  // } else {
-  const results: InlineQueryResultArticle[] = await getHistoryArticle(user)
-  try {
-    ctx.answerInlineQuery(results, {
-      cache_time:  0,
-      is_personal: true,
+  const searchType: 'article' | 'photo' = config.show_history_as_gallery ? 'photo' : 'article'
+  if (searchType === 'photo') {
+    const results: InlineQueryResult[] = await getHistoryUniversal(user)
+    results.forEach((result)=>{
+      result.type = 'photo'
     })
-  } catch (error){
-    throw new Verror(error, 'Answer Inline Favorites Article')
+    try {
+      await ctx.answerInlineQuery(results, {
+        cache_time:  0,
+        is_personal: true,
+      })
+    } catch (error){
+      throw new Verror(error, 'Answer Inline Favorites Photo')
+    }
+  } else {
+    const results: InlineQueryResult[] = await getHistoryUniversal(user)
+    results.forEach((result)=>{
+      result.type = 'article'
+    })
+    try {
+      await ctx.answerInlineQuery(results, {
+        cache_time:  0,
+        is_personal: true,
+      })
+    } catch (error) {
+      throw new Verror(error, 'Answer Inline Favorites Article')
+    }
   }
-  // }
 }
 
-async function getHistoryArticle(
+async function getHistoryUniversal(
   user: UserSchema & Document<any, any, UserSchema>
-): Promise<InlineQueryResultArticle[]> {
-  const results: InlineQueryResultArticle[] = []
+): Promise<InlineQueryResult[]> {
+  const results: InlineQueryResult[] = []
   if (!Array.isArray(user.manga_history) || user.manga_history.length === 0) {
     // history is empty
     results.push({

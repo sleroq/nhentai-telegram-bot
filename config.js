@@ -17,13 +17,14 @@ export default {
   maximum_codes_from_one_message: 30,
 
   show_favorites_as_gallery: false,
+  show_history_as_gallery:   false,
   search_sorting_by_default: 'date',
   // date / popular,
 
   search_appearance_by_default: 'photo',
   // article (same as gallery) / photo,
 
-  random_localy_by_default: true,
+  random_locally_by_default: true,
   // about random loacaly https://telegra.ph/Settings-04-09,
 
   can_repeat_in_random_by_default: true,

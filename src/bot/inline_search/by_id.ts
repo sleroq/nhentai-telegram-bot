@@ -6,17 +6,15 @@ import Verror  from 'verror'
 import { getMangaMessage, isFullColor, sliceByHalf } from '../some_functions'
 
 import {
-  InlineQueryResultArticle,
-  InlineQueryResultPhoto,
+  InlineQueryResult,
   InlineKeyboardButton
 } 					   from 'typegram'
 import { Document }    from 'mongoose'
 import { UserSchema }  from '../../models/user.model'
 import { MangaSchema } from '../../models/manga.model'
 import saveAndGetManga from '../../db/save_and_get_manga'
-import {InlineQueryResult} from 'typegram/inline'
 
-const nothingIsFoundResult: InlineQueryResultArticle = {
+const nothingIsFoundResult: InlineQueryResult = {
   id:                    String(6969696969),
   type:                  'article',
   title:                 i18n.__('nothing_is_found'),
@@ -51,7 +49,7 @@ export default async function replyWithFavoritesInline(
   } catch (error) {
     // if nothing is found
     if(error.cause() && error.cause().message === 'Not found') {
-      const results: InlineQueryResultArticle[] = []
+      const results: InlineQueryResult[] = []
       results.push(nothingIsFoundResult)
       try {
         await ctx.answerInlineQuery(results).catch((err) => console.log(err))
