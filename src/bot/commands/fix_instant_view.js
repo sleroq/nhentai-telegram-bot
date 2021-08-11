@@ -3,8 +3,8 @@ const config = require('../../config.json');
 
 const {
   telegraphCreatePage,
-} = require("../telegraph.js");
-const { getMangaMessage } = require("../some_functions.js");
+} = require("../telegraph.ts");
+const { getMangaMessage } = require("../some_functions.ts");
 const { saveAndGetUser } = require("../../db/save_and_get_user");
 const { uploadByUrl } = require("telegraph-uploader");
 const { saveAndGetManga } = require("../../db/save_and_get_manga");
