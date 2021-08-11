@@ -8,6 +8,8 @@ import saveAndGetManga from '../../db/save_and_get_manga'
 import {getMangaMessage, isFullColor} from '../some_functions'
 import config from '../../../config'
 import {InlineKeyboardButton} from 'typegram'
+import i18n from '../../i18n'
+
 import saveAndGetUser from '../../db/save_and_get_user'
 
 async function createMessage(chat_id: string, message_id: string){
@@ -68,7 +70,7 @@ export default async function makeRandom(ctx: Context, mode: 'next' | 'previous'
      [ 234, 123, 345, 1243, 356]  - history.length === 5
                             usr     current        === 4 */
   // TODO: be able to work without database connection
-  if (message.current === (message.history.length - 1)){
+  if (message.current >= (message.history.length - 1)){
     try {
       manga = await saveAndGetManga(user)
     } catch (error) {
@@ -123,7 +125,7 @@ export default async function makeRandom(ctx: Context, mode: 'next' | 'previous'
     [
       {
         text: i18n.__('next_button'),
-        callback_data: 'r_' + manga.id
+        callback_data: 'r'
       }
     ],
   ]
