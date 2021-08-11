@@ -1,17 +1,28 @@
 import Manga, { MangaSchema } from '../models/manga.model'
-import { Document } from 'mongoose'
+import {Document, FilterQuery} from 'mongoose'
 
+// TODO: fix ignore tags
 export default async function getRandomMangaLocally(
   includedTags: string[] | undefined,
   excludedTags: string[] | undefined
 ): Promise<MangaSchema & Document<any, any, MangaSchema> | null> {
-  const query = {
-    tags: {
-      $in:  includedTags,
-      $nin: excludedTags
-    }
-  }
-  const count = await Manga.countDocuments(query)
+  let query: FilterQuery<MangaSchema> | undefined
+
+  // const isExcluded = Array.isArray(excludedTags) && excludedTags[0]
+  // const isIncluded = Array.isArray(includedTags) && includedTags[0]
+  // if (isExcluded || isIncluded){
+  //   query = {
+  //     tags: {}
+  //   }
+  //   if (isIncluded){
+  //     query.tags.$in = includedTags
+  //   }
+  //   if (isExcluded) {
+  //     query.tags.$nin = excludedTags
+  //   }
+  // }
+
+  const count = await Manga.countDocuments()
   if (count === 0 || count === null) {
     return null
   }
