@@ -1,73 +1,112 @@
-const { saveAndGetUser } = require("../../db/save_and_get_user");
-const Manga = require("../../models/manga.model");
-const nhentai = require("../../nhentai");
-const config = require('../../config.json');
+import {Context} from 'telegraf'
+import saveAndGetUser from '../../db/save_and_get_user'
+import {UserSchema} from '../../models/user.model'
+import {Document} from 'mongoose'
+import Verror from 'verror'
+import saveAndGetManga from '../../db/save_and_get_manga'
+import {MangaSchema} from '../../models/manga.model'
+import {InlineKeyboardButton} from 'typegram'
+import config from '../../../config'
+import i18n from '../../i18n'
 
-module.exports.likeButton = async function (ctx) {
-  let user = await saveAndGetUser(ctx),
-    manga_id = ctx.update.callback_query.data.split("_")[1];
-  manga = await Manga.findOne({ id: manga_id });
-  if(!manga){
+export default async function likeDoujin (ctx: Context) {
+  if(!('callback_query' in ctx.update)
+    || !('data' in ctx.update.callback_query)){
     return
   }
-  let keyboard;
-  if (ctx.update.callback_query.message) {
-    keyboard = ctx.update.callback_query.message.reply_markup.inline_keyboard;
+  let user: UserSchema & Document<any, any, UserSchema> | undefined
+  try {
+    user = await saveAndGetUser(ctx)
+  } catch (error) {
+    throw new Verror(error, 'Getting user in callbackHandler')
+  }
+  const doujinId = Number(ctx.update.callback_query.data.split('_')[1])
+  if(!doujinId){
+    throw new Verror('Somehow user is trying to like without id')
+  }
+  let doujin: MangaSchema & Document<any, any, MangaSchema> | undefined
+  try {
+    doujin = await saveAndGetManga(user, Number(doujinId))
+  } catch (error) {
+    if(error.message === 'Not found') {
+      try {
+        await ctx.reply(i18n.__('manga_does_not_exist') + '\n(' + doujinId + ')')
+      } catch (error) {
+        throw new Verror(error, 'Replying \'404\'')
+      }
+      return
+    }
+    throw new Verror(error, 'Getting manga by id')
+  }
+  let keyboard: InlineKeyboardButton[][] = []
+  if (ctx.update.callback_query.message
+   && ('reply_markup' in ctx.update.callback_query.message)
+   && ctx.update.callback_query.message.reply_markup) {
+    keyboard = ctx.update.callback_query.message.reply_markup.inline_keyboard
   } else {
     keyboard = [
       [
-        { text: "Telegra.ph", url: manga.telegraph_url },
-        { text: config.like_button_false, callback_data: "like_" + manga.id },
+        {
+          text: 'Telegra.ph',
+          url: String(doujin.telegraph_url)
+        },
+        {
+          text: config.like_button_false,
+          callback_data: 'like_' + doujin.id
+        },
       ],
-    ];
+    ]
   }
-  if (!manga.thumbnail) {
-    getManga = await nhentai.getDoujin(manga_id).catch((err) => {
-      console.log(err);
-    });
-    if (!getManga) {
-      console.log("!thumbnail");
-    } else {
-      manga.thumbnail =
-        Array.isArray(getManga.thumbnails) && getManga.thumbnails[0]
-          ? getManga.thumbnails[0]
-          : undefined;
-      manga.save();
+
+  if (!user.favorites.includes(doujin.id)) {
+    user.favorites.push({
+      _id: doujin.id,
+      title: doujin.title,
+      description: doujin.description,
+      tags: doujin.tags,
+      pages: doujin.pages,
+      thumbnail:     String(doujin.thumbnail),
+      telegraph_url: String(doujin.telegraph_url),
+    })
+    try {
+      await user.save()
+    } catch (error) {
+      throw new Verror(error, 'Saving user to like doujin')
+    }
+    console.log('Added to favorites!')
+
+    keyboard[0][keyboard[0].length - 1].text = config.like_button_true
+
+    try {
+      await ctx
+        .answerCbQuery('Added to favorites!')
+    } catch (error) {
+      console.error(error, 'answerCbQuery')
+    }
+    try {
+      await ctx.editMessageReplyMarkup({ inline_keyboard: keyboard })
+    } catch (error){
+      throw new Verror(error, 'editing like button ')
+    }
+  } else {
+    user.favorites.splice(user.favorites.indexOf(doujin.id), 1)
+    try {
+      await user.save()
+    } catch (error) {
+      throw new Verror(error, 'Saving user to like doujin')
+    }
+    console.log('Removed from favorites!')
+    try {
+      await ctx.answerCbQuery('Removed from favorites!')
+    } catch (error) {
+      console.error(error, 'answerCbQuery')
+    }
+    keyboard[0][keyboard[0].length - 1].text = config.like_button_false
+    try {
+      await ctx.editMessageReplyMarkup({ inline_keyboard: keyboard })
+    } catch (error){
+      throw new Verror(error, 'editing like button ')
     }
   }
-  if (!user.favorites.id(manga_id)) {
-    user.favorites.push({
-      _id: manga_id,
-      title: manga.title,
-      description: manga.description,
-      tags: manga.tags,
-      pages: manga.pages,
-      thumbnail: manga.thumbnail,
-      telegraph_url: manga.telegraph_url,
-    });
-
-    await user.save();
-    console.log("Added to favorites!");
-    // keyboard[0].push({ text: "♥️", callback_data: "like_" + manga.id });
-    keyboard[0][keyboard[0].length - 1].text = config.like_button_true;
-    await ctx
-      .answerCbQuery("Added to favorites!")
-      .catch((err) => console.log(err));
-    await ctx
-      .editMessageReplyMarkup({ inline_keyboard: keyboard })
-      .catch((err) => {}/*console.log(err)*/);
-  } else {
-    user.favorites.id(manga_id).remove();
-    await user.save();
-    console.log("Removed from favorites!");
-    await ctx
-      .answerCbQuery("Removed from favorites!")
-      .catch((err) => console.log(err));
-
-    keyboard[0][keyboard[0].length - 1].text = config.like_button_false;
-    await ctx
-      .editMessageReplyMarkup({ inline_keyboard: keyboard })
-      .catch((err) => console.log(err));
-  }
-  console.log(user.favorites.length);
-};
+  console.log(user.favorites.length)
+}
