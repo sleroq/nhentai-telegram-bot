@@ -7,8 +7,9 @@ import Verror from 'verror'
 import saveAndGetManga from '../../db/save_and_get_manga'
 import {MangaSchema} from '../../models/manga.model'
 import {getMangaMessage, isFullColor} from '../some_functions'
+import i18n from '../../i18n'
 
-export default async function openIInTelegraph (ctx: Context) {
+export default async function openInTelegraph (ctx: Context): Promise<void> {
   if(!('callback_query' in ctx.update)
   || !('data' in ctx.update.callback_query)){
     return
@@ -35,7 +36,7 @@ export default async function openIInTelegraph (ctx: Context) {
     console.error('openInTelegraph: Edit buttons before starting: ' + error)
   }
 
-  const mangaId = ctx.update.callback_query.data.split('_')[1];
+  const mangaId = ctx.update.callback_query.data.split('_')[1]
   let manga: MangaSchema & Document<any, any, MangaSchema> | undefined
   try {
     manga = await saveAndGetManga(user, Number(mangaId))
@@ -44,8 +45,9 @@ export default async function openIInTelegraph (ctx: Context) {
       try {
         await ctx.reply(i18n.__('manga_does_not_exist') + '\n(' + mangaId + ')')
       } catch (error) {
-        console.error('Replying \'404\'' + error)
+        throw new Verror(error, 'Replying \'404\'')
       }
+      return
     }
     throw new Verror(error, 'Getting manga by id')
   }
