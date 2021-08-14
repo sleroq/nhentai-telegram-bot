@@ -1,11 +1,12 @@
-import nhentai, { Doujin } from '../nhentai'
-import Manga, { MangaSchema } from '../models/manga.model.js'
-import TelegraphUploadByUrls from '../bot/telegraph.js'
-
-import getRandomMangaLocally from '../db/get_manga_random_locally'
-import { UserSchema } from '../models/user.model'
 import Verror from 'verror'
-import { Document } from 'mongoose'
+
+import nhentai, { Doujin }    from '../lib/nhentai'
+import TelegraphUploadByUrls  from '../lib/telegraph.js'
+
+import { Document }           from 'mongoose'
+import Manga, { MangaSchema } from '../models/manga.model.js'
+import { UserSchema }         from '../models/user.model'
+import getRandomMangaLocally  from '../db/get_manga_random_locally'
 
 export default async function saveAndGetManga(user: UserSchema, id?: number): Promise<MangaSchema & Document<any, any, MangaSchema>> {
   let savedManga: MangaSchema & Document<any, any, MangaSchema> | null = null
@@ -74,30 +75,11 @@ export default async function saveAndGetManga(user: UserSchema, id?: number): Pr
 
   // Update old manga where telegraph_url was not saved for some reason
   if (!savedManga.telegraph_url) {
-    if (images.length === 0) {
-      let mangaWithPages: Doujin | undefined
-      try {
-        mangaWithPages = await nhentai.getDoujin(savedManga.id)
-      } catch (error) {
-        if(error.message === 'Not found'){
-          throw new Error('Not found')
-        }
-        throw new Verror(error, 'Getting images to update manga without telegra.ph url')
-      }
-      images = mangaWithPages.pages
-      console.log('Got pages to fix manga from DB')
-    }
-    try {
-      savedManga.telegraph_url = await TelegraphUploadByUrls(savedManga, images)
-    } catch (error) {
-      throw new Verror(error, 'Posting doujin to telegra.ph to fix manga without telegra.pf url')
-    }
-    try {
-      await savedManga.save()
-    } catch (error) {
-      console.log('Could not save manga with updated telegraph_url: ' + savedManga.id)
-      console.log(error)
-    }
+    await updateTelegraphUrl(images, savedManga)
+  }
+  // Add thumbnail and first page if was saved without them
+  if (!savedManga.thumbnail || !savedManga.page0) {
+    await addThumbnail(savedManga)
   }
   // Update old manga where date was not specified
   if (!savedManga.createdAt || !savedManga.updatedAt) {
@@ -105,39 +87,18 @@ export default async function saveAndGetManga(user: UserSchema, id?: number): Pr
       { id: savedManga.id },
       {
         $set:
-        {
-          createdAt: new Date(),
-          updatedAt: new Date()
-        },
+          {
+            createdAt: new Date(),
+            updatedAt: new Date()
+          },
       }
     )
     console.log('Added date to ' + savedManga.id)
   }
-  // Add thumbnail and first page if was saved without them
-  if (!savedManga.thumbnail || !savedManga.page0) {
-    let mangaWithThumbnail: Doujin | undefined
-    try {
-      mangaWithThumbnail = await nhentai.getDoujin(savedManga.id)
-    } catch (error) {
-      if(error.message === 'Not found'){
-        throw new Error('Not found')
-      }
-      throw new Verror('Getting manga with thumbnail')
-    }
-    savedManga.thumbnail = mangaWithThumbnail.thumbnails[0]
-    savedManga.page0 = mangaWithThumbnail.pages[0]
-
-    try {
-      await savedManga.save()
-    } catch (error) {
-      console.log('Could not save manga with updated thumbnail and page0: ' + savedManga.id)
-      console.log(error)
-    }
-    console.log('Added thumbnail and page0 to ' + savedManga.id)
-  }
   console.log('returning manga')
   return savedManga
 }
+
 async function saveNewManga(manga: Doujin): Promise<MangaSchema & Document<any, any, MangaSchema>> {
   const thumbnail = Array.isArray(manga.thumbnails) && manga.thumbnails[0]
     ? manga.thumbnails[0]
@@ -172,4 +133,53 @@ async function saveNewManga(manga: Doujin): Promise<MangaSchema & Document<any, 
   }
   console.log('Doujin saved')
   return mangaDB
+}
+
+async function updateTelegraphUrl(images: string[], savedManga: MangaSchema & Document<any, any, MangaSchema>) {
+  if (images.length === 0) {
+    let mangaWithPages: Doujin | undefined
+    try {
+      mangaWithPages = await nhentai.getDoujin(savedManga.id)
+    } catch (error) {
+      if(error.message === 'Not found'){
+        throw new Error('Not found')
+      }
+      throw new Verror(error, 'Getting images to update manga without telegra.ph url')
+    }
+    images = mangaWithPages.pages
+    console.log('Got pages to fix manga from DB')
+  }
+  try {
+    savedManga.telegraph_url = await TelegraphUploadByUrls(savedManga, images)
+  } catch (error) {
+    throw new Verror(error, 'Posting doujin to telegra.ph to fix manga without telegra.pf url')
+  }
+  try {
+    await savedManga.save()
+  } catch (error) {
+    console.log('Could not save manga with updated telegraph_url: ' + savedManga.id)
+    console.log(error)
+  }
+}
+
+async function addThumbnail(savedManga: MangaSchema & Document<any, any, MangaSchema>) {
+  let mangaWithThumbnail: Doujin | undefined
+  try {
+    mangaWithThumbnail = await nhentai.getDoujin(savedManga.id)
+  } catch (error) {
+    if(error.message === 'Not found'){
+      throw new Error('Not found')
+    }
+    throw new Verror('Getting manga with thumbnail')
+  }
+  savedManga.thumbnail = mangaWithThumbnail.thumbnails[0]
+  savedManga.page0 = mangaWithThumbnail.pages[0]
+
+  try {
+    await savedManga.save()
+  } catch (error) {
+    console.log('Could not save manga with updated thumbnail and page0: ' + savedManga.id)
+    console.log(error)
+  }
+  console.log('Added thumbnail and page0 to ' + savedManga.id)
 }

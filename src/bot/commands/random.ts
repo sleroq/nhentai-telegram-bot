@@ -5,10 +5,10 @@ import Message, {MessageSchema} from '../../models/message.model'
 import Verror from 'verror'
 import {MangaSchema} from '../../models/manga.model'
 import saveAndGetManga from '../../db/save_and_get_manga'
-import {getMangaMessage, isFullColor} from '../some_functions'
+import {getMangaMessage, isFullColor} from '../../lib/some_functions'
 import config from '../../../config'
 import {InlineKeyboardButton} from 'typegram'
-import i18n from '../../i18n'
+import i18n from '../../lib/i18n'
 
 import saveAndGetUser from '../../db/save_and_get_user'
 
@@ -70,6 +70,8 @@ export default async function makeRandom(ctx: Context, mode: 'next' | 'previous'
      [ 234, 123, 345, 1243, 356]  - history.length === 5
                             usr     current        === 4 */
   // TODO: be able to work without database connection
+    console.log(message.current)
+  console.log(message.history.length - 1)
   if (message.current >= (message.history.length - 1)){
     try {
       manga = await saveAndGetManga(user)

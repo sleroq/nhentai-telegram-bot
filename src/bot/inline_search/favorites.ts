@@ -1,9 +1,9 @@
 import Context from 'telegraf/typings/context'
 import config  from '../../../config'
-import i18n 	 from '../../i18n'
+import i18n 	 from '../../lib/i18n'
 import Verror  from 'verror'
 
-import { getMangaMessage, sliceByHalf } from '../some_functions'
+import { getMangaMessage, sliceByHalf } from '../../lib/some_functions'
 
 import {
   InlineKeyboardMarkup

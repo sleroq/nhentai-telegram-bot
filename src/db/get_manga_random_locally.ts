@@ -1,5 +1,5 @@
-import Manga, { MangaSchema } from '../models/manga.model'
-import {Document, FilterQuery} from 'mongoose'
+import Manga, { MangaSchema }    from '../models/manga.model'
+import { Document, FilterQuery } from 'mongoose'
 
 // TODO: fix ignore tags
 export default async function getRandomMangaLocally(

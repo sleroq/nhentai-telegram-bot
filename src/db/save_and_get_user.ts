@@ -1,9 +1,12 @@
-import User, { UserSchema } from '../models/user.model'
-import config from '../../config'
-import { Context } from 'telegraf'
-import { Document } from 'mongoose'
-import i18n from '../i18n'
+import i18n   from '../lib/i18n'
 import Verror from 'verror'
+
+import config from '../../config'
+import User, { UserSchema } from '../models/user.model'
+
+import { Context }  from 'telegraf'
+import { Document } from 'mongoose'
+
 
 export default async function saveAndGetUser(ctx: Context): Promise<UserSchema & Document<any, any, UserSchema>> {
   if (!ctx.from) {

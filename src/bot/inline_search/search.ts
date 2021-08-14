@@ -1,16 +1,16 @@
 import Context from 'telegraf/typings/context'
 import config  from '../../../config'
-import i18n 	 from '../../i18n'
+import i18n 	 from '../../lib/i18n'
 import Verror  from 'verror'
 
-import { getMessageInline, sliceByHalf } from '../some_functions'
+import { getMessageInline, sliceByHalf } from '../../lib/some_functions'
 
 import {
   InlineQueryResultArticle,
 } 										from 'typegram'
 import { Document } 	from 'mongoose'
 import { UserSchema } from '../../models/user.model'
-import nHentai, { LightDoujin, SearchResult, SortingType } from '../../nhentai'
+import nHentai, { LightDoujin, SearchResult, SortingType } from '../../lib/nhentai'
 import {InlineQueryResult} from 'typegram/inline'
 
 const nothingIsFoundResult: InlineQueryResultArticle = {
