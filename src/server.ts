@@ -1,48 +1,33 @@
 import dotenv from 'dotenv'
 dotenv.config()
 
-import Verror from 'verror'
 import { Telegraf } from 'telegraf'
+import Verror       from 'verror'
 
 import startWithWebhook from './express'
+import saveAndGetUser   from './db/save_and_get_user'
+import i18n             from './lib/i18n'
 
-import saveAndGetUser from './db/save_and_get_user'
-import i18n from './i18n'
 // Import all commands
-// import dlzip from './bot/commands/dlzip.js'
-// import help from './bot/commands/help.js'
-// import settings from './bot/settings/settings.js'
-
 import callbackHandler from './bot/callback_handler'
-import makeRandom from './bot/commands/random'
-import textHandler from './bot/text_handler'
-import inlineSearch from './bot/inline_search/index'
+import makeRandom      from './bot/commands/random'
+import textHandler     from './bot/text_handler'
+import inlineSearch    from './bot/inline_search/index'
+import connectToMongo  from './db/connect'
 
-let token: string | undefined
-if (!process.env.BOT_TOKEN) {
+const token = process.env.BOT_TOKEN
+if (!token) {
   throw new Verror('No BOT_TOKEN in .env')
-} else {
-  token = process.env.BOT_TOKEN
-}
-if (!process.env.DATABASE_URL) {
-  throw new Verror('No DATABASE_URL in env')
 }
 
-const bot = new Telegraf(process.env.BOT_TOKEN)
+await connectToMongo()
+const bot = new Telegraf(token)
 
 // Connect to the database
-import mongoose from 'mongoose'
 
-mongoose.connect(process.env.DATABASE_URL, {
-  useNewUrlParser:    true,
-  useUnifiedTopology: true,
-})
-const db = mongoose.connection
-db.on('error', console.error.bind(console, 'connection error:'))
-db.once('open', function () { console.log('mongoose is connected!') })
+
 
 // Commands that always work (without nhentai/telegraph connections)
-
 bot.start(async (ctx) => {
   await saveAndGetUser(ctx)
   const message = i18n.__('greeting')
@@ -87,21 +72,21 @@ bot.command('rand', async (ctx) => {
   try {
     await makeRandom(ctx, 'next')
   } catch (error) {
-    console.error('Random text command: ' + error)
+    console.error('Random text command: ', error)
   }
 })
 // bot.command("zip", async (ctx) => { await dlzip(ctx); });
 
-// non-text
+
 bot.on('callback_query', async (ctx) => {
   if (!('data' in ctx.update.callback_query)
     || !ctx.update.callback_query.data
     || !ctx.from) {
     return
   }
-  const query = ctx.update.callback_query.data
+  const callback_query = ctx.update.callback_query
   try {
-    await callbackHandler(ctx, query)
+    await callbackHandler(ctx, callback_query)
   } catch (error) {
     console.error('Callback query: ', error)
   }
@@ -115,22 +100,23 @@ bot.on('inline_query', async (ctx) => {
   } 
 })
 
-// get with id
 bot.on('text', async (ctx) => {
   try {
     await textHandler(ctx)
   } catch (error) {
-    console.error('textHandler: ' + error)
+    console.error('textHandler: ', error)
   }
-});
+})
 
-// start the bot 
-(async()=>{
-  if (process.env.REPL_URL || process.env.HEROKU_URL) {
+// start the bot
+if (process.env.REPL_URL || process.env.HEROKU_URL) {
+  try {
     await startWithWebhook(bot, token)
-    console.log('Bot is started webhook!')
-  } else {
-    await bot.launch({ dropPendingUpdates: true })
-    console.log('Bot is started polling!')
+  } catch (error) {
+    throw new Verror(error, 'Starting bot with webhook')
   }
-})()
+  console.log('Bot is started webhook!')
+} else {
+  await bot.launch({ dropPendingUpdates: true })
+  console.log('Bot is started polling!')
+}
