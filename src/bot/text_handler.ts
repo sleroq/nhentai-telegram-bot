@@ -6,7 +6,7 @@ import {Document} from 'mongoose'
 import Verror from 'verror'
 import {UserSchema} from '../models/user.model'
 import saveAndGetUser from '../db/save_and_get_user'
-import {getMangaMessage, isFullColor} from './some_functions'
+import {getMangaMessage, isFullColor} from '../lib/some_functions'
 import Message from '../models/message.model'
 import {InlineKeyboardButton} from 'typegram'
 
