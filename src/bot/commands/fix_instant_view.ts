@@ -1,173 +1,197 @@
-const nhentai = require("../../nhentai");
-const config = require('../../config.json');
+import nhentai, {Doujin} from '../../lib/nhentai'
+import {Context} from 'telegraf'
+import {UserSchema} from '../../models/user.model'
+import {Document} from 'mongoose'
+import saveAndGetUser from '../../db/save_and_get_user'
+import Verror from 'verror'
+import saveAndGetManga from '../../db/save_and_get_manga'
+import {MangaSchema} from '../../models/manga.model'
+import {InlineKeyboardButton} from 'typegram'
+import i18n from '../../lib/i18n'
+import {CallbackQuery} from 'telegraf/typings/core/types/typegram'
+import Message, {MessageSchema} from '../../models/message.model'
+import { uploadByUrl } from 'telegraph-uploader'
+import {telegraphCreatePage} from '../../lib/telegraph'
 
-const {
-  telegraphCreatePage,
-} = require("../telegraph.ts");
-const { getMangaMessage } = require("../some_functions.ts");
-const { saveAndGetUser } = require("../../db/save_and_get_user");
-const { uploadByUrl } = require("telegraph-uploader");
-const { saveAndGetManga } = require("../../db/save_and_get_manga");
+export default async function fixInstantView(ctx: Context, callback_query: CallbackQuery.DataCallbackQuery) {
 
-const Message = require("../../models/message.model");
-
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-module.exports.fixInstantView = async function (ctx) {
-  const user = await saveAndGetUser(ctx);
-  // get manga from db
-  let query_data = ctx.update.callback_query.data,
-    manga_id = query_data.split("_")[1];
-  if (!manga_id) {
-    return;
-  }
-
-  let manga_db = await saveAndGetManga(manga_id)
-  if (!manga_db || manga_db == 404) {
-    console.log("couldn't get manga in fixinstant so return")
+  const matchId = callback_query.data.match(/_[0-9]+/)
+  if(!matchId || !Number(matchId[0])) {
     return
   }
-  let telegraph_fixed_url = manga_db.telegraph_fixed_url,
-    telegraph_url = manga_db.telegraph_url;
+  const doujinId = Number(matchId[0])
 
-  if (!telegraph_fixed_url) {
-    // get magna from nhentai because db don't habe pages array
-    manga = await nhentai.getDoujin(manga_id).catch((err) => {
-      console.log(err);
-    });
-    // save manga if it's not already
+  let user: UserSchema & Document<any, any, UserSchema> | undefined
+  try {
+    user = await saveAndGetUser(ctx)
+  } catch (error) {
+    throw new Verror(error, 'Getting user in callbackHandler')
+  }
 
-    let pages = manga.pages,
-      telegraph_urls = [],
-      attempts_counter = 0; // coun't retries because err
+  let doujin: MangaSchema & Document<any, any, MangaSchema>
+  try {
+    doujin = await saveAndGetManga(user, doujinId)
+  } catch (error) {
+    if(error.message === 'Not found') {
+      try {
+        await ctx.reply(i18n.__('manga_does_not_exist') + '\n(' + mangaId + ')')
+      } catch (error) {
+        console.error('Replying \'404\'' + error)
+      }
+      return
+    }
+    throw new Verror(error, 'Can`t get doujin')
+  }
+  let fixedUrl = doujin.telegraph_fixed_url
 
-    // incase it isn't the first try to fix manga we nont want to reupload same pages
-    if (Array.isArray(manga_db.fixed_pages) && manga_db.fixed_pages.length) {
-      telegraph_urls = uniq(manga_db.fixed_pages); // so get them from db
+  if (!fixedUrl) {
+    let doujinWithPages: Doujin
+    try {
+      doujinWithPages = await nhentai.getDoujin(doujin.id)
+    } catch (error) {
+      if (error.message === 'Not found') {
+        try {
+          await ctx.reply(i18n.__('cant_get_anymore'))
+        } catch (error) {
+          throw new Verror(error, 'Replying \'404\'')
+        }
+        return
+      }
+      throw new Verror(error, 'Getting doujin to fix pages')
+    }
+    const pages = doujinWithPages.pages
+
+    let attemptsCnt = 0    // coun't retries because err
+    let telegraphUrls: string[] = []
+    // in case it isn't the first try to fix manga we dont want to reupload same pages
+    if (Array.isArray(doujin.fixed_pages) && doujin.fixed_pages.length) {
+      telegraphUrls = uniq(doujin.fixed_pages) // so get them from db
       console.log(
-        "here is " + telegraph_urls.length + " pages from previous fix"
-      );
+        'here is ' + telegraphUrls.length + ' pages from previous fix'
+      )
     }
 
-    for (let i = telegraph_urls.length || 0; i < pages.length; i++) {
-      let fixing_keyboard = [[]];
-      if (telegraph_url) {
-        // while manga is fixing you can still try to open broken one:
+    for (let i = telegraphUrls.length || 0; i < pages.length; i++) {
+      const fixing_keyboard: InlineKeyboardButton[][] = [[]]
+
+      // while manga is fixing you can still try to open broken one:
+      if(doujin.telegraph_url){
         fixing_keyboard[0].push({
-          text: "Telegra.ph",
-          url: telegraph_url,
-        });
+          text: 'Telegra.ph',
+          url:  doujin.telegraph_url,
+        })
       }
       // incase we were retrying after err 3 times - stop it
-      if (attempts_counter > 2) {
+      if (attemptsCnt > 2) {
         fixing_keyboard[0].unshift({
           // button to try again:
-          text: ctx.i18n.t("try_again_later"),
-          callback_data: "fixLater_" + manga.id,
-        });
-        // incase it happen not in inline search we should add buttons back:
-        if (ctx.update.callback_query.message) {
+          text:          i18n.__('try_again_later'),
+          callback_data: 'fixLater_' + doujin.id + '_' + new Date(),
+        })
+        // in case it happen not in inline search we should add buttons back:
+        if (callback_query.message) {
           fixing_keyboard.push([
             {
-              text: ctx.i18n.t("search_button"),
-              switch_inline_query_current_chat: "",
+              text: i18n.__('search_button'),
+              switch_inline_query_current_chat: '',
             },
-          ]);
+          ])
           fixing_keyboard.push([
             {
-              text: ctx.i18n.t("next_button"),
-              callback_data: "r_prev" + manga.id,
+              text:          i18n.__('next_button'),
+              callback_data: 'r',
             },
-          ]);
-          let message_db = await Message.findOne({
-            message_id: ctx.update.callback_query.message.message_id,
-            chat_id: ctx.update.callback_query.message.from.id,
-          });
+          ])
+          const message_db = await Message.findOne({
+            message_id: callback_query.message.message_id,
+            chat_id: String(callback_query.message.from?.id),
+          })
           if (message_db && message_db.current > 0) {
             fixing_keyboard[2].unshift({
-              text: ctx.i18n.t("previous_button"),
-              callback_data: "prev_" + manga.id,
-            });
+              text:          i18n.__('previous_button'),
+              callback_data: 'previous',
+            })
           }
         }
-
-        await ctx
-          .editMessageReplyMarkup({
+        try {
+          await ctx.editMessageReplyMarkup({
             inline_keyboard: fixing_keyboard,
           })
-          .catch((err) => {
-            console.log(err);
-          });
-        return;
+        } catch (error) {
+          console.error('editMessageReplyMarkup while fixing pages stopped trying: ', error)
+        }
+        return
       }
-      let new_url = await uploadByUrl(pages[i]).catch(async (err) => {
+      let newUrl: { link: string, path: string } | undefined
+      try {
+        newUrl = await uploadByUrl(pages[i])
+      } catch (error) {
         console.log(
-          "err in uploading image heppened on try number " +
-          attempts_counter +
-          "\nerr: " +
-          err
-        );
-        i -= 1;
-        attempts_counter += 1;
+          'error in uploading image happened on try number ' +
+          attemptsCnt +
+          '\nerr: ' +
+          error
+        )
+        i -= 1
+        attemptsCnt += 1
         fixing_keyboard[0].unshift({
-          text: "flood wait err",
-          callback_data: "flood_wait",
-        });
+          text:          'flood wait err',
+          callback_data: 'flood_wait',
+        })
 
-        await sleep(5000); // idk if it helps
-      });
+        await sleep(5000) // idk if it helps
+      }
 
-      if (new_url && new_url.link) {
-        telegraph_urls.push(new_url.link);
-        manga_db.fixed_pages.push(new_url.link); // if err, we won't lose pages
-        await manga_db.save(); // hope there is no limits on the number of requests
+      if (newUrl && newUrl.link) {
+        telegraphUrls.push(newUrl.link)
+        doujin.fixed_pages.push(newUrl.link) // if err, we won't lose pages
+        await doujin.save() // hope there is no limits on the number of requests
       }
 
       // display the process:
       fixing_keyboard[0].unshift({
-        text: i + 1 + "/" + pages.length + ctx.i18n.t("pages_fixed"),
-        callback_data: "fixing",
-      });
+        text:          i + 1 + '/' + pages.length + i18n.__('pages_fixed'),
+        callback_data: 'fixing',
+      })
+      try {
+        await ctx
+          .editMessageReplyMarkup({
+            inline_keyboard: fixing_keyboard,
+          })
+      } catch (error) {
+        console.error('editMessageReplyMarkup while fixing pages: ', error)
+      }
+    }
+
+    try {
+      fixedUrl = (await telegraphCreatePage(doujin, telegraphUrls)).url
+
+    } catch (error) {
+      console.error('Creating fixed telegraph page', error)
+    }
+
+    const keyboard: InlineKeyboardButton[][] = []
+    // if there is no url somehow, prevent err, and allow user to return
+    if (!fixedUrl) {
+      keyboard[0].push({
+        text: 'Telegra.ph',
+        url:  telegraphUrl,
+      })
+      if (callback_query.message) {
+        keyboard[0].unshift({
+          text:          i18n.__('previous_button'),
+          callback_data: 'previous',
+        })
+      }
       await ctx
         .editMessageReplyMarkup({
-          inline_keyboard: fixing_keyboard,
+          inline_keyboard: keyboard,
         })
         .catch((err) => {
-          // console.log(err);
-        });
+          console.log(err)
+        })
+      return
     }
-
-    telegraph_fixed_url = await telegraphCreatePage(manga, telegraph_urls)
-      .then((page) => {
-        return page.url;
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
-
-  // if there is no url somehow, prevent err, and allow user to return
-  if (!telegraph_fixed_url) {
-    fixing_keyboard[0].push({
-      text: "Telegra.ph",
-      url: telegraph_url,
-    });
-    if (ctx.update.callback_query.message) {
-      fixing_keyboard[0].unshift({
-        text: ctx.i18n.t("previous_button"),
-        callback_data: "prev_" + manga.id,
-      });
-    }
-    await ctx
-      .editMessageReplyMarkup({
-        inline_keyboard: fixing_keyboard,
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-    return;
   }
   // save new url ofcourse:
   manga_db.telegraph_fixed_url = telegraph_fixed_url;
@@ -229,4 +253,7 @@ function uniq(a) {
   return a.filter(function (item) {
     return seen.hasOwnProperty(item) ? false : (seen[item] = true);
   });
+}
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
