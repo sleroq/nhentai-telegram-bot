@@ -1,7 +1,7 @@
 import { MangaSchema } from '../models/manga.model'
-import { Doujin, LightDoujin } from '../nhentai'
+import { Doujin, LightDoujin } from './nhentai'
 import { Document } from 'mongoose'
-import i18n from '../i18n'
+import i18n from './i18n'
 import { Favorite } from '../models/user.model'
 
 export function getMangaMessage(

@@ -1,24 +1,17 @@
-import config from '../../config'
-import { Doujin } from '../nhentai'
 import Telegraph from 'telegra.ph'
-import { Node, Page } from 'telegra.ph/typings/telegraph'
-import { Document } from 'mongoose'
+import config    from '../../config'
+
+import { Doujin }      from './nhentai'
+import { Node, Page }  from 'telegra.ph/typings/telegraph'
+import { Document }    from 'mongoose'
 import { MangaSchema } from '../models/manga.model'
 
-let token: string | undefined;
-
-(async () => {
-  if (!process.env.TELEGRAPH_TOKEN) {
-    console.error('No token for telegra.ph')
-    token = await createAccount()
-  } else {
-    token = process.env.TELEGRAPH_TOKEN
-  }
-})()
+let token = process.env.TELEGRAPH_TOKEN
 
 if (!token) {
-  throw new Error('This can\'t happen, but typescript thinks it can.')
+  token = await createAccount()
 }
+
 const client = new Telegraph(token)
 
 export async function createAccount(): Promise<string> {
