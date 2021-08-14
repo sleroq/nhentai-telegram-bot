@@ -6,14 +6,10 @@ import {UserSchema} from '../../models/user.model'
 import Verror from 'verror'
 import saveAndGetManga from '../../db/save_and_get_manga'
 import {MangaSchema} from '../../models/manga.model'
-import {getMangaMessage, isFullColor} from '../some_functions'
-import i18n from '../../i18n'
+import {getMangaMessage, isFullColor} from '../../lib/some_functions'
+import i18n from '../../lib/i18n'
 
-export default async function openInTelegraph (ctx: Context): Promise<void> {
-  if(!('callback_query' in ctx.update)
-  || !('data' in ctx.update.callback_query)){
-    return
-  }
+export default async function openInTelegraph (ctx: Context, query: string): Promise<void> {
   let user: UserSchema & Document<any, any, UserSchema> | undefined
   try {
     user = await saveAndGetUser(ctx)
@@ -36,7 +32,7 @@ export default async function openInTelegraph (ctx: Context): Promise<void> {
     console.error('openInTelegraph: Edit buttons before starting: ' + error)
   }
 
-  const mangaId = ctx.update.callback_query.data.split('_')[1]
+  const mangaId = query.split('_')[1]
   let manga: MangaSchema & Document<any, any, MangaSchema> | undefined
   try {
     manga = await saveAndGetManga(user, Number(mangaId))
@@ -62,7 +58,7 @@ export default async function openInTelegraph (ctx: Context): Promise<void> {
         {text: heart, callback_data: 'like_' + manga.id},
       ],
     ],
-    messageText = getMangaMessage(manga, telegraphUrl);
+    messageText = getMangaMessage(manga, telegraphUrl)
 
   user.manga_history.push(manga.id) // save to history
   await user.save()

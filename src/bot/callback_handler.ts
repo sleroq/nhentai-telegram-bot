@@ -1,33 +1,33 @@
-import {Context} from 'telegraf'
-import {Update} from 'telegraf/typings/core/types/typegram'
-import makeRandom from './commands/random'
-import openInTelegraph from './commands/open_in_telegraph'
-import likeDoujin from './commands/like'
-import Verror from 'verror'
+import Verror           from 'verror'
+import { Context }      from 'telegraf'
+import { Update, CallbackQuery }       from 'telegraf/typings/core/types/typegram'
+import makeRandom       from './commands/random'
+import openInTelegraph  from './commands/open_in_telegraph'
+import likeDoujin       from './commands/like'
 
-export default async function callbackHandler(ctx: Context<Update>, query: string): Promise<void> {
-  console.log(query)
-  if (query === 'r'){
+export default async function callbackHandler(ctx: Context<Update>, callback_query: CallbackQuery.DataCallbackQuery): Promise<void> {
+  const data: string = callback_query.data
+  if (data === 'r'){
     try {
       await makeRandom(ctx,'next')
     } catch (error) {
       throw new Verror(error, 'Random - \'next\' button')
     }
-  } else if (query === 'previous'){
+  } else if (data === 'previous'){
     try {
       await makeRandom(ctx,'previous')
     } catch (error) {
       throw new Verror(error, 'Random - \'previous\' button')
     }
-  } else if (query.match('open')) {
+  } else if (data.match('open')) {
     try {
-      await openInTelegraph(ctx)
+      await openInTelegraph(ctx, data)
     } catch (error) {
       throw new Verror(error, 'openInTelegraph')
     }
-  } else if (query.match('like_')){
+  } else if (data.match('like_')){
     try {
-      await likeDoujin(ctx)
+      await likeDoujin(ctx, callback_query)
     } catch (error) {
       throw new Verror(error, 'likeDoujin')
     }

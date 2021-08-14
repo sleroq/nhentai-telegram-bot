@@ -1,26 +1,27 @@
-import {Context} from 'telegraf'
-import saveAndGetUser from '../../db/save_and_get_user'
-import {UserSchema} from '../../models/user.model'
-import {Document} from 'mongoose'
 import Verror from 'verror'
-import saveAndGetManga from '../../db/save_and_get_manga'
-import {MangaSchema} from '../../models/manga.model'
-import {InlineKeyboardButton} from 'typegram'
-import config from '../../../config'
-import i18n from '../../i18n'
 
-export default async function likeDoujin (ctx: Context) {
-  if(!('callback_query' in ctx.update)
-    || !('data' in ctx.update.callback_query)){
-    return
-  }
+import {
+  CallbackQuery,
+  InlineKeyboardButton
+}                      from 'telegraf/typings/core/types/typegram'
+import { UserSchema }  from '../../models/user.model'
+import { MangaSchema } from '../../models/manga.model'
+import { Document }    from 'mongoose'
+import { Context }     from 'telegraf'
+
+import config from '../../../config'
+import i18n   from '../../lib/i18n'
+import saveAndGetUser  from '../../db/save_and_get_user'
+import saveAndGetManga from '../../db/save_and_get_manga'
+
+export default async function likeDoujin (ctx: Context, query: CallbackQuery.DataCallbackQuery) {
   let user: UserSchema & Document<any, any, UserSchema> | undefined
   try {
     user = await saveAndGetUser(ctx)
   } catch (error) {
     throw new Verror(error, 'Getting user in callbackHandler')
   }
-  const doujinId = Number(ctx.update.callback_query.data.split('_')[1])
+  const doujinId = Number(query.data.split('_')[1])
   if(!doujinId){
     throw new Verror('Somehow user is trying to like without id')
   }
@@ -39,10 +40,10 @@ export default async function likeDoujin (ctx: Context) {
     throw new Verror(error, 'Getting manga by id')
   }
   let keyboard: InlineKeyboardButton[][] = []
-  if (ctx.update.callback_query.message
-   && ('reply_markup' in ctx.update.callback_query.message)
-   && ctx.update.callback_query.message.reply_markup) {
-    keyboard = ctx.update.callback_query.message.reply_markup.inline_keyboard
+  if (query.message
+   && ('reply_markup' in query.message)
+   && query.message.reply_markup) {
+    keyboard = query.message.reply_markup.inline_keyboard
   } else {
     keyboard = [
       [
