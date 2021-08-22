@@ -1,9 +1,11 @@
 import Context        from 'telegraf/typings/context'
 import saveAndGetUser from '../../db/save_and_get_user'
 import Verror         from 'verror'
+
 import replyWithFavoritesInline from './favorites'
-import replyWithHistoryInline from './history'
-import replyWithSearchInline from './search'
+import replyWithHistoryInline   from './history'
+import replyWithSearchInline    from './search'
+import replyByIdInline          from './by_id'
 
 export default async function (ctx: Context): Promise<void> {
   const user = await saveAndGetUser(ctx)
@@ -16,7 +18,8 @@ export default async function (ctx: Context): Promise<void> {
   const matchNumbers = inlineQuery.match(/\d+/)
 
   console.log(inlineQuery)
-  console.log('\'' + inlineQuery.replace(String(matchPage), '').trim() + '\'')
+  // console.log('\'' + inlineQuery.replace(String(matchPage), '').trim() + '\'')
+
   // check if query is empty
   if (!inlineQuery || (matchPage && inlineQuery.replace(matchPage[0], '').trim() === '')){
     console.log('favorites')
@@ -34,8 +37,9 @@ export default async function (ctx: Context): Promise<void> {
     }
   } else if(matchNumbers && inlineQuery.replace(/\d+/, '').trim() === ''){
     console.log('Inline by id')
+    const doujinId = Number(matchNumbers[0])
     try  {
-      await replyWithHistoryInline(ctx, user)
+      await replyByIdInline(ctx, inlineQuery, user, doujinId)
     } catch (error) {
       throw new Verror(error, 'Inline search - by id')
     }
