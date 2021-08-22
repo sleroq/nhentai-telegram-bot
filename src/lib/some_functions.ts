@@ -1,8 +1,11 @@
-import { MangaSchema } from '../models/manga.model'
+import config from '../../config'
+import i18n from './i18n'
+
+import { Manga, MangaSchema } from '../models/manga.model'
 import { Doujin, LightDoujin } from './nhentai'
 import { Document } from 'mongoose'
-import i18n from './i18n'
-import { Favorite } from '../models/user.model'
+import { Favorite, User } from '../models/user.model'
+import { InlineKeyboardButton } from 'typegram'
 
 export function getMangaMessage(
   manga: Doujin | MangaSchema & Document<any, any, MangaSchema> | Favorite,
@@ -10,7 +13,7 @@ export function getMangaMessage(
 ): string {
   const title = getTitle(manga),
     tags = tagString(manga),
-    pages_word = i18n.__('pages'),
+    pages_word = i18n.t('pages'),
     pages = Array.isArray(manga.pages) ? manga.pages.length : manga.pages,
     id = 'id' in manga ? manga.id : manga._id,
     mangaUrl = `https://nhentai.net/g/${id}/`
@@ -29,7 +32,7 @@ ${tags}\n<a href="${mangaUrl}">nhentai.net</a> | <code>${id}</code>`
 function tagString(
   manga: Doujin | MangaSchema & Document<any, any, MangaSchema> | Favorite
 ): string {
-  let tags = i18n.__('tags')
+  let tags = i18n.t('tags')
   let tagsArray: string[] = []
   if ('tags' in manga && manga.tags) {
     tagsArray = manga.tags
@@ -99,4 +102,49 @@ export function isFullColor(manga: Doujin | MangaSchema & Document<any, any, Man
     })
   }
   return result
+}
+export function assembleKeyboard(
+  user: User,
+  manga: Manga,
+  telegraphUrl: string | undefined,
+  inline = false
+): InlineKeyboardButton[][] {
+  const heart = user.favorites.includes(manga.id) ? config.like_button_true : config.like_button_false
+  const inlineKeyboard: InlineKeyboardButton[][] = [
+    [
+      {
+        text: 'Telegra.ph',
+        url:  String(telegraphUrl)
+      },
+      {
+        text:          heart,
+        callback_data: 'like_' + manga.id
+      },
+    ],
+    [
+      {
+        text:                             i18n.t('search_button'),
+        switch_inline_query_current_chat: '',
+      },
+    ],
+  ]
+  if (!inline) {
+    inlineKeyboard.push([
+      {
+        text:          i18n.t('next_button'),
+        callback_data: 'r'
+      }
+    ])
+  }
+  const numberOfPages = manga.pages
+
+  if (!manga.telegraph_fixed_url
+    && (numberOfPages > config.pages_to_show_fix_button
+      || isFullColor(manga))) {
+    inlineKeyboard[0].unshift({
+      text:          i18n.t('fix_button'),
+      callback_data: 'fix_' + manga.id,
+    })
+  }
+  return inlineKeyboard
 }
