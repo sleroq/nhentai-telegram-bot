@@ -25,7 +25,7 @@ export default {
   // article (same as gallery) / photo,
 
   random_locally_by_default: true,
-  // about random loacaly https://telegra.ph/Settings-04-09,
+  // about random locally https://telegra.ph/Settings-04-09,
 
   can_repeat_in_random_by_default: true,
 
