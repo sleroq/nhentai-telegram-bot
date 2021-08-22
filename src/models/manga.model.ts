@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose'
+import {Schema, model, Document} from 'mongoose'
 
 export interface MangaSchema {
   id:                   number
@@ -27,4 +27,5 @@ const mangaSchema = new Schema({
   fixed_pages:         [String],
 }, { timestamps: true })
 
+export type Manga = MangaSchema & Document<any, any, MangaSchema>
 export default model<MangaSchema>('Manga', mangaSchema)

@@ -1,4 +1,4 @@
-import mongoose from 'mongoose'
+import mongoose, {Document} from 'mongoose'
 
 export interface UserSchema {
   _id:            string
@@ -68,4 +68,5 @@ const userSchema = new mongoose.Schema({
   search_history: [String],
 }, { timestamps: true })
 
+export type User = UserSchema & Document<any, any, UserSchema>
 export default mongoose.model<UserSchema>('User', userSchema)

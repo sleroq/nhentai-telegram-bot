@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose'
+import {Schema, model, Document} from 'mongoose'
 
 export interface MessageSchema {
   chat_id:    string
@@ -16,4 +16,5 @@ const messageSchema = new Schema({
   history:    [Number],
 }, { timestamps: true })
 
+export type Message = MessageSchema & Document<any, any, MessageSchema>
 export default model<MessageSchema>('Message', messageSchema)
