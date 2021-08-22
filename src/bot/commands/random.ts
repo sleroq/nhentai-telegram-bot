@@ -1,42 +1,36 @@
-import {Context} from 'telegraf'
-import {UserSchema} from '../../models/user.model'
-import {Document} from 'mongoose'
-import Message, {MessageSchema} from '../../models/message.model'
 import Verror from 'verror'
-import {MangaSchema} from '../../models/manga.model'
+import i18n   from '../../lib/i18n'
+
+import {
+  assembleKeyboard,
+  getMangaMessage,
+} from '../../lib/some_functions'
 import saveAndGetManga from '../../db/save_and_get_manga'
-import {getMangaMessage, isFullColor} from '../../lib/some_functions'
-import config from '../../../config'
-import {InlineKeyboardButton} from 'typegram'
-import i18n from '../../lib/i18n'
+
+import { Context }                from 'telegraf'
+import { User }                   from '../../models/user.model'
+import { Manga }                  from '../../models/manga.model'
+import MessageRecord, { Message } from '../../models/message.model'
 
 import saveAndGetUser from '../../db/save_and_get_user'
 
-async function createMessage(chat_id: string, message_id: string){
-  return new Message({
-    chat_id:    chat_id,
-    message_id: message_id,
-    current:    0,
-    history:    [],
-  })
-}
 export default async function makeRandom(ctx: Context, mode: 'next' | 'previous'): Promise<void> {
-  let user: UserSchema & Document<any, any, UserSchema> | undefined
+  let user: User | undefined
   try {
     user = await saveAndGetUser(ctx)
   } catch (error) {
     throw new Verror(error, 'Getting user in callbackHandler')
   }
 
-  let message: MessageSchema & Document<any, any, MessageSchema> | null = null
+  let message: Message | null = null
 
   if (('callback_query' in ctx.update)
     && ctx.update.callback_query.message
     && ctx.update.callback_query.message.from){
-    const chat_id = String(ctx.update.callback_query.message.from.id)
+    const chat_id = String(ctx.update.callback_query.message.chat.id)
     const message_id = ctx.update.callback_query.message.message_id
     try {
-      message = await Message.findOne({
+      message = await MessageRecord.findOne({
         message_id,
         chat_id,
       })
@@ -48,12 +42,14 @@ export default async function makeRandom(ctx: Context, mode: 'next' | 'previous'
       message = await createMessage(chat_id, String(message_id))
     }
   } else if (ctx.message) {
-    message = await createMessage(String(ctx.message.from.id), String(ctx.message.message_id + 1))
+    message = await createMessage(String(ctx.message.chat.id), String(ctx.message.message_id + 1))
   } else {
-    throw new Verror('Cant get message_id and chat_id from context')
+    throw new Verror('Can\'t get message_id and chat_id from context')
   }
-  let manga: MangaSchema & Document<any, any, MangaSchema> | undefined
+  let manga: Manga | undefined
 
+  // console.log('current: ' + message.current)
+  // console.log('history length: ' + (message.history.length - 1))
 
   if (mode === 'previous') {
     if (message.current === 0) {
@@ -70,8 +66,6 @@ export default async function makeRandom(ctx: Context, mode: 'next' | 'previous'
      [ 234, 123, 345, 1243, 356]  - history.length === 5
                             usr     current        === 4 */
   // TODO: be able to work without database connection
-    console.log(message.current)
-  console.log(message.history.length - 1)
   if (message.current >= (message.history.length - 1)){
     try {
       manga = await saveAndGetManga(user)
@@ -84,19 +78,22 @@ export default async function makeRandom(ctx: Context, mode: 'next' | 'previous'
       for (let t = message.history.length; t > 50; t--) {
         message.history.shift()
       }
+    } else {
+      if (message.history.length !== 1){
+        message.current += 1
+      }
     }
-    message.current += 1
   } else
-  /* if user previously was clicking back button and he is not at the and of history
+  /* if user previously was clicking back button and he is not at the end of history
      [ 234, 123, 345, 1243, 356]  - history.length === 5
             usr                     current        === 1                             */
   {
+    message.current += 1
     try {
       manga = await saveAndGetManga(user, message.history[message.current])
     } catch (error) {
       throw new Verror('Getting random manga')
     }
-    message.current += 1
   }
   user.manga_history.push(manga.id)
   if (user.manga_history.length > 50) {
@@ -106,43 +103,18 @@ export default async function makeRandom(ctx: Context, mode: 'next' | 'previous'
     }
   }
   await message.save()
+  console.log('message saved')
   await user.save()
 
   const telegraphUrl = manga.telegraph_fixed_url
     ? manga.telegraph_fixed_url
     : manga.telegraph_url
   const messageText = getMangaMessage(manga, telegraphUrl)
-  const heart = user.favorites.includes(manga.id) ? config.like_button_true : config.like_button_false
-  const inline_keyboard: InlineKeyboardButton[][] = [
-    [
-      { text: 'Telegra.ph', url: String(telegraphUrl) },
-      { text: heart, callback_data: 'like_' + manga.id },
-    ],
-    [
-      {
-        text: i18n.__('search_button'),
-        switch_inline_query_current_chat: '',
-      },
-    ],
-    [
-      {
-        text: i18n.__('next_button'),
-        callback_data: 'r'
-      }
-    ],
-  ]
-  const numberOfPages = manga.pages
-  if (!manga.telegraph_fixed_url
-    && (numberOfPages > config.pages_to_show_fix_button
-      || isFullColor(manga))) {
-    inline_keyboard[0].unshift({
-      text:          i18n.__('fix_button'),
-      callback_data: 'fix_' + manga.id,
-    })
-  }
+  const inlineKeyboard = assembleKeyboard(user, manga, telegraphUrl)
+
   if (message.current > 0) {
-    inline_keyboard[2].unshift({
-      text:          i18n.__('previous_button'),
+    inlineKeyboard[2].unshift({
+      text:          i18n.t('previous_button'),
       callback_data: 'previous',
     })
   }
@@ -153,7 +125,7 @@ export default async function makeRandom(ctx: Context, mode: 'next' | 'previous'
       await ctx.editMessageText(messageText, {
         parse_mode:   'HTML',
         reply_markup: {
-          inline_keyboard: inline_keyboard,
+          inline_keyboard: inlineKeyboard,
         },
       })
     } catch (error) {
@@ -164,11 +136,20 @@ export default async function makeRandom(ctx: Context, mode: 'next' | 'previous'
       await ctx.reply(messageText, {
         parse_mode:   'HTML',
         reply_markup: {
-          inline_keyboard: inline_keyboard,
+          inline_keyboard: inlineKeyboard,
         },
       })
     } catch (error) {
       throw new Verror(error, 'Replying with random manga (->)')
     }
   }
+}
+
+async function createMessage(chat_id: string, message_id: string){
+  return new MessageRecord({
+    chat_id:    chat_id,
+    message_id: message_id,
+    current:    0,
+    history:    [],
+  })
 }
