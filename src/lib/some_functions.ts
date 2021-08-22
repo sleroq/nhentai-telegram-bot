@@ -1,13 +1,13 @@
 import config from '../../config'
 import i18n from './i18n'
 
-import { Manga, MangaSchema } from '../models/manga.model'
-import { Doujin, LightDoujin } from './nhentai'
-import { Favorite, User } from '../models/user.model'
-import { InlineKeyboardButton } from 'typegram'
+import {Manga} from '../models/manga.model'
+import {Doujin, LightDoujin} from './nhentai'
+import {Favorite, User} from '../models/user.model'
+import {InlineKeyboardButton} from 'typegram'
 
 export function getMangaMessage(
-  manga: Doujin | MangaSchema & Document<any, any, MangaSchema> | Favorite,
+  manga: Doujin | Manga | Favorite,
   telegraphLink?: string
 ): string {
   const title = getTitle(manga),
@@ -29,7 +29,7 @@ export function getMangaMessage(
 ${tags}\n<a href="${mangaUrl}">nhentai.net</a> | <code>${id}</code>`
 }
 function tagString(
-  manga: Doujin | MangaSchema & Document<any, any, MangaSchema> | Favorite
+  manga: Doujin | Manga | Favorite
 ): string {
   let tags = i18n.t('tags')
   let tagsArray: string[] = []
@@ -60,8 +60,7 @@ export function sliceByHalf(s: string): string {
   } else {
     middle = before
   }
-  const s2 = s.substr(middle + 1)
-  return s2
+  return s.substr(middle + 1)
 }
 export function getMessageInline(manga: LightDoujin): string {
   const link = 'https://nhentai.net/g/' + manga.id + '/',
@@ -71,7 +70,7 @@ export function getMessageInline(manga: LightDoujin): string {
       .trim() : 'Some manga'
   return `<a href="${link}">${title}</a>`
 }
-export function getTitle(manga: Doujin | MangaSchema & Document<any, any, MangaSchema> | Favorite): string {
+export function getTitle(manga: Doujin | Manga | Favorite): string {
   let title
   if (typeof manga.title === 'string') {
     title = manga.title
@@ -89,7 +88,7 @@ export function getTitle(manga: Doujin | MangaSchema & Document<any, any, MangaS
     .replace(/>/g, ']')
     .replace(/</g, '[')
 }
-export function isFullColor(manga: Doujin | MangaSchema & Document<any, any, MangaSchema>): boolean {
+export function isFullColor(manga: Doujin | Manga): boolean {
   let result = false
   if ('tags' in manga && manga.tags) {
     result = manga.tags.includes('full color') || manga.tags.includes('full_color')
