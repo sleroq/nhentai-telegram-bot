@@ -6,10 +6,10 @@ import { Node, Page }  from 'telegra.ph/typings/telegraph'
 import { Document }    from 'mongoose'
 import { MangaSchema } from '../models/manga.model'
 
-let token = process.env.TELEGRAPH_TOKEN
+const token = process.env.TELEGRAPH_TOKEN
 
 if (!token) {
-  token = await createAccount()
+  throw new Error('Not telegraph token')
 }
 
 const client = new Telegraph(token)
