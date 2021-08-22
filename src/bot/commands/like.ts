@@ -4,9 +4,8 @@ import {
   CallbackQuery,
   InlineKeyboardButton
 }                      from 'telegraf/typings/core/types/typegram'
-import { UserSchema }  from '../../models/user.model'
-import { MangaSchema } from '../../models/manga.model'
-import { Document }    from 'mongoose'
+import { User }  from '../../models/user.model'
+import { Manga } from '../../models/manga.model'
 import { Context }     from 'telegraf'
 
 import config from '../../../config'
@@ -14,24 +13,26 @@ import i18n   from '../../lib/i18n'
 import saveAndGetUser  from '../../db/save_and_get_user'
 import saveAndGetManga from '../../db/save_and_get_manga'
 
-export default async function likeDoujin (ctx: Context, query: CallbackQuery.DataCallbackQuery) {
-  let user: UserSchema & Document<any, any, UserSchema> | undefined
+export default async function likeDoujin (ctx: Context, query: CallbackQuery.DataCallbackQuery): Promise<void> {
+  let user: User | undefined
   try {
     user = await saveAndGetUser(ctx)
   } catch (error) {
     throw new Verror(error, 'Getting user in callbackHandler')
   }
+
   const doujinId = Number(query.data.split('_')[1])
   if(!doujinId){
     throw new Verror('Somehow user is trying to like without id')
   }
-  let doujin: MangaSchema & Document<any, any, MangaSchema> | undefined
+
+  let doujin: Manga | undefined
   try {
     doujin = await saveAndGetManga(user, Number(doujinId))
   } catch (error) {
     if(error.message === 'Not found') {
       try {
-        await ctx.reply(i18n.__('manga_does_not_exist') + '\n(' + doujinId + ')')
+        await ctx.reply(i18n.t('manga_does_not_exist') + '\n(' + doujinId + ')')
       } catch (error) {
         throw new Verror(error, 'Replying \'404\'')
       }
