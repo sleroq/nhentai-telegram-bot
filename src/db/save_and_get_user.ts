@@ -42,10 +42,10 @@ export default async function saveAndGetUser(ctx: Context): Promise<UserSchema &
     console.log('New user saved!')
   }
   if (user.language_code == 'ru') {
-    i18n.setLocale('ru')
+    await i18n.changeLanguage('ru')
   }
   if (user.language_code == 'es') {
-    i18n.setLocale('es')
+    await i18n.changeLanguage('es')
   }
   return user
 }
