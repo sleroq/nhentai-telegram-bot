@@ -3,7 +3,6 @@ import i18n from './i18n'
 
 import { Manga, MangaSchema } from '../models/manga.model'
 import { Doujin, LightDoujin } from './nhentai'
-import { Document } from 'mongoose'
 import { Favorite, User } from '../models/user.model'
 import { InlineKeyboardButton } from 'typegram'
 
