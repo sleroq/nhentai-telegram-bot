@@ -8,7 +8,7 @@
     "start": "node built/src/server"
   },
   "engines": {
-    "node": ">=14.x"
+    "node": ">=16.x"
   },
   "repository": {
     "url": "https://github.com/iamdowner/nhentai-telegram-bot"
