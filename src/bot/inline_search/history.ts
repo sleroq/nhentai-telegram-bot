@@ -1,20 +1,19 @@
 import Context from 'telegraf/typings/context'
 import config  from '../../../config'
-import i18n 	 from '../../lib/i18n'
+import i18n    from '../../lib/i18n'
 import Verror  from 'verror'
 import Manga   from '../../models/manga.model.js'
 
 import { getMangaMessage, isFullColor, sliceByHalf } from '../../lib/some_functions'
 
-import { Document } 	from 'mongoose'
-import { UserSchema } from '../../models/user.model'
-import {InlineQueryResult} from 'typegram/inline'
+import { User } from '../../models/user.model'
+import { InlineQueryResult } from 'typegram/inline'
 
 const history_reply_markup = {
   inline_keyboard: [
     [
       {
-        text:                             i18n.__('history_tip_title'),
+        text: i18n.t('history_tip_title'),
         switch_inline_query_current_chat: '/h',
       },
     ],
@@ -22,7 +21,7 @@ const history_reply_markup = {
 }
 export default async function replyWithHistoryInline(
   ctx: Context,
-  user: UserSchema & Document<any, any, UserSchema>
+  user: User
 ): Promise<void> {
   const searchType: 'article' | 'photo' = config.show_history_as_gallery ? 'photo' : 'article'
   if (searchType === 'photo') {
@@ -55,7 +54,7 @@ export default async function replyWithHistoryInline(
 }
 
 async function getHistoryUniversal(
-  user: UserSchema & Document<any, any, UserSchema>
+  user: User
 ): Promise<InlineQueryResult[]> {
   const results: InlineQueryResult[] = []
   if (!Array.isArray(user.manga_history) || user.manga_history.length === 0) {
@@ -63,11 +62,11 @@ async function getHistoryUniversal(
     results.push({
       id:                    String(69696969696969),
       type:                  'article',
-      title:                 i18n.__('history_tip_title'),
-      description:           i18n.__('history_is_empty'),
+      title:                 i18n.t('history_tip_title'),
+      description:           i18n.t('history_is_empty'),
       thumb_url:             config.history_icon_inline,
       input_message_content: {
-        message_text: i18n.__('tap_to_open_history'),
+        message_text: i18n.t('tap_to_open_history'),
         parse_mode:   'HTML',
       },
       reply_markup: history_reply_markup,
@@ -95,7 +94,7 @@ async function getHistoryUniversal(
     ]
     if (!doujin.telegraph_fixed_url && (doujin.pages > config.pages_to_show_fix_button || isFullColor(doujin))) {
       inline_keyboard[0].unshift({
-        text:          i18n.__('fix_button'),
+        text:          i18n.t('fix_button'),
         callback_data: 'fix_' + doujin.id,
       })
     }
@@ -110,6 +109,7 @@ async function getHistoryUniversal(
         .replace('<', '\\<')
         .replace('>', '\\>')
         .trim(),
+      thumb_url: doujin.thumbnail,
       input_message_content: {
         message_text: message_text,
         parse_mode:   'HTML',
@@ -122,11 +122,11 @@ async function getHistoryUniversal(
   results.push({
     id:                    String(69696969696969),
     type:                  'article',
-    title:                 i18n.__('history_tip_title'),
-    description:           i18n.__('history_tip_desctiption'),
+    title:                 i18n.t('history_tip_title'),
+    description:           i18n.t('history_tip_description'),
     thumb_url:             config.history_icon_inline,
     input_message_content: {
-      message_text: i18n.__('tap_to_open_history'),
+      message_text: i18n.t('tap_to_open_history'),
       parse_mode:   'HTML',
     },
     reply_markup: history_reply_markup,
