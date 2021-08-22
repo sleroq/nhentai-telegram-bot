@@ -20,7 +20,6 @@ async function clearQueue(token: string) {
 export default async function startWithWebhook(bot: Telegraf<Context<Update>>, token: string): Promise<void> {
   const port = process.env.PORT || 3000,
     domain = process.env.REPL_URL || process.env.HEROKU_URL
-
   const secretPath = `/telegraf/${Math.random().toString(36).substring(7)}`
 
   await clearQueue(token)
