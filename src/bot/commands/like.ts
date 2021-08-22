@@ -60,7 +60,7 @@ export default async function likeDoujin (ctx: Context, query: CallbackQuery.Dat
     ]
   }
 
-  if (!user.favorites.includes(doujin.id)) {
+  if (!user.favorites.findIndex(item => item._id === String(doujinId))) {
     user.favorites.push({
       _id: doujin.id,
       title: doujin.title,

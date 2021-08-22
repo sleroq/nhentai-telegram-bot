@@ -107,7 +107,7 @@ export function assembleKeyboard(
   telegraphUrl: string | undefined,
   inline = false
 ): InlineKeyboardButton[][] {
-  const heart = user.favorites.includes(manga.id) ? config.like_button_true : config.like_button_false
+  const heart = user.favorites.findIndex(item => item._id === String(manga.id)) ? config.like_button_true : config.like_button_false
   const inlineKeyboard: InlineKeyboardButton[][] = [
     [
       {
