@@ -1,54 +1,50 @@
 import Context from 'telegraf/typings/context'
 import config  from '../../../config'
-import i18n 	 from '../../lib/i18n'
+import i18n    from '../../lib/i18n'
 import Verror  from 'verror'
 
-import { getMangaMessage, isFullColor, sliceByHalf } from '../../lib/some_functions'
+import { assembleKeyboard, getMangaMessage, sliceByHalf } from '../../lib/some_functions'
 
-import {
-  InlineQueryResult,
-  InlineKeyboardButton
-} 					   from 'typegram'
-import { Document }    from 'mongoose'
-import { UserSchema }  from '../../models/user.model'
-import { MangaSchema } from '../../models/manga.model'
-import saveAndGetManga from '../../db/save_and_get_manga'
+import { InlineQueryResult } from 'typegram'
+import { User }              from '../../models/user.model'
+import { Manga }             from '../../models/manga.model'
+import saveAndGetManga       from '../../db/save_and_get_manga'
 
 const nothingIsFoundResult: InlineQueryResult = {
-  id:                    String(6969696969),
-  type:                  'article',
-  title:                 i18n.__('nothing_is_found'),
-  description:           '',
-  thumb_url:             config.help_icon_inline,
+  id:          String(6969696969),
+  type:        'article',
+  title:       i18n.t('nothing_is_found'),
+  description: '',
+  thumb_url:   config.help_icon_inline,
   input_message_content: {
-    message_text: i18n.__('help'),
+    message_text: i18n.t('help'),
     parse_mode:   'Markdown',
   },
   reply_markup: {
     inline_keyboard: [
       [
         {
-          text:          i18n.__('search_tips_button'),
+          text: i18n.t('search_tips_button'),
           callback_data: 'searchtips',
         },
       ],
-      [{ text: i18n.__('settings_button'), callback_data: 'settings' }],
+      [{ text: i18n.t('settings_button'), callback_data: 'settings' }],
     ],
   },
 }
 
-export default async function replyWithFavoritesInline(
+export default async function replyByIdInline(
   ctx: Context,
   inlineQuery: string,
-  user: UserSchema & Document<any, any, UserSchema>,
-  mangaId: number
+  user: User,
+  doujinId: number,
 ): Promise<void> {
-  let doujin: MangaSchema & Document<any, any, MangaSchema> | undefined
+  let doujin: Manga | undefined
   try {
-    doujin = await saveAndGetManga(user, mangaId)
+    doujin = await saveAndGetManga(user, doujinId)
   } catch (error) {
     // if nothing is found
-    if(error.cause() && error.cause().message === 'Not found') {
+    if(error.message === 'Not found') {
       const results: InlineQueryResult[] = []
       results.push(nothingIsFoundResult)
       try {
@@ -58,13 +54,13 @@ export default async function replyWithFavoritesInline(
       }
       return
     }
-    throw new Verror(error, 'Getting doujin by id inline ' + mangaId)
+    throw new Verror(error, 'Getting doujin by id inline ' + doujinId)
   }
   
   const searchType: 'photo' | 'article' = config.show_favorites_as_gallery ? 'photo' : 'article'
 
   if (searchType === 'photo') {
-    const results: InlineQueryResult[] = await getDoujinUniversal(doujin)
+    const results: InlineQueryResult[] = await getDoujinUniversal(doujin, user)
     results.forEach((result)=>{
       result.type = 'photo'
     })
@@ -77,7 +73,7 @@ export default async function replyWithFavoritesInline(
       throw new Verror(error, 'Answer Inline Search by id Photo')
     }
   } else {
-    const results: InlineQueryResult[] = await getDoujinUniversal(doujin)
+    const results: InlineQueryResult[] = await getDoujinUniversal(doujin, user)
     results.forEach((result)=>{
       result.type = 'article'
     })
@@ -94,7 +90,8 @@ export default async function replyWithFavoritesInline(
 }
 
 async function getDoujinUniversal (
-  doujin: MangaSchema & Document<any, any, MangaSchema>
+  doujin: Manga,
+  user: User
 ): Promise<InlineQueryResult[]> {
   const results: InlineQueryResult[] = []
 
@@ -103,14 +100,7 @@ async function getDoujinUniversal (
     : doujin.telegraph_url
 
   const messageText = getMangaMessage(doujin, telegraph_url)
-  const inline_keyboard: InlineKeyboardButton[][] = [[{ text: 'Telegra.ph', url: String(telegraph_url) }]]
-
-  if (!doujin.telegraph_fixed_url && (doujin.pages > config.pages_to_show_fix_button || isFullColor(doujin))) {
-    inline_keyboard[0].unshift({
-      text:          i18n.__('fix_button'),
-      callback_data: 'fix_' + doujin.id,
-    })
-  }
+  const inline_keyboard = assembleKeyboard(user, doujin, telegraph_url, true)
   const description = doujin.description || sliceByHalf(doujin.title)
   results.push({
     id:    String(doujin.id),

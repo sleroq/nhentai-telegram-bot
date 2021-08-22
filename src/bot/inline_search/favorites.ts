@@ -1,22 +1,19 @@
 import Context from 'telegraf/typings/context'
 import config  from '../../../config'
-import i18n 	 from '../../lib/i18n'
+import i18n    from '../../lib/i18n'
 import Verror  from 'verror'
 
 import { getMangaMessage, sliceByHalf } from '../../lib/some_functions'
 
-import {
-  InlineKeyboardMarkup
-} 										from 'typegram'
-import { Document } 	from 'mongoose'
-import { UserSchema } from '../../models/user.model'
-import {InlineQueryResult} from 'typegram/inline'
+import { InlineKeyboardMarkup } from 'typegram'
+import { User }                 from '../../models/user.model'
+import { InlineQueryResult }    from 'typegram/inline'
 
 const favoritesReplyMarkup: InlineKeyboardMarkup = {
   inline_keyboard: [
     [
       {
-        text:                             i18n.__('favorites'),
+        text: i18n.t('favorites'),
         switch_inline_query_current_chat: '',
       },
     ],
@@ -27,7 +24,7 @@ export default async function replyWithFavoritesInline(
   ctx: Context,
   inlineQuery: string,
   specifiedPage: number | undefined,
-  user: UserSchema & Document<any, any, UserSchema>
+  user: User
 ): Promise<void> {
   const searchType: 'photo' | 'article' = config.show_favorites_as_gallery ? 'photo' : 'article'
 
@@ -61,7 +58,7 @@ export default async function replyWithFavoritesInline(
 }
 
 async function getFavoritesUniversal(
-  user: UserSchema & Document<any, any, UserSchema>,
+  user: User,
   specifiedPage: number | undefined,
   inlineQuery: string
 ): Promise<InlineQueryResult[]> {
@@ -74,7 +71,7 @@ async function getFavoritesUniversal(
       inline_keyboard: [
         [
           {
-            text:          i18n.__('fix_button'),
+            text: i18n.t('fix_button'),
             callback_data: 'fix_' + favorite._id,
           },
           { text: 'Telegra.ph', url: String(favorite.telegraph_url) },
@@ -117,12 +114,12 @@ async function getFavoritesUniversal(
   results.unshift({
     id:                    String(Math.floor(Math.random() * 10000000)),
     type:                  'photo',
-    title:                 i18n.__('favorites'),
-    description:           i18n.__('favorites_tip_desctiption'),
+    title:                 i18n.t('favorites'),
+    description:           i18n.t('favorites_tip_description'),
     photo_url:             config.favorites_icon_inline,
     thumb_url:             config.favorites_icon_inline,
     input_message_content: {
-      message_text: i18n.__('tap_to_open_favorites'),
+      message_text: i18n.t('tap_to_open_favorites'),
       parse_mode:   'HTML',
     },
     reply_markup: favoritesReplyMarkup,
@@ -132,21 +129,21 @@ async function getFavoritesUniversal(
     results.push({
       id:          String(9696969696),
       type:        'photo',
-      title:       i18n.__('next_page_tip_title'),
+      title:       i18n.t('next_page_tip_title'),
       description: `TAP HERE or Just add "/p${+pageNumber + 1
       }" to search query: (@nhentai_mangabot ${nextPageSwitch})`,
       photo_url:             config.next_page_icon_inline,
       thumb_url:             config.next_page_icon_inline,
       input_message_content: {
         message_text:
-            i18n.__('next_page_tip_message'),
+            i18n.t('next_page_tip_message'),
         parse_mode: 'HTML',
       },
       reply_markup: {
         inline_keyboard: [
           [
             {
-              text:                             i18n.__('next_page_button'),
+              text: i18n.t('next_page_button'),
               switch_inline_query_current_chat: nextPageSwitch,
             },
           ],
