@@ -1,6 +1,7 @@
 export default {
-  greeting:                'Hola, ${uppercase(from.first_name)}\n<b>Este bot tiene contenido +18, pulsa el botón solo si tienes la edad suficiente.</b>',
-  // # buttons:
+  greeting:                'Hola, {{name}}\n<b>Este bot tiene contenido +18, pulsa el botón solo si tienes la edad suficiente.</b>',
+
+  // buttons:
   random_button:           'Manga aleatorio',
   search_button:           'Buscar',
   next_button:             'Siguiente',
@@ -12,13 +13,15 @@ export default {
   settings_button:         'Ajustes',
   next_page_button:        'Siguiente página',
   tap_to_open_history:     'Toca para abrir el historial',
-  // # manga related text:
+
+  // manga related text:
   pages:                   'páginas',
   tags:                    'Etiquetas: ',
   too_many_pages:          'Muchas páginas, lo siento :(',
   try_again_later:         'Inténtalo más tarde :(',
   pages_fixed:             'páginas arregladas',
-  // # just text
+
+  // just text
   yes:                     'sí',
   enabled:                 'habilitado',
   no:                      'no',
@@ -32,7 +35,8 @@ export default {
   something_went_wrong:    'Algo salió mal :(',
   file_is_too_big:         'No puedo enviar archivos de más de 50 MB debido a restricciones.',
   size_of_your_file:       'Tamaño de su archivo: ',
-  // # inline search
+
+  // inline search
   history_tip_title:       '¡Historia!',
   history_tip_desctiption: 'Este es tu historial:',
   history_is_empty:        'Tu historial está vacío ...',
@@ -47,7 +51,8 @@ export default {
   favorites_tip_desctiption: '"Estos son tus favoritos:"',
   favorites_is_empty:        'No te ha gustado nada todavía"',
   tap_to_open_favorites:     'Toca para abrir favoritos',
-  // # settings:
+
+  // settings:
   settings:                  '<b>Ajustes:</b>',
   search_appearance:         'Buscar apariencia:  ',
   search_sorting:            'Buscar ordenando por ',
@@ -61,7 +66,8 @@ export default {
 
   article: 'artículo',
   gallery: 'galería',
-  // # help
+
+  // help
   help: 
   `• Para abrir un doujin en específico solo envíame el link de nhentai o el código nuclear
   • También puedes descargar imágenes en archivos .zip con el comando /zip. Por ejemplo: “/zip 234638”

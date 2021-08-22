@@ -1,6 +1,7 @@
 export default {
-  greeting:                'Hello, ${uppercase(from.first_name)}\n<b>This bot have R-18 content, click this button only if you mature enough</b>',
-  // # buttons:
+  greeting:                'Hello, {{name}}\n<b>This bot have R-18 content, click this button only if you mature enough</b>',
+
+  // buttons:
   random_button:           'Random manga',
   search_button:           'Search',
   next_button:             'Next',
@@ -12,13 +13,15 @@ export default {
   settings_button:         'settings',
   next_page_button:        'Next page',
   tap_to_open_history:     'Tap to open history',
-  // # manga related text:
+
+  // manga related text:
   pages:                   'pages',
   tags:                    'Tags: ',
   too_many_pages:          'Too many pages, sorry :(',
   try_again_later:         'Try again later :(',
   pages_fixed:             ' pages fixed',
-  // # just text
+
+  // just text
   yes:                     'yes',
   enabled:                 'enabled',
   no:                      'no',
@@ -32,7 +35,8 @@ export default {
   something_went_wrong:    'Something went wrong :(',
   file_is_too_big:         'Sorry, I can\'t send files larger than 50 MB due to telegram\'s restrictions.',
   size_of_your_file:       'Size of your file: ',
-  // # inline search
+
+  // inline search
   history_tip_title:       'History!',
   history_tip_description: 'This is your history:',
   history_is_empty:        'Your history is empty..',
@@ -47,7 +51,8 @@ export default {
   favorites_tip_description: 'This is your favorites:',
   favorites_is_empty:        'You haven\'t liked anything yet',
   tap_to_open_favorites:     'Tap to open favorites',
-  // # settings:
+
+  // settings:
   settings:                  '<b>Settings:</b>',
   search_appearance:         'Search appearance:  ',
   search_sorting:            'Search sorting by ',
@@ -62,7 +67,8 @@ export default {
 
   article: 'article',
   gallery: 'gallery',
-  // # help
+
+  // help
   help:
   `• To open a specific doujin just send me nhentais link or nuclear code
   • Also you can download images in .zip file with /zip command. For example: \`/zip 234638\`,
