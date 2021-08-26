@@ -1,5 +1,6 @@
 export default {
-  greeting:                'Hola, {{name}}\n<b>Este bot tiene contenido +18, pulsa el botón solo si tienes la edad suficiente.</b>',
+  language_name: 'Español',
+  greeting:      'Hola, {{name}}\n<b>Este bot tiene contenido +18, pulsa el botón solo si tienes la edad suficiente.</b>',
 
   // buttons:
   random_button:           'Manga aleatorio',
