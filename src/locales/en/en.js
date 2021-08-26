@@ -1,5 +1,6 @@
 export default {
-  greeting:                'Hello, {{name}}\n<b>This bot have R-18 content, click this button only if you mature enough</b>',
+  language_name: 'English',
+  greeting:      'Hello, {{name}}\n<b>This bot have R-18 content, click this button only if you mature enough</b>',
 
   // buttons:
   random_button:           'Random manga',
