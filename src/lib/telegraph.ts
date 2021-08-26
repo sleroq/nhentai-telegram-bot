@@ -1,25 +1,24 @@
-import Telegraph from 'telegra.ph'
-import config    from '../../config'
+import Telegraph         from 'telegra.ph'
+import config            from '../../config'
+import got, { Response } from 'got'
 
 import { Doujin }      from './nhentai'
-import { Node, Page }  from 'telegra.ph/typings/telegraph'
+import { Node, Page} from 'telegra.ph/typings/telegraph'
 import { Document }    from 'mongoose'
 import { MangaSchema } from '../models/manga.model'
 
 const token = process.env.TELEGRAPH_TOKEN
 
-if (!token) {
-  throw new Error('Not telegraph token')
-}
+let client: undefined | Telegraph
 
-const client = new Telegraph(token)
-
-export async function createAccount(): Promise<string> {
-  const account = await client.createAccount(config.bot_username, config.bot_username)
-  if (!account.access_token) {
-    throw new Error('Could not create an account for telegra.ph: no access_token')
+function getClient(): Telegraph {
+  if (!token) {
+    throw new Error('No telegraph token')
   }
-  return account.access_token
+  if (!client) {
+    client = new Telegraph(token)
+  }
+  return client
 }
 
 export async function telegraphCreatePage(
@@ -27,6 +26,7 @@ export async function telegraphCreatePage(
   images: string[],
   username = config.bot_username
 ): Promise<Page> {
+  const client = await getClient()
   const page: Node[] = []
   return client.createPage(
     `${manga.title}`,
@@ -64,4 +64,30 @@ export default async function TelegraphUploadByUrls(
   }
   console.log('returning uploaded url')
   return articlePage.url
+}
+interface AccountResponse {
+  ok: true,
+  result: {
+    short_name:   string,
+    author_name:  string,
+    author_url:   string,
+    access_token: string,
+    auth_url:     string
+  }
+}
+export async function createAccount(): Promise<string> {
+  let response: Response<AccountResponse> | undefined
+  try {
+    response = await got({
+      url: `https://api.telegra.ph/createAccount?short_name=${config.bot_username}&author_name=${config.bot_username}`,
+      responseType: 'json',
+    })
+  } catch (error) {
+    throw new Error('Creating telegra.ph account' + error.message)
+  }
+  if (!response.body.ok || !response.body.result || !response.body.result.access_token) {
+    throw new Error('response is not ok, respose: ' + response.body)
+  }
+  console.log('Your telegra.ph access token: \'' + response.body.result.access_token + '\'')
+  return response.body.result.access_token
 }

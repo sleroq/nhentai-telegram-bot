@@ -9,7 +9,7 @@ import startWithWebhook  from './express'
 import Verror from 'verror'
 
 (async() => {
-  // create telegra.ph token
+  // get telegra.ph token
   if (!process.env.TELEGRAPH_TOKEN) {
     process.env.TELEGRAPH_TOKEN = await createAccount()
   }
