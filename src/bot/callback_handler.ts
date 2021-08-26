@@ -5,6 +5,7 @@ import makeRandom         from './commands/random'
 import openInTelegraph    from './commands/open_in_telegraph'
 import likeDoujin         from './commands/like'
 import help, { editHelp } from './commands/help'
+import settingsChanger from './commands/settings/buttons_handler'
 
 export default async function callbackHandler(ctx: Context<Update>, callback_query: CallbackQuery.DataCallbackQuery): Promise<void> {
   const data: string = callback_query.data
@@ -43,6 +44,12 @@ export default async function callbackHandler(ctx: Context<Update>, callback_que
       await help(ctx)
     } catch (error) {
       throw new Verror(error, 'Editing help')
+    }
+  } else if (data.startsWith('sttgs_')) {
+    try {
+      await settingsChanger(ctx, callback_query)
+    } catch (error) {
+      throw new Verror(error, 'Editing settings')
     }
   }
 }
