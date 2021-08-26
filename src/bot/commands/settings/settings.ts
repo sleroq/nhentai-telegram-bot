@@ -41,19 +41,19 @@ export default async function settings (ctx: Context): Promise<void> {
   const inlineKeyboard = [
     [{
       text: i18n.t('search_appearance') + search_type,
-      callback_data: 'change_search_type',
+      callback_data: 'sttgs_search-type',
     }],
     [{
       text: i18n.t('search_sorting') + search_sorting,
-      callback_data: 'change_search_sorting',
+      callback_data: 'sttgs_search-sorting',
     },],
     [{
       text: i18n.t('random_localy') + random_locally,
-      callback_data: 'changa_rangom_localy',
+      callback_data: 'sttgs_random-locally',
     }],
     [{
       text: safe_mode_text,
-      callback_data: 'toggle_safe_mode',
+      callback_data: 'sttgs_safe-mode',
     }],
     [{
       text: i18n.t('about_settings'),
@@ -61,7 +61,7 @@ export default async function settings (ctx: Context): Promise<void> {
     }],
     [{
       text: language,
-      callback_data: 'change_language',
+      callback_data: 'sttgs_language',
     }],
   ]
   if ('callback_query' in ctx.update) {
