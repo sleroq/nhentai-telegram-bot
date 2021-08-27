@@ -170,8 +170,14 @@ export default class nHentai {
   }
 }
 export function getIdFromUrl(idOrUrl: string | number): number {
-  const urlToId = /\/g\/(\d+)\/?.*/
-  return Number(String(idOrUrl).replace(urlToId, '$2'))
+  const numberRegexp = /\/g\/(\d+)\/?.*/
+  const matchNumbers = String(idOrUrl).match(numberRegexp)
+  if (!matchNumbers
+    || matchNumbers[1]
+    || Number.isNaN(Number(matchNumbers[1]))) {
+    throw new Error('No id in this url')
+  }
+  return Number(matchNumbers[1])
 }
 function getLightDoujin($: CheerioAPI, element: Element) {
   const cover = $(element).children('.cover')
@@ -202,11 +208,8 @@ function getLightDoujin($: CheerioAPI, element: Element) {
   }
 }
 function assembleDoujin(response: Response<string>): Doujin {
-  const url = response.redirectUrls.length !== 0
-    ? response.redirectUrls[response.redirectUrls.length - 1]
-    : response.requestUrl
+  const url = response.redirectUrls[response.redirectUrls.length - 1]
   const id = getIdFromUrl(url)
-
   const $ = cheerio.load(response.body)
   const doujinInfo = $('#info')
 

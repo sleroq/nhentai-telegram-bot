@@ -14,8 +14,6 @@ export default async function saveAndGetManga(user: UserSchema, id?: number): Pr
   let images: string[] = []
 
   if (!id) {  // RANDOM NEW MANGA
-    if (user.random_localy) {
-      // (if randomizing only in database records)
       try {
         savedManga = await getRandomMangaLocally(
           user.default_random_tags,
