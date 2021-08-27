@@ -3,17 +3,17 @@ import Verror from 'verror'
 import nhentai, { Doujin }    from '../lib/nhentai'
 import TelegraphUploadByUrls  from '../lib/telegraph.js'
 
-import { Document }           from 'mongoose'
-import Manga, { MangaSchema } from '../models/manga.model.js'
+import MangaModel,  { Manga } from '../models/manga.model.js'
 import { UserSchema }         from '../models/user.model'
 import getRandomMangaLocally  from '../db/get_manga_random_locally'
 
-export default async function saveAndGetManga(user: UserSchema, id?: number): Promise<MangaSchema & Document<any, any, MangaSchema>> {
-  let savedManga: MangaSchema & Document<any, any, MangaSchema> | null = null
+export default async function saveAndGetManga(user: UserSchema, id?: number): Promise<Manga> {
+  let savedManga: Manga | null = null
   let newManga: Doujin | null = null
   let images: string[] = []
 
   if (!id) {  // RANDOM NEW MANGA
+    if (user.random_localy) { // (if randomizing only in database records)
       try {
         savedManga = await getRandomMangaLocally(
           user.default_random_tags,
@@ -25,7 +25,6 @@ export default async function saveAndGetManga(user: UserSchema, id?: number): Pr
       if (savedManga === null) {
         throw new Verror('Couldn\'t find manga with such tags')
       }
-      console.log('got manga random locally')
     } else { // (not locally)
       try {
         newManga = await nhentai.getRandomDoujin()
@@ -33,9 +32,9 @@ export default async function saveAndGetManga(user: UserSchema, id?: number): Pr
       } catch (error) {
         throw new Verror(error, 'Getting random doujin from nhentai')
       }
-      let sameMangaInDB: MangaSchema & Document<any, any, MangaSchema> | null = null
+      let sameMangaInDB: Manga | null = null
       try {
-        sameMangaInDB = await Manga.findOne({ id: newManga.id })
+        sameMangaInDB = await MangaModel.findOne({ id: newManga.id })
       } catch (error) {
         console.log(error)
       }
@@ -52,7 +51,7 @@ export default async function saveAndGetManga(user: UserSchema, id?: number): Pr
     }
   } else {
     try {
-      savedManga = await Manga.findOne({ id: id })
+      savedManga = await MangaModel.findOne({ id: id })
     } catch (error) {
       console.log(error)
     }
@@ -81,7 +80,7 @@ export default async function saveAndGetManga(user: UserSchema, id?: number): Pr
   }
   // Update old manga where date was not specified
   if (!savedManga.createdAt || !savedManga.updatedAt) {
-    await Manga.updateOne(
+    await MangaModel.updateOne(
       { id: savedManga.id },
       {
         $set:
@@ -97,7 +96,7 @@ export default async function saveAndGetManga(user: UserSchema, id?: number): Pr
   return savedManga
 }
 
-async function saveNewManga(manga: Doujin): Promise<MangaSchema & Document<any, any, MangaSchema>> {
+async function saveNewManga(manga: Doujin): Promise<Manga> {
   const thumbnail = Array.isArray(manga.thumbnails) && manga.thumbnails[0]
     ? manga.thumbnails[0]
     : undefined
@@ -113,7 +112,7 @@ async function saveNewManga(manga: Doujin): Promise<MangaSchema & Document<any, 
     throw new Verror(error, 'Posting doujin to telegra.ph')
   }
 
-  const mangaDB = new Manga({
+  const mangaDB = new MangaModel({
     id:            manga.id,
     title:         manga.title,
     description:   language,
@@ -133,7 +132,7 @@ async function saveNewManga(manga: Doujin): Promise<MangaSchema & Document<any, 
   return mangaDB
 }
 
-async function updateTelegraphUrl(images: string[], savedManga: MangaSchema & Document<any, any, MangaSchema>) {
+async function updateTelegraphUrl(images: string[], savedManga: Manga) {
   if (images.length === 0) {
     let mangaWithPages: Doujin | undefined
     try {
@@ -160,7 +159,7 @@ async function updateTelegraphUrl(images: string[], savedManga: MangaSchema & Do
   }
 }
 
-async function addThumbnail(savedManga: MangaSchema & Document<any, any, MangaSchema>) {
+async function addThumbnail(savedManga: Manga) {
   let mangaWithThumbnail: Doujin | undefined
   try {
     mangaWithThumbnail = await nhentai.getDoujin(savedManga.id)
