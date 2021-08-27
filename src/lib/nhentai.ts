@@ -65,17 +65,15 @@ export default class nHentai {
     if (!identifier) {
       throw Error('You have to specify id')
     }
-    const id = getIdFromUrl(identifier)
     let response: Response<string> | undefined 
     try {
-      response = await got(`https://nhentai.net/g/${id}/`)
+      response = await got(`https://nhentai.net/g/${identifier}/`)
     } catch (error) {
       if (error.message === 'Response code 404 (Not Found)') {
         throw new Error('Not found')
       }
       throw error
     }
-
     return assembleDoujin(response)
   }
   static async getRandomDoujin(): Promise<Doujin> {
@@ -158,9 +156,11 @@ export default class nHentai {
   }
 
   static async exists(identifier: string | number): Promise<boolean> {
-    const id = getIdFromUrl(identifier)
+    if (!identifier) {
+      throw Error('You have to specify id')
+    }
     try {
-      await got('https://nhentai.net/g/' + id + '/')
+      await got('https://nhentai.net/g/' + identifier + '/')
     } catch (error) {
       if (error.message === 'Response code 404 (Not Found)') {
         return false
@@ -169,12 +169,13 @@ export default class nHentai {
     return true
   }
 }
-export function getIdFromUrl(idOrUrl: string | number): number {
+export function getIdFromUrl(url: string | number): number {
   const numberRegexp = /\/g\/(\d+)\/?.*/
-  const matchNumbers = String(idOrUrl).match(numberRegexp)
+  const matchNumbers = String(url).match(numberRegexp)
   if (!matchNumbers
-    || matchNumbers[1]
+    || !matchNumbers[1]
     || Number.isNaN(Number(matchNumbers[1]))) {
+    console.error('No id in this url ' + url)
     throw new Error('No id in this url')
   }
   return Number(matchNumbers[1])
@@ -208,7 +209,7 @@ function getLightDoujin($: CheerioAPI, element: Element) {
   }
 }
 function assembleDoujin(response: Response<string>): Doujin {
-  const url = response.redirectUrls[response.redirectUrls.length - 1]
+  const url = response.redirectUrls[response.redirectUrls.length - 1] || response.url
   const id = getIdFromUrl(url)
   const $ = cheerio.load(response.body)
   const doujinInfo = $('#info')
@@ -258,9 +259,9 @@ function assembleDoujin(response: Response<string>): Doujin {
   const thumbnails: Doujin['thumbnails'] = []
   const pages: Doujin['pages'] = []
 
-  $('.thumbnail-container .thumbs').children('.thumb-container').each((index, element) => {
+  $('.thumb-container').each((index, element) => {
     const thumbnailElement = $(element).children('a')
-    const thumbnailUrl = thumbnailElement.children('img').attr('src')
+    const thumbnailUrl = thumbnailElement.children('img').attr('data-src')
     if (thumbnailUrl) {
       thumbnails.push(thumbnailUrl)
     }
