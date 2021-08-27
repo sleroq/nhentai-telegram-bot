@@ -85,6 +85,10 @@ export default async function settingsChanger(ctx: Context<Update>, callback_que
     await editLanguages(user, ctx)
     break
   }
+  case 'back-main': {
+    await safeAndEdit(user, ctx)
+    break
+  }
   default: {
     throw new Error('no such setting: ' + setting)
   }
@@ -109,6 +113,12 @@ async function editLanguages(user: User, ctx: Context) {
       },
     ])
   })
+  inlineKeyboard.push([
+    {
+      text:          i18n.t('back_button'),
+      callback_data: 'sttgs_back-main',
+    },
+  ])
   if (!checkExists){
     const englishIndex = inlineKeyboard.findIndex(element => element[0].text === 'English')
     inlineKeyboard[englishIndex][0].text = 'English' + config.check_mark
