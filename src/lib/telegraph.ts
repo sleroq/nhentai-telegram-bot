@@ -3,9 +3,9 @@ import config            from '../../config'
 import got, { Response } from 'got'
 
 import { Doujin }      from './nhentai'
-import { Node, Page} from 'telegra.ph/typings/telegraph'
-import { Document }    from 'mongoose'
-import { MangaSchema } from '../models/manga.model'
+import { Node, Page}   from 'telegra.ph/typings/telegraph'
+import { Manga }       from '../models/manga.model'
+import { getTitle }    from './some_functions'
 
 const token = process.env.TELEGRAPH_TOKEN
 
@@ -22,14 +22,15 @@ function getClient(): Telegraph {
 }
 
 export async function telegraphCreatePage(
-  manga: Doujin | MangaSchema & Document<any, any, MangaSchema>,
+  manga: Doujin | Manga,
   images: string[],
   username = config.bot_username
 ): Promise<Page> {
   const client = await getClient()
   const page: Node[] = []
+  const title = getTitle(manga)
   return client.createPage(
-    `${manga.title}`,
+    `${title}`,
     page
       .concat(
         images.map((image) => ({
@@ -49,20 +50,20 @@ export async function telegraphCreatePage(
   )
 }
 export default async function TelegraphUploadByUrls(
-  manga: Doujin | MangaSchema & Document<any, any, MangaSchema>,
+  manga: Doujin | Manga,
   images?: string[]
 ): Promise<string> {
-  console.log('start uploading url')
   const pages = images || manga.pages
-  if(typeof pages === 'number'){
+
+  if (typeof pages === 'number') {
     throw new Error('You have to provide pages, or Doujin with them')
   }
+
   const articlePage = await telegraphCreatePage(manga, pages)
 
-  if (!articlePage || articlePage.url) {
+  if (!articlePage || !articlePage.url) {
     throw new Error('Could not create a page: no page url')
   }
-  console.log('returning uploaded url')
   return articlePage.url
 }
 interface AccountResponse {
