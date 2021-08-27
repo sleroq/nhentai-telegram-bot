@@ -6,6 +6,7 @@ import TelegraphUploadByUrls  from '../lib/telegraph.js'
 import MangaModel,  { Manga } from '../models/manga.model.js'
 import { UserSchema }         from '../models/user.model'
 import getRandomMangaLocally  from '../db/get_manga_random_locally'
+import { getTitle }           from '../lib/some_functions'
 
 export default async function saveAndGetManga(user: UserSchema, id?: number): Promise<Manga> {
   let savedManga: Manga | null = null
@@ -47,7 +48,6 @@ export default async function saveAndGetManga(user: UserSchema, id?: number): Pr
           throw new Verror(error, 'Saving doujin')
         }
       }
-      console.log('Got manga random locally!')
     }
   } else {
     try {
@@ -67,7 +67,6 @@ export default async function saveAndGetManga(user: UserSchema, id?: number): Pr
       images = newManga.pages
       savedManga = await saveNewManga(newManga)
     }
-    console.log('Got manga by id')
   }
 
   // Update old manga where telegraph_url was not saved for some reason
@@ -92,7 +91,6 @@ export default async function saveAndGetManga(user: UserSchema, id?: number): Pr
     )
     console.log('Added date to ' + savedManga.id)
   }
-  console.log('returning manga')
   return savedManga
 }
 
@@ -101,9 +99,15 @@ async function saveNewManga(manga: Doujin): Promise<Manga> {
     ? manga.thumbnails[0]
     : undefined
   const page0 = manga.pages[0]
-  const language = manga.details.languages
-    ? manga.details.languages[manga.details.languages.length - 1]
+  const language = manga.details.languages?.length
+    ? manga.details.languages[manga.details.languages.length - 1].name
     : undefined
+  const title = getTitle(manga)
+  const tags: string[] = []
+
+  manga.details.tags?.forEach((tag) => {
+    tags.push(tag.name)
+  })
 
   let telegraphUrl: string | undefined
   try {
@@ -114,9 +118,9 @@ async function saveNewManga(manga: Doujin): Promise<Manga> {
 
   const mangaDB = new MangaModel({
     id:            manga.id,
-    title:         manga.title,
+    title:         title,
     description:   language,
-    tags:          manga.details.tags,
+    tags:          tags,
     telegraph_url: telegraphUrl,
     pages:         manga.details.pages,
     thumbnail,
@@ -125,8 +129,8 @@ async function saveNewManga(manga: Doujin): Promise<Manga> {
   try {
     await mangaDB.save()
   } catch (error) {
-    console.log('Could not save new manga :(')
-    console.log(error)
+    console.error('Could not save new manga :(')
+    console.error(error)
   }
   console.log('Doujin saved')
   return mangaDB
@@ -152,6 +156,7 @@ async function updateTelegraphUrl(images: string[], savedManga: Manga) {
     throw new Verror(error, 'Posting doujin to telegra.ph to fix manga without telegra.pf url')
   }
   try {
+    console.log('updated Telegraph Url for ' + savedManga.id)
     await savedManga.save()
   } catch (error) {
     console.log('Could not save manga with updated telegraph_url: ' + savedManga.id)
