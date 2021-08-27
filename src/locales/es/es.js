@@ -57,7 +57,7 @@ export default {
   settings:                  '<b>Ajustes:</b>',
   search_appearance:         'Buscar apariencia:  ',
   search_sorting:            'Buscar ordenando por ',
-  random_localy:             'Localizacón aleatoria:  ',
+  random_locally:            'Localizacón aleatoria:  ',
   allow_repeat_in_random:    'Permitir la repetición en el modo aleatorio: ',
   safe_mode:                 'Modo seguro está ',
   about_settings:            'What does settings mean?',

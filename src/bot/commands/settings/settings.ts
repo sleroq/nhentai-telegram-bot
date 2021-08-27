@@ -48,7 +48,7 @@ export default async function settings (ctx: Context): Promise<void> {
       callback_data: 'sttgs_search-sorting',
     },],
     [{
-      text: i18n.t('random_localy') + random_locally,
+      text: i18n.t('random_locally') + random_locally,
       callback_data: 'sttgs_random-locally',
     }],
     [{

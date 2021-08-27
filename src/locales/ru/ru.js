@@ -52,7 +52,7 @@ export default {
   settings:                  '<b>Настройки:</b>',
   search_appearance:         'Вид поиска:  ',
   search_sorting:            'Сортировка результатов по ',
-  random_localy:             'Рандом локально:  ',
+  random_locally:            'Рандом локально:  ',
   allow_repeat_in_random:    'Разрешить повторяться:  ',
   safe_mode:                 'Безопасный режим ',
   about_settings:            'Что означают настройки?',
