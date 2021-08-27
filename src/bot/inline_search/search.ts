@@ -43,8 +43,16 @@ export default async function replyWithSearchInline(
   specifiedPage: number | undefined,
   user: User
 ): Promise<void> {
-  const searchType: 'photo' | 'article' = config.show_favorites_as_gallery ? 'photo' : 'article'
-  
+  let searchType: 'photo' | 'article' = config.show_favorites_as_gallery ? 'photo' : 'article'
+
+  if (user.search_type) {
+    if (user.search_type === 'photo') {
+      searchType = 'photo'
+    } else {
+      searchType = 'article'
+    }
+  }
+
   const pageNumber = specifiedPage || 1
   inlineQuery = inlineQuery.replace(/\/p\d+/g, '').trim()
 
