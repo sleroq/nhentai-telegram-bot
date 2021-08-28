@@ -7,6 +7,7 @@ import User, { UserSchema } from '../models/user.model'
 import { Context }  from 'telegraf'
 import { Document } from 'mongoose'
 
+const ignoredTags = process.env.IGNORED_TAGS ? process.env.IGNORED_TAGS.split(', ') : []
 
 export default async function saveAndGetUser(ctx: Context): Promise<UserSchema & Document<any, any, UserSchema>> {
   if (!ctx.from) {
@@ -28,7 +29,7 @@ export default async function saveAndGetUser(ctx: Context): Promise<UserSchema &
       language_code:        ctx.from.language_code,
       search_sorting:       config.search_sorting_by_default,
       search_type:          config.search_appearance_by_default,
-      ignored_random_tags:  config.awful_tags,
+      ignored_random_tags:  ignoredTags,
       random_localy:        config.random_locally_by_default,
       can_repeat_in_random: config.can_repeat_in_random_by_default,
     })

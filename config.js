@@ -39,17 +39,4 @@ export default {
   help_icon_inline:            'https://i.imgur.com/j2zt4j7.png',
   sort_by_new_icon_inline:     'https://i.imgur.com/j2zt4j7.png',
   sort_by_popular_icon_inline: 'https://i.imgur.com/j2zt4j7.png',
-
-  awful_tags: [
-    'rape',
-    'guro',
-    'scat',
-    'torture',
-    'moral degeneration',
-    'mind break',
-    'incest',
-    'futanari',
-    'shotacon',
-    'lolicon'
-  ]
 }
