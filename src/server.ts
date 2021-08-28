@@ -22,9 +22,15 @@ import Verror from 'verror'
   if (!botToken) {
     throw new Error('No BOT_TOKEN in env')
   }
-  if (process.env.REPL_URL || process.env.HEROKU_URL) {
+  if (process.env.REPL_OWNER && process.env.REPL_SLUG || process.env.HEROKU_APP_NAME) {
+    let webhookUrl: string | undefined
+    if (process.env.HEROKU_APP_NAME) {
+      webhookUrl = `https://${process.env.HEROKU_APP_NAME}.herokuapp.com/`
+    } else {
+      webhookUrl = `https://replit.com/@${process.env.REPL_OWNER}/${process.env.REPL_SLUG}/`
+    }
     try {
-      await startWithWebhook(bot, botToken)
+      await startWithWebhook(bot, webhookUrl)
     } catch (error) {
       throw new Verror(error, 'Starting bot with webhook')
     }

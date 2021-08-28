@@ -8,12 +8,11 @@ import cors from 'cors'
 import { Context, Telegraf } from 'telegraf'
 import { Update } from 'telegraf/typings/core/types/typegram'
 
-export default async function startWithWebhook(bot: Telegraf<Context<Update>>, token: string): Promise<void> {
-  const port = process.env.PORT || 3000,
-    domain = process.env.REPL_URL || process.env.HEROKU_URL
+export default async function startWithWebhook(bot: Telegraf<Context<Update>>, webhookUrl: string): Promise<void> {
+  const port = process.env.PORT || 3000
   const secretPath = `/telegraf/${Math.random().toString(36).substring(7)}`
 
-  await bot.telegram.setWebhook(`${domain}${secretPath}`, {
+  await bot.telegram.setWebhook(webhookUrl + secretPath, {
     drop_pending_updates: true,
   })
 
@@ -22,7 +21,7 @@ export default async function startWithWebhook(bot: Telegraf<Context<Update>>, t
 
   expressApp.get('/', (req, res) => { res.send(config.express_get_slash) })
 
-  // for api with statistics (./api.js):
+  // for api with statistics (./api.ts):
   if (config.api_enabled) {
     expressApp.use(cors())
 
