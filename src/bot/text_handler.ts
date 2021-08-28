@@ -9,10 +9,11 @@ import {
 import saveAndGetManga from '../db/save_and_get_manga'
 import saveAndGetUser  from '../db/save_and_get_user'
 
-import Message   from '../models/message.model'
-import { Manga } from '../models/manga.model'
-import { User }  from '../models/user.model'
-import { Context }              from 'telegraf'
+import MessageModel from '../models/message.model'
+import { Manga }    from '../models/manga.model'
+import { User }     from '../models/user.model'
+import { Context }  from 'telegraf'
+import { Message }  from 'typegram'
 
 // TODO: be able to work without database connection
 export default async function textHandler(ctx: Context): Promise<void> {
@@ -41,27 +42,26 @@ export default async function textHandler(ctx: Context): Promise<void> {
   if (!ids[0]) {
     return
   }
+  console.log('textHandler started work')
   for (const id of ids) {
     const index = ids.indexOf(id)
     if (index > config.maximum_codes_from_one_message) {
       console.log('textHandler: Stop: Reached limit' + config.maximum_codes_from_one_message + ' codes')
       return
     }
-    console.log('textHandler started work on ' + id)
-
-    let manga: Manga| undefined
+    let manga: Manga | undefined
     try {
       manga = await saveAndGetManga(user, Number(id))
     } catch (error) {
       if(error.message === 'Not found') {
         try {
-          await ctx.reply(i18n.t('manga_does_not_exist') + '\n(' + id + ')')
+          await ctx.reply(i18n.t('manga_does_not_exist') + ' (<code>' + id + '</code>)')
         } catch (error) {
           console.error('Replying \'404\'' + error)
         }
       } else {
         try {
-          await ctx.reply(i18n.t('failed_to_get') + '\n(`' + id + '`)', {
+          await ctx.reply(i18n.t('failed_to_get') + ' (<code>' + id + '</code>)', {
             parse_mode: 'HTML',
           })
         } catch (error) {
@@ -75,29 +75,18 @@ export default async function textHandler(ctx: Context): Promise<void> {
       ? manga.telegraph_fixed_url
       : manga.telegraph_url
 
-    const message = new Message({
-      chat_id:    ctx.message.chat.id,
-      message_id: ctx.message.message_id + 1 + index,
-      current:    0,
-      history:    [],
-    })
     const messageText = getMangaMessage(manga, telegraph_url)
     const inlineKeyboard = assembleKeyboard(user, manga, telegraph_url)
-    message.history.push(manga.id)
     user.manga_history.push(manga.id)
-    try {
-      await message.save()
-    } catch (error){
-      console.error('Cant save message: ' + error)
-    }
+
     try {
       await user.save()
     } catch (error){
       console.error('Cant save user: ' + error)
     }
-
+    let response: Message.TextMessage | undefined
     try {
-      await ctx.reply(messageText, {
+      response = await ctx.reply(messageText, {
         parse_mode:   'HTML',
         reply_markup: {
           inline_keyboard: inlineKeyboard,
@@ -105,9 +94,22 @@ export default async function textHandler(ctx: Context): Promise<void> {
       })
     } catch (error) {
       console.error('Text handler replying with result ' + error)
+      continue
     }
-    if (ids.indexOf(id) === ids.length - 1) {
-      console.log('textHandler finished work')
+
+    const message = new MessageModel({
+      chat_id:    response.chat.id,
+      message_id: response.message_id,
+      current:    0,
+      history:    [],
+    })
+    message.history.push(manga.id)
+
+    try {
+      await message.save()
+    } catch (error){
+      console.error('Cant save message: ' + error)
     }
   }
+  console.log('textHandler finished work')
 }
