@@ -25,9 +25,9 @@ import Verror from 'verror'
   if (process.env.REPL_OWNER && process.env.REPL_SLUG || process.env.HEROKU_APP_NAME) {
     let webhookUrl: string | undefined
     if (process.env.HEROKU_APP_NAME) {
-      webhookUrl = `https://${process.env.HEROKU_APP_NAME}.herokuapp.com/`
+      webhookUrl = `https://${process.env.HEROKU_APP_NAME}.herokuapp.com`
     } else {
-      webhookUrl = `https://replit.com/@${process.env.REPL_OWNER}/${process.env.REPL_SLUG}/`
+      webhookUrl = `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER?.toLowerCase()}.repl.co`
     }
     try {
       await startWithWebhook(bot, webhookUrl)
