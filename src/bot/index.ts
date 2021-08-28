@@ -11,6 +11,7 @@ import textHandler     from './text_handler'
 import inlineSearch    from './inline_search/index'
 import help            from './commands/help'
 import settings        from './commands/settings/settings'
+import dlZip from './commands/dlzip'
 
 const botToken = process.env.BOT_TOKEN
 if (!botToken) {
@@ -46,7 +47,7 @@ bot.help(async (ctx) => {
   try {
     await help(ctx)
   } catch (error) {
-    throw new Verror('Handling \'/help\' command')
+    throw new Verror(error, 'Handling \'/help\' command')
   }
 })
 bot.command('code', async (ctx) => {
@@ -83,9 +84,9 @@ bot.command('rand', async (ctx) => {
 
 bot.command('zip', async (ctx) => {
   try {
-    await ctx.reply(i18n.t('does_not_work_yet'))
+    await dlZip(ctx)
   } catch (error) {
-    throw new Verror(error, 'Replying on \'/zip\' command')
+    throw new Verror(error, 'Handling \'/zip\' command')
   }
 })
 
