@@ -265,10 +265,10 @@ function assembleDoujin(response: Response<string>): Doujin {
     if (thumbnailUrl) {
       thumbnails.push(thumbnailUrl)
     }
-    const relativeImageUrl = thumbnailElement.attr('href')
-    if (relativeImageUrl && thumbnailUrl) {
-      const absolute = new URL(relativeImageUrl, 'https://i.nhentai.net/galleries/').toString().replace(/\/$/, '')
-      const complete = absolute + thumbnailUrl.slice(thumbnailUrl.lastIndexOf('.'))
+    if (thumbnailUrl) {
+      const complete = thumbnailUrl
+        .replace(/(\/[0-9]+)t./, '$1.')
+        .replace(/(https:\/\/)t./, '$1i.')
       pages.push(complete)
     }
   })
