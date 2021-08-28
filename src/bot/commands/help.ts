@@ -5,28 +5,27 @@ import { InlineKeyboardButton} from 'telegraf/typings/core/types/typegram'
 import { Context } from 'telegraf'
 import Verror from 'verror'
 
-const helpKeyboard: InlineKeyboardButton[][] = [
-  [
-    {
-      text:          i18n.t('search_tips_button'),
-      callback_data: 'searchtips',
-    },
-  ],
-  [
-    {
-      text:                             i18n.t('tap_to_open_favorites'),
-      switch_inline_query_current_chat: '',
-    },
-  ],
-  [
-    {
-      text:                             i18n.t('tap_to_open_history'),
-      switch_inline_query_current_chat: '/h',
-    },
-  ],
-]
-
 export default async function help(ctx: Context): Promise<void> {
+  const helpKeyboard: InlineKeyboardButton[][] = [
+    [
+      {
+        text:          i18n.t('search_tips_button'),
+        callback_data: 'searchtips',
+      },
+    ],
+    [
+      {
+        text:                             i18n.t('tap_to_open_favorites'),
+        switch_inline_query_current_chat: '',
+      },
+    ],
+    [
+      {
+        text:                             i18n.t('tap_to_open_history'),
+        switch_inline_query_current_chat: '/h',
+      },
+    ],
+  ]
   let help_text = i18n.t('help')
   const wallets = config.donation_wallets
   if (wallets && wallets.length) {
