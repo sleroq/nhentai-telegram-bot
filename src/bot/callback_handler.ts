@@ -53,4 +53,9 @@ export default async function callbackHandler(ctx: Context<Update>, callback_que
       throw new Verror(error, 'Editing settings')
     }
   }
+  try {
+    await ctx.answerCbQuery()
+  } catch (error) {
+    console.error('Answering callback query: ' + error.message)
+  }
 }
