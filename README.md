@@ -33,7 +33,6 @@
 ## One-Click Deploy Button
 Since I'm currently working on a complete transition to typescript, **not all the functionality works yet**<br>
 Does not work in new version yet:
-* /zip command
 * 'fix' button (For fixing telegra.ph links without 'Instant View' button)
 
 if you want an old version, then use the code from the latest javascript release<br>
