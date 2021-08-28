@@ -1,7 +1,7 @@
 import config from '../../../config'
 import i18n from '../../lib/i18n'
 
-import { CallbackQuery, InlineKeyboardButton} from 'telegraf/typings/core/types/typegram'
+import { InlineKeyboardButton} from 'telegraf/typings/core/types/typegram'
 import { Context } from 'telegraf'
 import Verror from 'verror'
 
@@ -28,8 +28,12 @@ const helpKeyboard: InlineKeyboardButton[][] = [
 
 export default async function help(ctx: Context): Promise<void> {
   let help_text = i18n.t('help')
-  if (config.donation_wallets != '') {
-    help_text += '\n' + i18n.t('donation_message') + config.donation_wallets
+  const wallets = config.donation_wallets
+  if (wallets && wallets.length) {
+    help_text += '\n' + i18n.t('donation_message')
+    wallets.forEach((wallet) => {
+      help_text += `\n${wallet.name}: <code>${wallet.address}</code>`
+    })
   }
   if ('callback_query' in ctx.update) {
     try {
@@ -59,6 +63,7 @@ export default async function help(ctx: Context): Promise<void> {
 }
 
 export async function editHelp(ctx: Context, query: CallbackQuery.DataCallbackQuery): Promise<void> {
+export async function searchTips(ctx: Context): Promise<void> {
   const message = i18n.t('search_tips')
   const inlineKeyboard = [
     [

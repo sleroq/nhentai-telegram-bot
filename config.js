@@ -5,7 +5,11 @@ export default {
   api_enabled: true,
   // show some stats as json on api/ page (details in: api.js, express.js),
 
-  donation_wallets: '',
+  donation_wallets: [
+    {
+      name: 'Monero',
+      address: '85DLifC32dN3cYSBjF8ShgSYn6KD7WPAoSXEATyEVnQZW5mFxJDnMNacBvJ1qLHgVxjKQUXikb7cU4WXzp1Zc4gwMWDgMB8'}
+  ],
   // Add donation message to /help command with donation_wallets,
 
   express_get_slash:                 'Hello, love <3',
