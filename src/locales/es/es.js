@@ -3,64 +3,73 @@ export default {
   greeting:      'Hola, {{name}}\n<b>Este bot tiene contenido +18, pulsa el botón solo si tienes la edad suficiente.</b>',
 
   // buttons:
-  random_button:           'Manga aleatorio',
-  search_button:           'Buscar',
-  next_button:             'Siguiente',
-  previous_button:         'Anterior',
-  back_button:             'Regresar',
-  fix_button:              'Arreglar',
-  waitabit_button:         'Espera un poco',
-  search_tips_button:      'Buscar consejos',
-  settings_button:         'Ajustes',
-  next_page_button:        'Siguiente página',
-  tap_to_open_history:     'Toca para abrir el historial',
+  random_button:         'Manga aleatorio',
+  search_button:         'Buscar',
+  next_button:           'Siguiente',
+  previous_button:       'Anterior',
+  back_button:           'Regresar',
+  fix_button:            'Arreglar',
+  waitabit_button:       'Espera un poco',
+  search_tips_button:    'Buscar consejos',
+  settings_button:       'Ajustes',
+  next_page_button:      'Siguiente página',
+  tap_to_open_favorites: 'Toca para abrir favoritos',
+  tap_to_open_history:   'Toca para abrir el historial',
+  open:                  'Abierto',
 
   // manga related text:
-  pages:                   'páginas',
-  tags:                    'Etiquetas: ',
-  too_many_pages:          'Muchas páginas, lo siento :(',
-  try_again_later:         'Inténtalo más tarde :(',
-  pages_fixed:             'páginas arregladas',
+  pages:           'páginas',
+  tags:            'Etiquetas: ',
+  too_many_pages:  'Muchas páginas, lo siento :(',
+  try_again_later: 'Inténtalo más tarde :(',
+  pages_fixed:     'páginas arregladas',
 
   // just text
-  yes:                     'sí',
-  enabled:                 'habilitado',
-  no:                      'no',
-  disabled:                'deshabilitado',
-  date:                    'fecha',
-  popular:                 'popularidad',
-  nothing_is_found:        'No se encuentra nada ¯_(ツ)_/¯',
-  manga_does_not_exist:    'Este manga no existe',
-  failed_to_get:           '¡No pude conseguir doujin!',
-  zip_tip:                 'Tienes que especificar un código: `/zip 234638`',
-  something_went_wrong:    'Algo salió mal :(',
-  file_is_too_big:         'No puedo enviar archivos de más de 50 MB debido a restricciones.',
-  size_of_your_file:       'Tamaño de su archivo: ',
+  yes:                  'sí',
+  enabled:              'habilitado',
+  no:                   'no',
+  disabled:             'deshabilitado',
+  date:                 'fecha',
+  popular:              'popularidad',
+  nothing_is_found:     'No se encuentra nada ¯_(ツ)_/¯',
+  manga_does_not_exist: 'Este manga no existe',
+  failed_to_get:        '¡No pude conseguir doujin!',
+  zip_tip:              'Tienes que especificar un código: `/zip 234638`',
+  something_went_wrong: 'Algo salió mal :(',
+  file_is_too_big:      'No puedo enviar archivos de más de 50 MB debido a restricciones.',
+  size_of_your_file:    'Tamaño de su archivo: ',
+  just_send_me_a_code:  'Solo envíame un código',
 
   // inline search
   history_tip_title:       '¡Historia!',
-  history_tip_desctiption: 'Este es tu historial:',
+  history_tip_description: 'Este es tu historial:',
   history_is_empty:        'Tu historial está vacío ...',
 
   next_page_tip_title:   'Página siguiente',
-  next_page_tip_message: 'Para ver una página específica, puede *agregar /p*`n` a la consulta de búsqueda, donde `n` es el número de página',
+  next_page_tip_message: 'Para ver una página específica, puede <b>agregar /p</b><code>n</code> a la consulta de búsqueda, donde <code>n</code> es el número de página',
+  next_page_tip: 'TOQUE AQUÍ o simplemente agregue "/p{{pageNumber}}" a la consulta de búsqueda: (@nhentai_mangabot {{nextPageSwitch}})',
 
   sorting_by_popularity_tip_title: 'Para ordenar los resultados por popularidad',
   sorting_by_new_tip_title:        'Para ordenar los resultados por nuevo',
 
   favorites:                 'Favoritos!',
-  favorites_tip_desctiption: '"Estos son tus favoritos:"',
+  favorites_tip_description: '"Estos son tus favoritos:"',
   favorites_is_empty:        'No te ha gustado nada todavía"',
-  tap_to_open_favorites:     'Toca para abrir favoritos',
+
+  sorting_tip_slim: 'Simplemente agregue "/s{{reverseSortingParameter}}" a la consulta de búsqueda: (@nhentai_mangabot {{searchSortingSwitch}})',
+  sorting_tip:
+  `Para ordenar los resultados de la búsqueda por {{reverseSortingWord}},
+  puede agregar <b>/s{{reverseSortingParameter}}</b> a la consulta de búsqueda.`,
 
   // settings:
-  settings:                  '<b>Ajustes:</b>',
-  search_appearance:         'Buscar apariencia:  ',
-  search_sorting:            'Buscar ordenando por ',
-  random_locally:            'Localizacón aleatoria:  ',
-  allow_repeat_in_random:    'Permitir la repetición en el modo aleatorio: ',
-  safe_mode:                 'Modo seguro está ',
-  about_settings:            'What does settings mean?',
+  settings:               '<b>Ajustes:</b>',
+  search_appearance:      'Buscar apariencia:  ',
+  search_sorting:         'Buscar ordenando por ',
+  random_locally:         'Localizacón aleatoria:  ',
+  allow_repeat_in_random: 'Permitir la repetición en el modo aleatorio: ',
+  safe_mode:              'Modo seguro está ',
+  about_settings:         'acerca de la configuración',
+  about_settings_url:     '', // TODO: translate https://telegra.ph/Settings-04-09
 
   current_language:  'Lang: 🇪🇸',
   choose_a_language: 'Elige un idioma',
@@ -71,10 +80,10 @@ export default {
   // help
   help: 
   `• Para abrir un doujin en específico solo envíame el link de nhentai o el código nuclear
-  • También puedes descargar imágenes en archivos .zip con el comando /zip. Por ejemplo: “/zip 234638”
+  • También puedes descargar imágenes en archivos .zip con el comando /zip. Por ejemplo: <code>/zip 234638</code>
   
-  [GitHub](https://github.com/iamdowner/nhentai-telegram-bot)`,
-  donation_message: 'Support this instance:',
+  <a href="https://github.com/iamdowner/nhentai-telegram-bot">GitHub</a>`,
+  donation_message: 'Apoya esta instancia::',
   search_tips: 
 `  <b>Buscar</b>
   • Puedes cambiar la clasificación de la búsqueda añadiendo <code>/s</code><I>p</i> antes de lo que quieres buscar, dónde <i>p</i> - significa <b>p</b>opular o <i>n</i> - <b>n</b>ew, por ejemplo: <code>/sp sex toys</code>

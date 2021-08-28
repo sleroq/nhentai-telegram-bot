@@ -15,11 +15,12 @@ import { User }               from '../../models/user.model'
 import { InlineQueryResult }          from 'typegram/inline'
 
 const nothingIsFoundResult: InlineQueryResultArticle = {
-  id:                    String(6969696969),
-  type:                  'article',
-  title:                 i18n.t('nothing_is_found'),
-  description:           '',
-  thumb_url:             config.help_icon_inline,
+  id:          String(6969696969),
+  type:        'article',
+  title:       i18n.t('nothing_is_found'),
+  description: '',
+  thumb_url:   config.help_icon_inline,
+
   input_message_content: {
     message_text: i18n.t('help'),
     parse_mode:   'Markdown',
@@ -164,8 +165,10 @@ async function getResultsUniversal(
         .replace('<', '\\<')
         .replace('>', '\\>')
         .trim(),
-      thumb_url:             String(doujin.thumbnail),
-      photo_url:             String(doujin.thumbnail),
+
+      thumb_url: String(doujin.thumbnail),
+      photo_url: String(doujin.thumbnail),
+
       input_message_content: {
         message_text: message_text,
         parse_mode:   'HTML',
@@ -174,7 +177,7 @@ async function getResultsUniversal(
         inline_keyboard: [
           [
             {
-              text:          'Open',
+              text:          i18n.t('open'),
               callback_data: 'open_' + doujin.id,
             },
           ],
@@ -191,26 +194,23 @@ async function getResultsUniversal(
         ? config.sort_by_new_icon_inline
         : config.sort_by_popular_icon_inline,
     sorting_tip_title = sortingParameter == 'popular' ? i18n.t('sorting_by_new_tip_title') : i18n.t('sorting_by_popularity_tip_title'),
-    reverseSortingParametr = reverseSortingWord.charAt(0),
+    reverseSortingParameter = reverseSortingWord.charAt(0),
     searchSortingSwitch = pageNumber > 1
-      ? `/p${pageNumber} /s${reverseSortingParametr} ${inlineQuery}`
-      : `/s${reverseSortingParametr} ${inlineQuery}`
+      ? `/p${pageNumber} /s${reverseSortingParameter} ${inlineQuery}`
+      : `/s${reverseSortingParameter} ${inlineQuery}`
 
   results.unshift({
-    id:                    String(69696969420),
-    type:                  'photo',
-    title:                 sorting_tip_title,
-    description:           `Just add "/s${reverseSortingParametr}" to search query: (@nhentai_mangabot ${searchSortingSwitch})`,
-    photo_url:             reverseSortingPhotoUrl,
-    thumb_url:             reverseSortingPhotoUrl,
+    id:          String(69696969420),
+    type:        'photo',
+    title:       sorting_tip_title,
+    description: i18n.t('sorting_tip_slim', { reverseSortingWord, reverseSortingParameter: reverseSortingParameter }),
+    
+    photo_url: reverseSortingPhotoUrl,
+    thumb_url: reverseSortingPhotoUrl,
+    
     input_message_content: {
-      message_text:
-          'To sort search results by ' +
-          reverseSortingWord +
-          ' you can *add /s' +
-          reverseSortingParametr +
-          '*',
-      parse_mode: 'HTML',
+      message_text: i18n.t('sorting_tip', { reverseSortingWord, reverseSortingParameter: reverseSortingParameter }),
+      parse_mode:   'HTML',
     },
     reply_markup: {
       inline_keyboard: [
@@ -225,16 +225,17 @@ async function getResultsUniversal(
   })
   const sortingParameterLetter = sortingParameter == 'popular' ? 'p' : 'n',
     nextPageSwitch = isSearchModified
-      ? `/p${+pageNumber + 1} /s${sortingParameterLetter} ${inlineQuery}`
-      : `/p${+pageNumber + 1} ${inlineQuery}`
+      ? `/p${pageNumber + 1} /s${sortingParameterLetter} ${inlineQuery}`
+      : `/p${pageNumber + 1} ${inlineQuery}`
   results.push({
     id:          String(9696969696),
     type:        'photo',
     title:       i18n.t('next_page_tip_title'),
-    description: `TAP HERE or Just add "/p${+pageNumber + 1
-    }" to search query: (@nhentai_mangabot ${nextPageSwitch})`,
-    photo_url:             config.next_page_icon_inline,
-    thumb_url:             config.next_page_icon_inline,
+    description: i18n.t('next_page_tip', { pageNumber: pageNumber + 1, nextPageSwitch }),
+    
+    photo_url: config.next_page_icon_inline,
+    thumb_url: config.next_page_icon_inline,
+    
     input_message_content: {
       message_text: i18n.t('next_page_tip_message'),
       parse_mode:   'HTML',

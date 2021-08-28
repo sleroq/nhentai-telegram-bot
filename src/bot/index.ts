@@ -51,7 +51,7 @@ bot.help(async (ctx) => {
 })
 bot.command('code', async (ctx) => {
   try {
-    await ctx.reply('Just send me a code')
+    await ctx.reply(i18n.t('just_send_me_a_code'))
   } catch (error) {
     throw new Verror(error, 'Replying on \'/code\' command')
   }
@@ -83,7 +83,7 @@ bot.command('rand', async (ctx) => {
 
 bot.command('zip', async (ctx) => {
   try {
-    await ctx.reply('This does not work in this version yet')
+    await ctx.reply(i18n.t('does_not_work_yet'))
   } catch (error) {
     throw new Verror(error, 'Replying on \'/zip\' command')
   }

@@ -13,7 +13,7 @@ const favoritesReplyMarkup: InlineKeyboardMarkup = {
   inline_keyboard: [
     [
       {
-        text: i18n.t('favorites'),
+        text:                             i18n.t('favorites'),
         switch_inline_query_current_chat: '',
       },
     ],
@@ -71,7 +71,7 @@ async function getFavoritesUniversal(
       inline_keyboard: [
         [
           {
-            text: i18n.t('fix_button'),
+            text:          i18n.t('fix_button'),
             callback_data: 'fix_' + favorite._id,
           },
           { text: 'Telegra.ph', url: String(favorite.telegraph_url) },
@@ -90,8 +90,10 @@ async function getFavoritesUniversal(
         .replace('<', '\\<')
         .replace('>', '\\>')
         .trim(),
-      thumb_url:             favorite.thumbnail,
-      photo_url:             favorite.thumbnail,
+
+      thumb_url: favorite.thumbnail,
+      photo_url: favorite.thumbnail,
+
       input_message_content: {
         message_text: caption,
         parse_mode:   'HTML',
@@ -112,12 +114,14 @@ async function getFavoritesUniversal(
   const nextPageSwitch = `/p${+pageNumber + 1} ${inlineQuery}`
 
   results.unshift({
-    id:                    String(Math.floor(Math.random() * 10000000)),
-    type:                  'photo',
-    title:                 i18n.t('favorites'),
-    description:           i18n.t('favorites_tip_description'),
-    photo_url:             config.favorites_icon_inline,
-    thumb_url:             config.favorites_icon_inline,
+    id:          String(Math.floor(Math.random() * 10000000)),
+    type:        'photo',
+    title:       i18n.t('favorites'),
+    description: i18n.t('favorites_tip_description'),
+
+    photo_url: config.favorites_icon_inline,
+    thumb_url: config.favorites_icon_inline,
+
     input_message_content: {
       message_text: i18n.t('tap_to_open_favorites'),
       parse_mode:   'HTML',
@@ -130,14 +134,14 @@ async function getFavoritesUniversal(
       id:          String(9696969696),
       type:        'photo',
       title:       i18n.t('next_page_tip_title'),
-      description: `TAP HERE or Just add "/p${+pageNumber + 1
-      }" to search query: (@nhentai_mangabot ${nextPageSwitch})`,
-      photo_url:             config.next_page_icon_inline,
-      thumb_url:             config.next_page_icon_inline,
+      description: i18n.t('next_page_tip', { pageNumber: pageNumber + 1, nextPageSwitch }),
+      
+      photo_url: config.next_page_icon_inline,
+      thumb_url: config.next_page_icon_inline,
+      
       input_message_content: {
-        message_text:
-            i18n.t('next_page_tip_message'),
-        parse_mode: 'HTML',
+        message_text: i18n.t('next_page_tip_message'),
+        parse_mode:   'HTML',
       },
       reply_markup: {
         inline_keyboard: [
