@@ -62,7 +62,6 @@ export default async function help(ctx: Context): Promise<void> {
   }
 }
 
-export async function editHelp(ctx: Context, query: CallbackQuery.DataCallbackQuery): Promise<void> {
 export async function searchTips(ctx: Context): Promise<void> {
   const message = i18n.t('search_tips')
   const inlineKeyboard = [

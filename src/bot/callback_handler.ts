@@ -1,11 +1,12 @@
 import Verror           from 'verror'
 import { Context }      from 'telegraf'
 import { Update, CallbackQuery } from 'telegraf/typings/core/types/typegram'
-import makeRandom         from './commands/random'
-import openInTelegraph    from './commands/open_in_telegraph'
-import likeDoujin         from './commands/like'
-import help, { editHelp } from './commands/help'
-import settingsChanger from './commands/settings/buttons_handler'
+
+import makeRandom           from './commands/random'
+import openInTelegraph      from './commands/open_in_telegraph'
+import likeDoujin           from './commands/like'
+import help, { searchTips } from './commands/help'
+import settingsChanger      from './commands/settings/buttons_handler'
 
 export default async function callbackHandler(ctx: Context<Update>, callback_query: CallbackQuery.DataCallbackQuery): Promise<void> {
   const data: string = callback_query.data
@@ -35,7 +36,7 @@ export default async function callbackHandler(ctx: Context<Update>, callback_que
     }
   } else if (data === 'searchtips') {
     try {
-      await editHelp(ctx, callback_query)
+      await searchTips(ctx)
     } catch (error) {
       throw new Verror(error, 'Showing search tips')
     }
