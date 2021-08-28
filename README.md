@@ -37,10 +37,12 @@ Does not work in new version yet:
 * 'fix' button (For fixing telegra.ph links without 'Instant View' button)
 
 if you want an old version, then use the code from the latest javascript release<br>
-### Pre-reqs for deploying this project to Heroku:
+### Pre-reqs for deploying this project to Heroku or Repl.it:
 
-- Create a free [Heroku account](https://signup.heroku.com/)
-- Create an [Mongo database](https://docs.atlas.mongodb.com/getting-started/)
+- Create [Heroku](https://signup.heroku.com/) or [Replit](https://replit.com/signup) account (free)
+- Create cluster on [Mongo database](https://docs.atlas.mongodb.com/getting-started/) (free)
 - Get bot token from [@BotFather](https://t.me/BotFather)
+
+[![Run on Repl.it](https://repl.it/badge/github/iamdowner/nhentai-telegram-bot)](https://repl.it/github/iamdowner/nhentai-telegram-bot)
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/iamdowner/nhentai-telegram-bot)
