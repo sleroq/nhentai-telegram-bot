@@ -46,28 +46,34 @@ export default async function dlZip(ctx: Context): Promise<void> {
         } catch (error) {
           if (error.message === 'Not found') {
             try {
-              await ctx.telegram.sendMessage(chatId, i18n.t('manga_does_not_exist') + ' (<code>' + doujinId + '</code>)')
+              await ctx.telegram.sendMessage(
+                chatId,
+                i18n.t('manga_does_not_exist') + ' (<code>' + doujinId + '</code>)',
+                { parse_mode: 'HTML' }
+              )
             } catch (error) {
-              removeFromQueue(queue, doujinId, chatId)
               console.error('Replying \'404\': ' + error.message)
             }
           } else {
             try {
-              await ctx.telegram.sendMessage(chatId, i18n.t('failed_to_get') + ' (<code>' + doujinId + '</code>)', {
-                parse_mode: 'HTML',
-              })
+              await ctx.telegram.sendMessage(
+                chatId,
+                i18n.t('failed_to_get') + ' (<code>' + doujinId + '</code>)',
+                { parse_mode: 'HTML' }
+              )
             } catch (error) {
-              removeFromQueue(queue, doujinId, chatId)
               console.error('Replying \'failed_to_get\': ' + error.message)
             }
           }
+          console.log('removing')
+          queue = removeFromQueue(queue, doujinId, chatId)
           continue
         }
         if (manga.details.pages > 150) {
           try {
             await ctx.telegram.sendMessage(chatId, i18n.t('too_many_pages'), {parse_mode: 'HTML'})
           } catch (error) {
-            removeFromQueue(queue, doujinId, chatId)
+            queue = removeFromQueue(queue, doujinId, chatId)
             console.error('Replying /zip too many pages: ' + error.message)
           }
           continue
