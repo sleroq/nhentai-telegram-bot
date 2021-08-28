@@ -58,7 +58,7 @@ export default async function makeRandom(ctx: Context, mode: 'next' | 'previous'
     try {
       manga = await saveAndGetManga(user, message.history[message.current-1])
     } catch (error) {
-      throw new Verror('Getting random manga')
+      throw new Verror(error, 'Getting random manga')
     }
     message.current -= 1
   } else
@@ -70,7 +70,7 @@ export default async function makeRandom(ctx: Context, mode: 'next' | 'previous'
     try {
       manga = await saveAndGetManga(user)
     } catch (error) {
-      throw new Verror('Getting random manga')
+      throw new Verror(error, 'Getting random manga')
     }
     message.history.push(manga.id)
     if (message.history.length > 50) {
@@ -92,7 +92,7 @@ export default async function makeRandom(ctx: Context, mode: 'next' | 'previous'
     try {
       manga = await saveAndGetManga(user, message.history[message.current])
     } catch (error) {
-      throw new Verror('Getting random manga')
+      throw new Verror(error, 'Getting random manga')
     }
   }
   user.manga_history.push(manga.id)
@@ -102,9 +102,16 @@ export default async function makeRandom(ctx: Context, mode: 'next' | 'previous'
       user.manga_history.shift()
     }
   }
-  await message.save()
-  console.log('message saved')
-  await user.save()
+  try {
+    await message.save()
+  } catch (error) {
+    throw new Verror(error, 'Saving message')
+  }
+  try {
+    await user.save()
+  } catch (error) {
+    throw new Verror(error, 'Saving user')
+  }
 
   const telegraphUrl = manga.telegraph_fixed_url
     ? manga.telegraph_fixed_url
