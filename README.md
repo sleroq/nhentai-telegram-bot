@@ -32,12 +32,15 @@
 
 ## One-Click Deploy Button
 Since I'm currently working on a complete transition to typescript, **not all the functionality works yet**<br>
-if you want a stable version, then use the code from the latest javascript release<br>
+Does not work in new version yet:
+* /zip command
+* 'fix' button (For fixing telegra.ph links without 'Instant View' button)
+
+if you want an old version, then use the code from the latest javascript release<br>
 ### Pre-reqs for deploying this project to Heroku:
 
 - Create a free [Heroku account](https://signup.heroku.com/)
 - Create an [Mongo database](https://docs.atlas.mongodb.com/getting-started/)
 - Get bot token from [@BotFather](https://t.me/BotFather)
-- Get [telegra.ph token](https://telegra.ph/api#createAccount)
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/iamdowner/nhentai-telegram-bot)
