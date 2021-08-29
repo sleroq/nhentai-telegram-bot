@@ -54,8 +54,8 @@ export default {
   sorting_by_new_tip_title:        'Para ordenar los resultados por nuevo',
 
   favorites:                 'Favoritos!',
-  favorites_tip_description: '"Estos son tus favoritos:"',
-  favorites_is_empty:        'No te ha gustado nada todavía"',
+  favorites_tip_description: 'Estos son tus favoritos:',
+  favorites_is_empty:        'No te ha gustado nada todavía',
 
   sorting_tip_slim: 'Simplemente agregue "/s{{reverseSortingParameter}}" a la consulta de búsqueda: (@nhentai_mangabot {{searchSortingSwitch}})',
   sorting_tip:
