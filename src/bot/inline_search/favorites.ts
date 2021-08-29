@@ -111,7 +111,7 @@ async function getFavoritesUniversal(
     results.splice(48, num_of_superfluous)
   }
 
-  const nextPageSwitch = `/p${+pageNumber + 1} ${inlineQuery}`
+  const nextPageSwitch = `/p${pageNumber + 1} ${inlineQuery}`
 
   results.unshift({
     id:          String(Math.floor(Math.random() * 10000000)),
@@ -134,7 +134,7 @@ async function getFavoritesUniversal(
       id:          String(9696969696),
       type:        'photo',
       title:       i18n.t('next_page_tip_title'),
-      description: i18n.t('next_page_tip', { pageNumber: pageNumber + 1, nextPageSwitch }),
+      description: i18n.t('next_page_tip', { pageNumber: pageNumber + 1 }) + `(@${config.bot_username} ${nextPageSwitch})`,
       
       photo_url: config.next_page_icon_inline,
       thumb_url: config.next_page_icon_inline,
