@@ -12,9 +12,15 @@ export default async function getRandomMangaLocally(
   if (ninTags?.length != 0 && query) {
     query.tags.$nin = ninTags
   }
-
-  const count = await MangaModel.countDocuments(query),
-    random = Math.floor(Math.random() * count)
+  
+  let count: number | undefined
+  if (query.tags.$in || query.tags.$nin){
+    count = await MangaModel.countDocuments(query)
+  } else {
+    count = await MangaModel.countDocuments()
+  }
+  
+  const random = Math.floor(Math.random() * count)
 
   return MangaModel.findOne(query).skip(random)
 }
