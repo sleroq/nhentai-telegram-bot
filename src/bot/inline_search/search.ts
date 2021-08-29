@@ -105,6 +105,10 @@ export default async function replyWithSearchInline(
     inlineQuery = inlineQuery.replace(matchSorting[0], '').trim()
   }
 
+  if (!inlineQuery) {
+    return
+  }
+
   let searchResult: SearchResult<LightDoujin> | SearchResult<Doujin>
   try {
     searchResult = await nHentai.searchApi(inlineQuery, pageNumber, sortingParameter)
