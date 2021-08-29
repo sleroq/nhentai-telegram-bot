@@ -3,16 +3,17 @@ import config  from '../../../config'
 import i18n    from '../../lib/i18n'
 import Verror  from 'verror'
 
-import { getMessageInline, sliceByHalf } from '../../lib/some_functions'
+import { getMangaMessage, getMessageInline, sliceByHalf, tagString } from '../../lib/some_functions'
 
 import nHentai, {
+  Doujin,
   LightDoujin,
   SearchResult,
   SortingType
 }                                   from '../../lib/nhentai'
 import { InlineQueryResultArticle } from 'typegram'
-import { User }               from '../../models/user.model'
-import { InlineQueryResult }          from 'typegram/inline'
+import { User }                     from '../../models/user.model'
+import { InlineQueryResult }        from 'typegram/inline'
 
 const nothingIsFoundResult: InlineQueryResultArticle = {
   id:          String(6969696969),
@@ -104,11 +105,16 @@ export default async function replyWithSearchInline(
     inlineQuery = inlineQuery.replace(matchSorting[0], '').trim()
   }
 
-  let searchResult: SearchResult
+  let searchResult: SearchResult<LightDoujin> | SearchResult<Doujin>
   try {
-    searchResult = await nHentai.search(inlineQuery, pageNumber, sortingParameter)
+    searchResult = await nHentai.searchApi(inlineQuery, pageNumber, sortingParameter)
   } catch (error) {
-    throw new Verror(error, 'Searching inline')
+    console.error(error)
+    try {
+      searchResult = await nHentai.search(inlineQuery, pageNumber, sortingParameter)
+    } catch (err) {
+      throw new Verror(err, 'Searching inline')
+    }
   }
   if (searchResult.totalSearchResults === 0){
     try {
@@ -144,7 +150,7 @@ export default async function replyWithSearchInline(
 
 async function getResultsUniversal(
   user: User,
-  doujins: LightDoujin[],
+  doujins: LightDoujin[] | Doujin[],
   inlineQuery: string,
   isSearchModified: boolean,
   sortingParameter: SortingType,
@@ -152,12 +158,26 @@ async function getResultsUniversal(
 ): Promise<InlineQueryResult[]> {
   const results: InlineQueryResult[] = []
   for (const doujin of doujins) {
-    const message_text = getMessageInline(doujin)
-    const description = doujin.language || sliceByHalf(String(doujin.title))
+    let message_text: string
+    let description: string
+    let thumbnail: string
+    let title: string
+    if ('pages' in doujin) {
+      message_text = getMangaMessage(doujin)
+      description = tagString(doujin)
+      thumbnail = doujin.thumbnails[0]
+      title = doujin.title.translated.pretty ||'Nice Title'
+    } else {
+      message_text = getMessageInline(doujin)
+      description = doujin.language || sliceByHalf(String(doujin.title))
+      thumbnail = doujin.thumbnail || 'https://static.nhentai.net/img/logo.090da3be7b51.svg'
+      title = doujin.title || 'Nice Title'
+    }
+
     results.push({
       id:    String(doujin.id),
       type:  'photo',
-      title: String(doujin.title)
+      title: title
         .replace('<', '\\<')
         .replace('>', '\\>')
         .trim(),
@@ -166,8 +186,8 @@ async function getResultsUniversal(
         .replace('>', '\\>')
         .trim(),
 
-      thumb_url: String(doujin.thumbnail),
-      photo_url: String(doujin.thumbnail),
+      thumb_url: thumbnail,
+      photo_url: thumbnail,
 
       input_message_content: {
         message_text: message_text,
