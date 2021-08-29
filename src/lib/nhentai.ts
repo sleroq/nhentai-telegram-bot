@@ -1,19 +1,20 @@
 import got, { Response } from 'got'
 import cheerio, { CheerioAPI } from 'cheerio'
 import { Element } from 'cheerio'
+
 export interface Doujin {
   id: number
   url: string
   title: {
     translated: {
-      before: string
+      before?: string
       pretty: string
-      after: string
+      after?: string
     }
     original: {
-      before: string
+      before?: string
       pretty: string
-      after: string
+      after?: string
     }
   }
   details: {
@@ -27,7 +28,7 @@ export interface Doujin {
     pages: number
     uploaded: {
       datetime?: Date
-      pretty: string
+      pretty?: string
     }
   }
   pages: string[]
@@ -35,17 +36,19 @@ export interface Doujin {
 }
 
 export interface Tag {
-  name: string,
-  count: string,
-  id: number
+  id:    number
+  type?: 'character' | 'language' | 'tag' | 'group' | 'parody' | 'category' | 'artist'
+  name:  string
+  url?:  string
+  count: number
 }
 
 export interface Homepage {
   popular: LightDoujin[]
   new: LightDoujin[]
 }
-export interface SearchResult {
-  results: LightDoujin[]
+export interface SearchResult<T> {
+  results: T[]
   lastPage: number
   totalSearchResults: number
 }
