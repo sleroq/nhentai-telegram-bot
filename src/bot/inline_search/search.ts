@@ -108,8 +108,9 @@ export default async function replyWithSearchInline(
   let searchResult: SearchResult<LightDoujin> | SearchResult<Doujin>
   try {
     searchResult = await nHentai.searchApi(inlineQuery, pageNumber, sortingParameter)
+    // nhentai`s api is not reliable (sometimes gives false 404) So fallback on webpage scraping
   } catch (error) {
-    console.error(error)
+    console.error(error.message)
     try {
       searchResult = await nHentai.search(inlineQuery, pageNumber, sortingParameter)
     } catch (err) {
@@ -164,7 +165,7 @@ async function getResultsUniversal(
     let title: string
     if ('pages' in doujin) {
       message_text = getMangaMessage(doujin)
-      description = tagString(doujin)
+      description = `${doujin.pages.length} ${i18n.t('pages')}. ${tagString(doujin)}`
       thumbnail = doujin.thumbnails[0]
       title = doujin.title.translated.pretty ||'Nice Title'
     } else {
@@ -223,7 +224,7 @@ async function getResultsUniversal(
     id:          String(69696969420),
     type:        'photo',
     title:       sorting_tip_title,
-    description: i18n.t('sorting_tip_slim', { reverseSortingWord, reverseSortingParameter: reverseSortingParameter }),
+    description: i18n.t('sorting_tip_slim', { reverseSortingWord }) + `(@${config.bot_username} ${searchSortingSwitch})`,
     
     photo_url: reverseSortingPhotoUrl,
     thumb_url: reverseSortingPhotoUrl,
