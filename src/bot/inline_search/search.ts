@@ -236,7 +236,7 @@ async function getResultsUniversal(
       inline_keyboard: [
         [
           {
-            text:                             'Sort by ' + reverseSortingWord,
+            text: 'Sort by ' + reverseSortingWord,
             switch_inline_query_current_chat: searchSortingSwitch,
           },
         ],
@@ -251,7 +251,7 @@ async function getResultsUniversal(
     id:          String(9696969696),
     type:        'photo',
     title:       i18n.t('next_page_tip_title'),
-    description: i18n.t('next_page_tip', { pageNumber: pageNumber + 1, nextPageSwitch }),
+    description: i18n.t('next_page_tip', { pageNumber: pageNumber + 1 }) + `(@${config.bot_username} ${nextPageSwitch})`,
     
     photo_url: config.next_page_icon_inline,
     thumb_url: config.next_page_icon_inline,
@@ -264,7 +264,7 @@ async function getResultsUniversal(
       inline_keyboard: [
         [
           {
-            text:                             i18n.t('next_page_button'),
+            text: i18n.t('next_page_button'),
             switch_inline_query_current_chat: nextPageSwitch,
           },
         ],
