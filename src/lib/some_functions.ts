@@ -28,7 +28,7 @@ export function getMangaMessage(
 <a href="${link}">${title}</a> (${pages} ${pages_word})
 ${tags}\n<a href="${mangaUrl}">nhentai.net</a> | <code>${id}</code>`
 }
-function tagString(
+export function tagString(
   manga: Doujin | Manga | Favorite
 ): string {
   let tags = i18n.t('tags')
