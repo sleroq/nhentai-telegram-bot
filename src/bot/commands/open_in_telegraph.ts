@@ -1,11 +1,9 @@
-import config from '../../../config'
 import i18n   from '../../lib/i18n'
 import Verror from 'verror'
 
 import {
   assembleKeyboard,
   getMangaMessage,
-  isFullColor
 } from '../../lib/some_functions'
 import saveAndGetUser  from '../../db/save_and_get_user'
 import saveAndGetManga from '../../db/save_and_get_manga'
@@ -61,16 +59,7 @@ export default async function openInTelegraph (ctx: Context, query: string): Pro
 
   user.manga_history.push(manga.id) // save to history
   await user.save()
-  /* if the manga is too big, the telegram might refuse to create an instant view,
-     so here is a button that can magically fix that */
-  const numberOfPages = manga.pages
-  if (!manga.telegraph_fixed_url
-    && (numberOfPages > config.pages_to_show_fix_button || isFullColor(manga))) {
-    inline_keyboard[0].unshift({
-      text:          i18n.t('fix_button'),
-      callback_data: 'fix_' + manga.id,
-    })
-  }
+
   try {
     await ctx.editMessageText(messageText, {
       parse_mode:   'HTML',

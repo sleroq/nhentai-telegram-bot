@@ -1,10 +1,10 @@
 import config from '../../config'
 import i18n from './i18n'
 
-import {Manga} from '../models/manga.model'
-import {Doujin, LightDoujin} from './nhentai'
-import {Favorite, User} from '../models/user.model'
-import {InlineKeyboardButton} from 'typegram'
+import { Manga } from '../models/manga.model'
+import { Doujin, LightDoujin } from './nhentai'
+import { Favorite, User } from '../models/user.model'
+import { InlineKeyboardButton } from 'typegram'
 
 export function getMangaMessage(
   manga: Doujin | Manga | Favorite,
@@ -135,7 +135,8 @@ export function assembleKeyboard(
     ])
   }
   const numberOfPages = manga.pages
-
+  /* if the manga is too big, the telegram might refuse to create an instant view,
+     so here is a button that can magically fix that */
   if (!manga.telegraph_fixed_url
     && (numberOfPages > config.pages_to_show_fix_button
       || isFullColor(manga))) {
