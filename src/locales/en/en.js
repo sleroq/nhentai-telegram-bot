@@ -48,7 +48,7 @@ export default {
 
   next_page_tip_title:   'Next page',
   next_page_tip_message: 'To view specific page you can <b>add /p</b><code>n</code> to the search query, where <code>n</code> is page number',
-  next_page_tip: 'TAP HERE or Just add "/p{{pageNumber}}" to search query: (@nhentai_mangabot {{nextPageSwitch}})',
+  next_page_tip: 'TAP HERE or Just add "/p{{pageNumber}}" to search query: ',
 
   sorting_by_popularity_tip_title: 'To sort results by popularity',
   sorting_by_new_tip_title:        'To sort results by new',
@@ -57,7 +57,7 @@ export default {
   favorites_tip_description: 'This is your favorites:',
   favorites_is_empty:        'You haven\'t liked anything yet',
 
-  sorting_tip_slim: 'TAP HERE or add "/s{{reverseSortingParameter}}" to search query: (@nhentai_mangabot {{searchSortingSwitch}})',
+  sorting_tip_slim: 'TAP HERE or add "/s{{reverseSortingParameter}}" to search query: ',
   sorting_tip:
   `To sort search results by {{reverseSortingWord}}
   you can add <b>/s{{reverseSortingParameter}}</b> to your search query.`,

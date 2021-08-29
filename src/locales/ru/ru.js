@@ -48,7 +48,7 @@ export default {
 
   next_page_tip_title:   'Следующая страница',
   next_page_tip_message: 'Чтобы просмотреть определенную страницу, вы можете <b>добавить /p</b><code>n</code> к поисковому запросу, где <code>n</code> - номер страницы',
-  next_page_tip: 'ТЫКАЙ СЮДА или добавь "/p{{pageNumber}}" к поисковому запросу: (@nhentai_mangabot {{nextPageSwitch}})',
+  next_page_tip: 'ТЫКАЙ СЮДА или добавь "/p{{pageNumber}}" к поисковому запросу: ',
 
   sorting_by_popularity_tip_title: 'Для сортировки по популярности',
   sorting_by_new_tip_title:        'Для сортировке по новому',
@@ -57,7 +57,7 @@ export default {
   favorites_tip_description: 'Это твои избранные:',
   favorites_is_empty:        'Ты еще ничего не лайкнул',
 
-  sorting_tip_slim: 'Просто добавь "/s{{reverseSortingParameter}}" к поисковому запросу: (@nhentai_mangabot {{searchSortingSwitch}})',
+  sorting_tip_slim: 'Просто добавь "/s{{reverseSortingParameter}}" к поисковому запросу: ',
   sorting_tip:
   `Чтобы сортировать результаты по {{reverseSortingWord}}
   ты можешь добавить <b>/s{{reverseSortingParameter}}</b> к поисковому запросу`,
