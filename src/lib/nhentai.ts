@@ -63,6 +63,38 @@ export interface LightDoujin {
 export type Language = 'english' | 'japanese' | 'chinese'
 export type SortingType = 'popular' | 'popular-today' | 'popular-week' | ''
 
+export interface ApiSearchResponse {
+  result:   ApiSearchResult[]
+  num_pages: number
+  per_page:  number
+}
+
+export interface ApiSearchResult {
+  id:       string
+  media_id: string
+  title: {
+    english:  string | null
+    japanese: string | null
+    pretty:   string | null
+  }
+  images: {
+    pages:     ApiPage[]
+    cover:     ApiPage
+    thumbnail: ApiPage
+  }
+  scanlator:     string
+  upload_date:   number
+  tags:          Tag[]
+  num_pages:     number
+  num_favorites: number
+}
+
+export interface ApiPage {
+  t: 'j' | 'p' | 'g'
+  w: number
+  h: number
+}
+
 export default class nHentai {
   static async getDoujin(identifier: string | number): Promise<Doujin> {
     if (!identifier) {
@@ -115,8 +147,8 @@ export default class nHentai {
     })
     return homepage
   }
-
-  static async search(query: string, page = 1, sort: SortingType = ''): Promise<SearchResult> {
+  // Fast, but not reliable search
+  static async searchApi(query: string, page = 1, sort: SortingType = ''): Promise<SearchResult<Doujin>> {
     if (!query) {
       throw Error('No search query')
     }
@@ -126,6 +158,85 @@ export default class nHentai {
       && sort !== '') {
       throw Error('Wrong sorting')
     }
+
+    const response = await got('https://nhentai.net/api/galleries/search', {
+      searchParams: {
+        query: query,
+        page,
+        sort
+      }
+    })
+
+    const body: ApiSearchResponse = JSON.parse(response.body)
+
+    const searchResult: SearchResult<Doujin> = {
+      results:            [],
+      totalSearchResults: body.num_pages * body.per_page,
+      lastPage:           body.num_pages,
+    }
+
+    body.result.map((result) => {
+      const tags = result.tags.filter((tag) => tag.type === 'tag')
+      const parodies = result.tags.filter((tag) => tag.type === 'parody')
+      const characters = result.tags.filter((tag) => tag.type === 'character')
+      const artists = result.tags.filter((tag) => tag.type === 'artist')
+      const groups = result.tags.filter((tag) => tag.type === 'group')
+      const categories = result.tags.filter((tag) => tag.type === 'category')
+      const languages = result.tags.filter((tag) => tag.type === 'language')
+
+      const pages: string[] = []
+      result.images.pages.forEach((page, index) => {
+        pages.push(`https://i.nhentai.net//galleries/${result.media_id}/${index + 1}.${extention[page.t]}`)
+      })
+      const thumbnails: string[] = []
+      result.images.pages.forEach((page, index) => {
+        thumbnails.push(`https://i.nhentai.net//galleries/${result.media_id}/${index + 1}t.${extention[page.t]}`)
+      })
+      if (!searchResult) {
+        return
+      }
+      searchResult.results.push({
+        id:    Number(result.id),
+        url:   'https://nhentai.net/g/' + result.id + '/',
+        title: {
+          translated: {
+            pretty: result.title.pretty || result.title.english || ''
+          },
+          original: {
+            pretty: result.title.japanese || ''
+          }
+        },
+        details: {
+          parodies:   parodies || undefined,
+          characters: characters || undefined,
+          artists:    artists || undefined,
+          groups:     groups || undefined,
+          categories: categories || undefined,
+          pages:      result.num_pages,
+          languages,
+          tags,
+          uploaded:   {
+            datetime: new Date(result.upload_date)
+          }
+        },
+        pages,
+        thumbnails
+      })
+    })
+    return searchResult
+  }
+
+  static async search(query: string, page = 1, sort: SortingType = ''): Promise<SearchResult<LightDoujin>> {
+    if (!query) {
+      throw Error('No search query')
+    }
+    if (sort !== 'popular'
+  && sort !== 'popular-today'
+  && sort !== 'popular-week'
+  && sort !== '') {
+      throw Error('Wrong sorting')
+    }
+  
     const response = await got('https://nhentai.net/search/', {
       searchParams: {
         q: query,
@@ -146,11 +257,12 @@ export default class nHentai {
     const lastPage = Number(
       lastPageMatch ? lastPageMatch[1] : undefined
     )
-    const searchResult: SearchResult = {
+    const searchResult: SearchResult<LightDoujin> = {
       results:            [],
       totalSearchResults: numberOfResults,
       lastPage:           lastPage,
     }
+    
     $('.container.index-container .gallery').each((index, element) => {
       const doujin = getLightDoujin($, element)
       searchResult.results.push(doujin)
@@ -171,6 +283,11 @@ export default class nHentai {
     }
     return true
   }
+}
+const extention = {
+  j: 'jpg',
+  p: 'png',
+  g: 'gif'
 }
 export function getIdFromUrl(url: string | number): number {
   const numberRegexp = /\/g\/(\d+)\/?.*/
@@ -240,7 +357,7 @@ function assembleDoujin(response: Response<string>): Doujin {
     tagsContainer.children('a').each((index, element) => {
       tags.push({
         name:  $(element).children('.name').text(),
-        count: $(element).children('.count').text(),
+        count: Number($(element).children('.count').text()),
         id:    Number($(element).attr('class')?.split(/tag\stag-/g)[1])
       })
     })
