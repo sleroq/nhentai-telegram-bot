@@ -1,5 +1,7 @@
-import Verror           from 'verror'
-import { Context }      from 'telegraf'
+import Verror from 'verror'
+import i18n   from '../lib/i18n'
+
+import { Context }               from 'telegraf'
 import { Update, CallbackQuery } from 'telegraf/typings/core/types/typegram'
 
 import makeRandom           from './commands/random'
@@ -45,6 +47,12 @@ export default async function callbackHandler(ctx: Context<Update>, callback_que
       await help(ctx)
     } catch (error) {
       throw new Verror(error, 'Editing help')
+    }
+  } else if (data.startsWith('fix')) {
+    try {
+      await ctx.answerCbQuery(i18n.t('will_be_implemented_soon'))
+    } catch (error) {
+      throw new Verror(error, 'Answering CbQuery will_be_implemented_soon')
     }
   } else if (data.startsWith('sttgs_')) {
     try {
