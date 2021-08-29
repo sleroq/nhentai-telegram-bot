@@ -40,7 +40,7 @@ export default async function likeDoujin (ctx: Context, query: CallbackQuery.Dat
     }
     throw new Verror(error, 'Getting manga by id')
   }
-  let keyboard: InlineKeyboardButton[][] = []
+  let keyboard: InlineKeyboardButton[][]
   if (query.message
    && ('reply_markup' in query.message)
    && query.message.reply_markup) {

@@ -14,7 +14,7 @@ export default async function settings (ctx: Context): Promise<void> {
     throw new Verror(error, 'Getting user')
   }
   const search_type = user.search_type == 'article' ? i18n.t('article') : i18n.t('gallery')
-  let search_sorting = ''
+  let search_sorting: string
   switch (user.search_sorting) {
   case 'date':
   case 'new':
