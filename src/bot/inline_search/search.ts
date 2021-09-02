@@ -146,7 +146,10 @@ export default async function replyWithSearchInline(
       result.type = 'article'
     })
     try {
-      await ctx.answerInlineQuery(results)
+      await ctx.answerInlineQuery(results, {
+        cache_time:  900,
+        is_personal: true,
+      })
     } catch (error){
       throw new Verror(error, 'Answer Inline Favorites Article')
     }
