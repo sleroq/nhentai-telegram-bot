@@ -190,11 +190,9 @@ export default class nHentai {
       })
       const thumbnails: string[] = []
       result.images.pages.forEach((page, index) => {
-        thumbnails.push(`https://i.nhentai.net//galleries/${result.media_id}/${index + 1}t.${extention[page.t]}`)
+        thumbnails.push(`https://t.nhentai.net/galleries/${result.media_id}/${index + 1}t.${extention[page.t]}`)
       })
-      if (!searchResult) {
-        return
-      }
+
       searchResult.results.push({
         id:    Number(result.id),
         url:   'https://nhentai.net/g/' + result.id + '/',
