@@ -362,7 +362,7 @@ function assembleDoujin(response: Response<string>): Doujin {
     if (tags.length !== 0) {
       return tags
     }
-    return
+    return  undefined
   }
   function getUploaded(title: string): Doujin['details']['uploaded'] {
     const tagsContainer = tagsElement.children(`.tag-container:contains(${title})`).children('.tags')
