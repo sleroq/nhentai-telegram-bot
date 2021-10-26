@@ -69,4 +69,4 @@ const userSchema = new mongoose.Schema({
 }, { timestamps: true })
 
 export type User = UserSchema & Document<any, any, UserSchema>
-export default mongoose.model<UserSchema>('User', userSchema)
+export default userSchema

@@ -2,7 +2,9 @@ import i18n   from '../lib/i18n'
 import Verror from 'verror'
 
 import config from '../../config'
-import User, { UserSchema } from '../models/user.model'
+
+import { UserSchema } from '../models/user.model'
+import { getUserModel } from './connect'
 
 import { Context }  from 'telegraf'
 import { Document } from 'mongoose'
@@ -10,6 +12,8 @@ import { Document } from 'mongoose'
 const ignoredTags = process.env.IGNORED_TAGS ? process.env.IGNORED_TAGS.split(', ') : []
 
 export default async function saveAndGetUser(ctx: Context): Promise<UserSchema & Document<any, any, UserSchema>> {
+  const User = getUserModel()
+  
   if (!ctx.from) {
     throw new Verror('Saving user: !ctx.from')
   }
