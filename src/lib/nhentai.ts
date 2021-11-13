@@ -36,10 +36,10 @@ export interface Doujin {
 }
 
 export interface Tag {
-	id:    number
+	id: number
 	type?: 'character' | 'language' | 'tag' | 'group' | 'parody' | 'category' | 'artist'
-	name:  string
-	url?:  string
+	name: string
+	url?: string
 	count: number
 }
 
@@ -64,28 +64,28 @@ export type Language = 'english' | 'japanese' | 'chinese'
 export type SortingType = 'popular' | 'popular-today' | 'popular-week' | ''
 
 export interface ApiSearchResponse {
-	result:   ApiSearchResult[]
+	result: ApiSearchResult[]
 	num_pages: number
-	per_page:  number
+	per_page: number
 }
 
 export interface ApiSearchResult {
-	id:       string
+	id: string
 	media_id: string
 	title: {
-		english:  string | null
+		english: string | null
 		japanese: string | null
-		pretty:   string | null
+		pretty: string | null
 	}
 	images: {
-		pages:     ApiPage[]
-		cover:     ApiPage
+		pages: ApiPage[]
+		cover: ApiPage
 		thumbnail: ApiPage
 	}
-	scanlator:     string
-	upload_date:   number
-	tags:          Tag[]
-	num_pages:     number
+	scanlator: string
+	upload_date: number
+	tags: Tag[]
+	num_pages: number
 	num_favorites: number
 }
 
@@ -100,26 +100,30 @@ export default class nHentai {
 		if (!identifier) {
 			throw Error('You have to specify id')
 		}
-		let response: Response<string> | undefined 
+		let response: Response<string> | undefined
 		try {
 			response = await got(`https://nhentai.net/g/${identifier}/`)
 		} catch (error) {
-			if (error.message === 'Response code 404 (Not Found)') {
+			const e = getError(error)
+
+			if (e.message === 'Response code 404 (Not Found)') {
 				throw new Error('Not found')
 			}
-			throw error
+			throw e
 		}
 		return assembleDoujin(response)
 	}
 	static async getRandomDoujin(): Promise<Doujin> {
-		let response: Response<string> | undefined 
+		let response: Response<string> | undefined
 		try {
 			response = await got('https://nhentai.net/random/')
 		} catch (error) {
-			if (error.message === 'Response code 404 (Not Found)') {
+			const e = getError(error)
+
+			if (e.message === 'Response code 404 (Not Found)') {
 				throw new Error('Not found')
 			}
-			throw error
+			throw e
 		}
 
 		return assembleDoujin(response)
@@ -160,11 +164,7 @@ export default class nHentai {
 		}
 
 		const response = await got('https://nhentai.net/api/galleries/search', {
-			searchParams: {
-				query: query,
-				page,
-				sort
-			}
+			searchParams: { query, page, sort }
 		})
 
 		const body: ApiSearchResponse = JSON.parse(response.body)
@@ -195,7 +195,7 @@ export default class nHentai {
 
 			searchResult.results.push({
 				id:    Number(result.id),
-				url:   'https://nhentai.net/g/' + result.id + '/',
+				url:   `https://nhentai.net/g/${result.id}/`,
 				title: {
 					translated: {
 						pretty: result.title.pretty || result.title.english || ''
@@ -229,12 +229,12 @@ export default class nHentai {
 			throw Error('No search query')
 		}
 		if (sort !== 'popular'
-	&& sort !== 'popular-today'
-	&& sort !== 'popular-week'
-	&& sort !== '') {
+			&& sort !== 'popular-today'
+			&& sort !== 'popular-week'
+			&& sort !== '') {
 			throw Error('Wrong sorting')
 		}
-	
+
 		const response = await got('https://nhentai.net/search/', {
 			searchParams: {
 				q: query,
@@ -260,7 +260,7 @@ export default class nHentai {
 			totalSearchResults: numberOfResults,
 			lastPage:           lastPage,
 		}
-		
+
 		$('.container.index-container .gallery').each((index, element) => {
 			const doujin = getLightDoujin($, element)
 			searchResult.results.push(doujin)
@@ -275,7 +275,9 @@ export default class nHentai {
 		try {
 			await got('https://nhentai.net/g/' + identifier + '/')
 		} catch (error) {
-			if (error.message === 'Response code 404 (Not Found)') {
+			const e = getError(error)
+
+			if (e.message === 'Response code 404 (Not Found)') {
 				return false
 			}
 		}
@@ -339,7 +341,7 @@ function assembleDoujin(response: Response<string>): Doujin {
 		translated: {
 			before: translated.children('.before').text(),
 			pretty: translated.children('.pretty').text(),
-			after:  translated.children('.after').text(),
+			after: 	translated.children('.after').text(),
 		},
 		original: {
 			before: original.children('.before').text(),
@@ -362,7 +364,7 @@ function assembleDoujin(response: Response<string>): Doujin {
 		if (tags.length !== 0) {
 			return tags
 		}
-		return  undefined
+		return undefined
 	}
 	function getUploaded(title: string): Doujin['details']['uploaded'] {
 		const tagsContainer = tagsElement.children(`.tag-container:contains(${title})`).children('.tags')
@@ -410,5 +412,13 @@ function assembleDoujin(response: Response<string>): Doujin {
 		details,
 		thumbnails,
 		pages,
+	}
+}
+
+function getError(error: unknown) {
+	if (error instanceof Error) {
+		return error
+	} else {
+		throw new Error('Error is not an instance of Error: ' + error)
 	}
 }
