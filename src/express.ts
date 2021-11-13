@@ -7,14 +7,19 @@ const expressApp = express()
 // import cors from 'cors'
 import { Context, Telegraf } from 'telegraf'
 import { Update } from 'telegraf/typings/core/types/typegram'
+import Werror from './lib/error'
 
 export default async function startWithWebhook(bot: Telegraf<Context<Update>>, webhookUrl: string): Promise<void> {
 	const port = process.env.PORT || 3000
 	const secretPath = `/telegraf/${Math.random().toString(36).substring(7)}`
 
-	await bot.telegram.setWebhook(webhookUrl + secretPath, {
-		drop_pending_updates: true,
-	})
+	try  {
+		await bot.telegram.setWebhook(webhookUrl + secretPath, {
+			drop_pending_updates: true,
+		})	
+	} catch (error) {
+		throw new Werror(error, 'Setting webhook')
+	}
 
 	// Set the bot API endpoint
 	expressApp.use(bot.webhookCallback(secretPath))
