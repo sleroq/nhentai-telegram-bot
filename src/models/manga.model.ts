@@ -1,4 +1,4 @@
-import {Schema, model, Document} from 'mongoose'
+import { Schema, model, Document } from 'mongoose'
 
 export interface MangaSchema {
 	id:                   number
