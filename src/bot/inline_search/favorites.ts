@@ -1,7 +1,7 @@
 import Context from 'telegraf/typings/context'
 import config  from '../../../config'
 import i18n    from '../../lib/i18n'
-import Verror  from 'verror'
+import Werror from '../../lib/error'
 
 import { getMangaMessage, sliceByHalf } from '../../lib/some_functions'
 
@@ -39,7 +39,7 @@ export default async function replyWithFavoritesInline(
 				is_personal: true,
 			})
 		} catch (error){
-			throw new Verror(error, 'Answer Inline Favorites Photo')
+			throw new Werror(error, 'Answer Inline Favorites Photo')
 		}
 	} else {
 		const results: InlineQueryResult[] = await getFavoritesUniversal(user, specifiedPage, inlineQuery)
@@ -52,7 +52,7 @@ export default async function replyWithFavoritesInline(
 				is_personal: true,
 			})
 		} catch (error){
-			throw new Verror(error, 'Answer Inline Favorites Article')
+			throw new Werror(error, 'Answer Inline Favorites Article')
 		}
 	}
 }

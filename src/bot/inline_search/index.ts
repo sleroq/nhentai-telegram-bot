@@ -1,6 +1,7 @@
+import Werror from '../../lib/error'
+
 import Context        from 'telegraf/typings/context'
 import saveAndGetUser from '../../db/save_and_get_user'
-import Verror         from 'verror'
 
 import replyWithFavoritesInline from './favorites'
 import replyWithHistoryInline   from './history'
@@ -26,14 +27,14 @@ export default async function (ctx: Context): Promise<void> {
 		try  {
 			await replyWithFavoritesInline(ctx, inlineQuery, specifiedPage, user)
 		} catch (error) {
-			throw new Verror(error, 'Inline search - favorites')
+			throw new Werror(error, 'Inline search - favorites')
 		}
 	} else if (inlineQuery.startsWith('/h')) {
 		console.log('history')
 		try  {
 			await replyWithHistoryInline(ctx, user)
 		} catch (error) {
-			throw new Verror(error, 'Inline search - history')
+			throw new Werror(error, 'Inline search - history')
 		}
 	} else if(matchNumbers && inlineQuery.replace(/\d+/, '').trim() === ''){
 		console.log('Inline by id')
@@ -41,14 +42,14 @@ export default async function (ctx: Context): Promise<void> {
 		try  {
 			await replyByIdInline(ctx, inlineQuery, user, doujinId)
 		} catch (error) {
-			throw new Verror(error, 'Inline search - by id')
+			throw new Werror(error, 'Inline search - by id')
 		}
 	} else {
 		console.log('Inline search')
 		try  {
 			await replyWithSearchInline(ctx, inlineQuery, specifiedPage, user)
 		} catch (error) {
-			throw new Verror(error, 'Inline search - search')
+			throw new Werror(error, 'Inline search - search')
 		}
 	}
 }

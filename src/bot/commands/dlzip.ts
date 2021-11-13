@@ -1,11 +1,12 @@
-import Verror  from 'verror'
+import Werror from '../../lib/error'
+
 import i18n    from '../../lib/i18n'
 import got, { Response } from 'got'
 import AdmZip  from 'adm-zip'
 
 import nhentai, { Doujin } from '../../lib/nhentai'
 import { getMangaMessage } from '../../lib/some_functions'
-import { Context }    from 'telegraf'
+import { Context, TelegramError }    from 'telegraf'
 
 interface QueueItem { chatId: number | string, doujinId: number }
 let queue: QueueItem[] = []
@@ -13,7 +14,7 @@ let queue: QueueItem[] = []
 let currentlyWorking = false
 export default async function dlZip(ctx: Context): Promise<void> {
 	if (!ctx.message || !('text' in ctx.message) || !ctx.message.text){
-		throw new Verror('No message text')
+		throw new Werror('No message text')
 	}
 	const message = ctx.message.text
 	const matchId = message.match(/\d+/)
@@ -25,7 +26,7 @@ export default async function dlZip(ctx: Context): Promise<void> {
 				parse_mode: 'Markdown',
 			})
 		} catch (error) {
-			throw new Verror(error, 'Replying on /zip with no id')
+			throw new Werror(error, 'Replying on /zip with no id')
 		}
 
 		return
@@ -44,7 +45,7 @@ export default async function dlZip(ctx: Context): Promise<void> {
 				try {
 					manga = await nhentai.getDoujin(doujinId)
 				} catch (error) {
-					if (error.message === 'Not found') {
+					if (error instanceof Error && error.message === 'Not found') {
 						try {
 							await ctx.telegram.sendMessage(
 								chatId,
@@ -52,7 +53,7 @@ export default async function dlZip(ctx: Context): Promise<void> {
 								{ parse_mode: 'HTML' }
 							)
 						} catch (error) {
-							console.error('Replying \'404\': ' + error.message)
+							logTelegramError(error, 'Replying \'404\'')
 						}
 					} else {
 						try {
@@ -62,7 +63,7 @@ export default async function dlZip(ctx: Context): Promise<void> {
 								{ parse_mode: 'HTML' }
 							)
 						} catch (error) {
-							console.error('Replying \'failed_to_get\': ' + error.message)
+							logTelegramError(error, 'Replying \'failed_to_get\'')
 						}
 					}
 					console.log('removing')
@@ -74,7 +75,7 @@ export default async function dlZip(ctx: Context): Promise<void> {
 						await ctx.telegram.sendMessage(chatId, i18n.t('too_many_pages'), {parse_mode: 'HTML'})
 					} catch (error) {
 						queue = removeFromQueue(queue, doujinId, chatId)
-						console.error('Replying /zip too many pages: ' + error.message)
+						logTelegramError(error, 'Replying /zip too many pages')
 					}
 					continue
 				}
@@ -89,12 +90,12 @@ export default async function dlZip(ctx: Context): Promise<void> {
 					try {
 						await ctx.telegram.sendChatAction(chatId, 'upload_document')
 					} catch (error) {
-						console.error('Making chat action "upload_document": ' + error.message)
+						logTelegramError(error, 'Making chat action "upload_document"')
 					}
 					try {
 						response = await got(page, {responseType: 'buffer'})
 					} catch (error) {
-						console.error('Downloading image ' + page + ': ' + error.message)
+						logTelegramError(error, 'Downloading image ' + page)
 						continue
 					}
 					file.addFile(manga.pages.indexOf(page) + '.jpg', response.body)
@@ -113,15 +114,15 @@ export default async function dlZip(ctx: Context): Promise<void> {
 					)
 				} catch (error) {
 					queue = removeFromQueue(queue, doujinId, chatId)
-					if (error.code === 413) {
+					if (error instanceof TelegramError && error.code === 413) {
 						try {
 							await ctx.telegram.sendMessage(chatId, i18n.t('file_is_too_big'))
 						} catch (error) {
-							console.error('Replying with file_is_too_big: ' + error.message)
+							logTelegramError(error, 'Replying with file_is_too_big')
 						}
+						console.error('Sending zip file ' + error.message)
 						continue
 					}
-					console.error('Sending zip file ' + error.message)
 				}
 				queue = removeFromQueue(queue, doujinId, chatId)
 			}
@@ -140,4 +141,12 @@ export default async function dlZip(ctx: Context): Promise<void> {
 
 function removeFromQueue(queue: QueueItem[], doujinId: number, chatId: number | string){
 	return queue.filter((item) => item.chatId !== chatId && item.doujinId !== doujinId)
+}
+
+function logTelegramError (error: unknown, message?: string) {
+	if (error instanceof TelegramError) {
+		console.error(`${message}: ${error.message}`)
+	} else {
+		console.error('error in not an instance of TelegramError')
+	}
 }

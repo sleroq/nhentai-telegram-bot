@@ -1,13 +1,13 @@
 import Context from 'telegraf/typings/context'
 import config  from '../../../config'
 import i18n    from '../../lib/i18n'
-import Verror  from 'verror'
 import Manga   from '../../models/manga.model.js'
 
 import { getMangaMessage, isFullColor, sliceByHalf } from '../../lib/some_functions'
 
 import { User } from '../../models/user.model'
 import { InlineQueryResult } from 'typegram/inline'
+import Werror from '../../lib/error'
 
 const history_reply_markup = {
 	inline_keyboard: [
@@ -35,7 +35,7 @@ export default async function replyWithHistoryInline(
 				is_personal: true,
 			})
 		} catch (error){
-			throw new Verror(error, 'Answer Inline Favorites Photo')
+			throw new Werror(error, 'Answer Inline Favorites Photo')
 		}
 	} else {
 		const results: InlineQueryResult[] = await getHistoryUniversal(user)
@@ -48,7 +48,7 @@ export default async function replyWithHistoryInline(
 				is_personal: true,
 			})
 		} catch (error) {
-			throw new Verror(error, 'Answer Inline Favorites Article')
+			throw new Werror(error, 'Answer Inline Favorites Article')
 		}
 	}
 }

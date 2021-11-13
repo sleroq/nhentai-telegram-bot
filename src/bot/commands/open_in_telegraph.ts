@@ -1,5 +1,5 @@
 import i18n   from '../../lib/i18n'
-import Verror from 'verror'
+import Werror from '../../lib/error'
 
 import {
 	assembleKeyboard,
@@ -17,7 +17,7 @@ export default async function openInTelegraph (ctx: Context, query: string): Pro
 	try {
 		user = await saveAndGetUser(ctx)
 	} catch (error) {
-		throw new Verror(error, 'Getting user in callbackHandler')
+		throw new Werror(error, 'Getting user in callbackHandler')
 	}
 
 	try {
@@ -40,15 +40,15 @@ export default async function openInTelegraph (ctx: Context, query: string): Pro
 	try {
 		manga = await saveAndGetManga(user, Number(mangaId))
 	} catch (error) {
-		if(error.message === 'Not found') {
+		if(error instanceof Error && error.message === 'Not found') {
 			try {
 				await ctx.reply(i18n.t('manga_does_not_exist') + '\n(' + mangaId + ')')
 			} catch (error) {
-				throw new Verror(error, 'Replying \'404\'')
+				throw new Werror(error, 'Replying \'404\'')
 			}
 			return
 		}
-		throw new Verror(error, 'Getting manga by id')
+		throw new Werror(error, 'Getting manga by id')
 	}
 	const telegraphUrl = manga.telegraph_fixed_url
 		? manga.telegraph_fixed_url
@@ -68,6 +68,6 @@ export default async function openInTelegraph (ctx: Context, query: string): Pro
 			},
 		})
 	} catch (error){
-		throw new Verror(error, 'Editing opened in telegraph')
+		throw new Werror(error, 'Editing opened in telegraph')
 	}
 }

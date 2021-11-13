@@ -1,6 +1,6 @@
+import Werror from '../lib/error'
 import config from '../../config'
 import i18n from '../lib/i18n'
-import Verror from 'verror'
 
 import {
 	assembleKeyboard,
@@ -33,7 +33,7 @@ export default async function textHandler(ctx: Context): Promise<void> {
 	try {
 		user = await saveAndGetUser(ctx)
 	} catch (error) {
-		throw new Verror(error, 'Getting user in callbackHandler')
+		throw new Werror(error, 'Getting user in callbackHandler')
 	}
 
 	const messageText = ctx.message.text
@@ -53,7 +53,7 @@ export default async function textHandler(ctx: Context): Promise<void> {
 		try {
 			manga = await saveAndGetManga(user, Number(id))
 		} catch (error) {
-			if(error.message === 'Not found') {
+			if(error instanceof Error && error.message === 'Not found') {
 				try {
 					await ctx.reply(i18n.t('manga_does_not_exist') + ' (<code>' + id + '</code>)')
 				} catch (error) {

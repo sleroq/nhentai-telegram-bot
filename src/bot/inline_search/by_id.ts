@@ -1,7 +1,8 @@
+import Werror from '../../lib/error'
+
 import Context from 'telegraf/typings/context'
 import config  from '../../../config'
 import i18n    from '../../lib/i18n'
-import Verror  from 'verror'
 
 import { assembleKeyboard, getMangaMessage, sliceByHalf } from '../../lib/some_functions'
 
@@ -44,17 +45,17 @@ export default async function replyByIdInline(
 		doujin = await saveAndGetManga(user, doujinId)
 	} catch (error) {
 		// if nothing is found
-		if(error.message === 'Not found') {
+		if(error instanceof Error && error.message === 'Not found') {
 			const results: InlineQueryResult[] = []
 			results.push(nothingIsFoundResult)
 			try {
 				await ctx.answerInlineQuery(results).catch((err) => console.log(err))
 			} catch (error) {
-				throw new Verror(error, 'Answer Inline Nothing is found')
+				throw new Werror(error, 'Answer Inline Nothing is found')
 			}
 			return
 		}
-		throw new Verror(error, 'Getting doujin by id inline ' + doujinId)
+		throw new Werror(error, 'Getting doujin by id inline ' + doujinId)
 	}
 	
 	const searchType: 'photo' | 'article' = config.show_favorites_as_gallery ? 'photo' : 'article'
@@ -70,7 +71,7 @@ export default async function replyByIdInline(
 				is_personal: true,
 			})
 		} catch (error){
-			throw new Verror(error, 'Answer Inline Search by id Photo')
+			throw new Werror(error, 'Answer Inline Search by id Photo')
 		}
 	} else {
 		const results: InlineQueryResult[] = await getDoujinUniversal(doujin, user)
@@ -83,7 +84,7 @@ export default async function replyByIdInline(
 				is_personal: true,
 			})
 		} catch (error){
-			throw new Verror(error, 'Answer Inline Search by id Article')
+			throw new Werror(error, 'Answer Inline Search by id Article')
 		}
 	}
 

@@ -7,6 +7,8 @@ import { Node, Page}   from 'telegra.ph/typings/telegraph'
 import { Manga }       from '../models/manga.model'
 import { getTitle }    from './some_functions'
 
+import Werror from './error'
+
 const token = process.env.TELEGRAPH_TOKEN
 
 let client: undefined | Telegraph
@@ -80,14 +82,14 @@ export async function createAccount(): Promise<string> {
 	let response: Response<AccountResponse> | undefined
 	try {
 		response = await got({
-			url: `https://api.telegra.ph/createAccount?short_name=${config.bot_username}&author_name=${config.bot_username}`,
+			url:          `https://api.telegra.ph/createAccount?short_name=${config.bot_username}&author_name=${config.bot_username}`,
 			responseType: 'json',
 		})
 	} catch (error) {
-		throw new Error('Creating telegra.ph account' + error.message)
+		throw new Werror(error, 'Creating telegra.ph account')
 	}
 	if (!response.body.ok || !response.body.result || !response.body.result.access_token) {
-		throw new Error('response is not ok, respose: ' + response.body)
+		throw new Werror('Response is not ok, respose: ' + response.body)
 	}
 	console.log('Your telegra.ph access token: \'' + response.body.result.access_token + '\'')
 	return response.body.result.access_token

@@ -1,10 +1,10 @@
-import Verror from 'verror'
-import i18n   from '../../lib/i18n'
+import Werror from '../../lib/error'
+import i18n from '../../lib/i18n'
 
 import {
 	assembleKeyboard,
 	getMangaMessage,
-} from '../../lib/some_functions'
+} 					   from '../../lib/some_functions'
 import saveAndGetManga from '../../db/save_and_get_manga'
 
 import { Context }                from 'telegraf'
@@ -19,7 +19,7 @@ export default async function makeRandom(ctx: Context, mode: 'next' | 'previous'
 	try {
 		user = await saveAndGetUser(ctx)
 	} catch (error) {
-		throw new Verror(error, 'Getting user in callbackHandler')
+		throw new Werror(error, 'Getting user in callbackHandler')
 	}
 
 	let message: Message | null = null
@@ -44,7 +44,7 @@ export default async function makeRandom(ctx: Context, mode: 'next' | 'previous'
 	} else if (ctx.message) {
 		message = await createMessage(String(ctx.message.chat.id), String(ctx.message.message_id + 1))
 	} else {
-		throw new Verror('Can\'t get message_id and chat_id from context')
+		throw new Werror('Can\'t get message_id and chat_id from context')
 	}
 	let manga: Manga | undefined
 
@@ -58,7 +58,7 @@ export default async function makeRandom(ctx: Context, mode: 'next' | 'previous'
 		try {
 			manga = await saveAndGetManga(user, message.history[message.current-1])
 		} catch (error) {
-			throw new Verror(error, 'Getting random manga')
+			throw new Werror(error, 'Getting random manga')
 		}
 		message.current -= 1
 	} else
@@ -70,7 +70,7 @@ export default async function makeRandom(ctx: Context, mode: 'next' | 'previous'
 		try {
 			manga = await saveAndGetManga(user)
 		} catch (error) {
-			throw new Verror(error, 'Getting random manga')
+			throw new Werror(error, 'Getting random manga')
 		}
 		message.history.push(manga.id)
 		if (message.history.length > 50) {
@@ -92,7 +92,7 @@ export default async function makeRandom(ctx: Context, mode: 'next' | 'previous'
 		try {
 			manga = await saveAndGetManga(user, message.history[message.current])
 		} catch (error) {
-			throw new Verror(error, 'Getting random manga')
+			throw new Werror(error, 'Getting random manga')
 		}
 	}
 	user.manga_history.push(manga.id)
@@ -105,12 +105,12 @@ export default async function makeRandom(ctx: Context, mode: 'next' | 'previous'
 	try {
 		await message.save()
 	} catch (error) {
-		throw new Verror(error, 'Saving message')
+		throw new Werror(error, 'Saving message')
 	}
 	try {
 		await user.save()
 	} catch (error) {
-		throw new Verror(error, 'Saving user')
+		throw new Werror(error, 'Saving user')
 	}
 
 	const telegraphUrl = manga.telegraph_fixed_url
@@ -136,7 +136,7 @@ export default async function makeRandom(ctx: Context, mode: 'next' | 'previous'
 				},
 			})
 		} catch (error) {
-			throw new Verror(error, 'Editing random manga (->)')
+			throw new Werror(error, 'Editing random manga (->)')
 		}
 	} else {
 		try {
@@ -147,7 +147,7 @@ export default async function makeRandom(ctx: Context, mode: 'next' | 'previous'
 				},
 			})
 		} catch (error) {
-			throw new Verror(error, 'Replying with random manga (->)')
+			throw new Werror(error, 'Replying with random manga (->)')
 		}
 	}
 }

@@ -1,4 +1,4 @@
-import Verror from 'verror'
+import Werror from '../../lib/error'
 
 import {
 	CallbackQuery,
@@ -18,42 +18,42 @@ export default async function likeDoujin (ctx: Context, query: CallbackQuery.Dat
 	try {
 		user = await saveAndGetUser(ctx)
 	} catch (error) {
-		throw new Verror(error, 'Getting user in callbackHandler')
+		throw new Werror(error, 'Getting user in callbackHandler')
 	}
 
 	const doujinId = Number(query.data.split('_')[1])
 	if(!doujinId){
-		throw new Verror('Somehow user is trying to like without id')
+		throw new Werror('Somehow user is trying to like without id')
 	}
 
 	let doujin: Manga | undefined
 	try {
 		doujin = await saveAndGetManga(user, Number(doujinId))
 	} catch (error) {
-		if(error.message === 'Not found') {
+		if(error instanceof Error && error.message === 'Not found') {
 			try {
 				await ctx.reply(i18n.t('manga_does_not_exist') + '\n(' + doujinId + ')')
 			} catch (error) {
-				throw new Verror(error, 'Replying \'404\'')
+				throw new Werror(error, 'Replying \'404\'')
 			}
 			return
 		}
-		throw new Verror(error, 'Getting manga by id')
+		throw new Werror(error, 'Getting manga by id')
 	}
 	let keyboard: InlineKeyboardButton[][]
 	if (query.message
-	 && ('reply_markup' in query.message)
-	 && query.message.reply_markup) {
+		&& ('reply_markup' in query.message)
+		&& query.message.reply_markup) {
 		keyboard = query.message.reply_markup.inline_keyboard
 	} else {
 		keyboard = [
 			[
 				{
 					text: 'Telegra.ph',
-					url: String(doujin.telegraph_url)
+					url:  String(doujin.telegraph_url)
 				},
 				{
-					text: config.like_button_false,
+					text:          config.like_button_false,
 					callback_data: 'like_' + doujin.id
 				},
 			],
@@ -62,18 +62,18 @@ export default async function likeDoujin (ctx: Context, query: CallbackQuery.Dat
 
 	if (!user.favorites.find(item => { return item._id === String(doujinId) })) {
 		user.favorites.push({
-			_id: doujin.id,
-			title: doujin.title,
-			description: doujin.description,
-			tags: doujin.tags,
-			pages: doujin.pages,
+			_id:           doujin.id,
+			title:         doujin.title,
+			description:   doujin.description,
+			tags:          doujin.tags,
+			pages:         doujin.pages,
 			thumbnail:     String(doujin.thumbnail),
 			telegraph_url: String(doujin.telegraph_url),
 		})
 		try {
 			await user.save()
 		} catch (error) {
-			throw new Verror(error, 'Saving user to like doujin')
+			throw new Werror(error, 'Saving user to like doujin')
 		}
 		console.log('Added to favorites!')
 
@@ -88,14 +88,14 @@ export default async function likeDoujin (ctx: Context, query: CallbackQuery.Dat
 		try {
 			await ctx.editMessageReplyMarkup({ inline_keyboard: keyboard })
 		} catch (error){
-			throw new Verror(error, 'editing like button ')
+			throw new Werror(error, 'editing like button ')
 		}
 	} else {
 		user.favorites.splice(user.favorites.indexOf(doujin.id), 1)
 		try {
 			await user.save()
 		} catch (error) {
-			throw new Verror(error, 'Saving user to like doujin')
+			throw new Werror(error, 'Saving user to like doujin')
 		}
 		console.log('Removed from favorites!')
 		try {
@@ -107,7 +107,7 @@ export default async function likeDoujin (ctx: Context, query: CallbackQuery.Dat
 		try {
 			await ctx.editMessageReplyMarkup({ inline_keyboard: keyboard })
 		} catch (error){
-			throw new Verror(error, 'editing like button ')
+			throw new Werror(error, 'editing like button ')
 		}
 	}
 	console.log(user.favorites.length)

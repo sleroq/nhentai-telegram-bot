@@ -1,5 +1,5 @@
+import Werror from '../../../lib/error'
 import { User } from '../../../models/user.model'
-import Verror from 'verror'
 
 const ignoredTags = process.env.IGNORED_TAGS ? process.env.IGNORED_TAGS.split(', ') : []
 
@@ -25,7 +25,7 @@ export async function toggle_safe_mode(user: User): Promise<void> {
 	try {
 		await user.save()
 	} catch (error) {
-		throw new Verror(error, 'Saving user')
+		throw new Werror(error, 'Saving user')
 	}
 }
 export function isSafeModeOn(user: User): boolean {

@@ -1,13 +1,13 @@
-import Verror from 'verror'
+import Werror from '../../../lib/error'
 
-import {Context} from 'telegraf'
-import {CallbackQuery, InlineKeyboardButton, Update} from 'telegraf/typings/core/types/typegram'
+import { Context } from 'telegraf'
+import { CallbackQuery, InlineKeyboardButton, Update } from 'telegraf/typings/core/types/typegram'
 
-import {User} from '../../../models/user.model'
+import { User } from '../../../models/user.model'
 import saveAndGetUser from '../../../db/save_and_get_user'
 
 import settings from './settings'
-import {toggle_safe_mode} from './safe_mode'
+import { toggle_safe_mode } from './safe_mode'
 import i18n from '../../../lib/i18n'
 import config from '../../../../config'
 
@@ -15,12 +15,12 @@ async function safeAndEdit(user: User, ctx: Context) {
 	try {
 		await user.save()
 	} catch (error) {
-		throw new Verror(error, 'Saving user after changing setting')
+		throw new Werror(error, 'Saving user after changing setting')
 	}
 	try {
 		await settings(ctx)
 	} catch (error) {
-		throw new Verror(error, 'Editing message after changing settings')
+		throw new Werror(error, 'Editing message after changing settings')
 	}
 }
 export default async function settingsChanger(ctx: Context<Update>, callback_query: CallbackQuery.DataCallbackQuery): Promise<void> {
@@ -28,7 +28,7 @@ export default async function settingsChanger(ctx: Context<Update>, callback_que
 	try {
 		user = await saveAndGetUser(ctx)
 	} catch (error) {
-		throw new Verror(error, 'Getting user in settings')
+		throw new Werror(error, 'Getting user in settings')
 	}
 	const data = callback_query.data
 	const setting = data.split('_')[1]
@@ -57,7 +57,7 @@ export default async function settingsChanger(ctx: Context<Update>, callback_que
 		try {
 			await toggle_safe_mode(user)
 		} catch (error) {
-			throw new Verror(error, 'Toggling safe mode')
+			throw new Werror(error, 'Toggling safe mode')
 		}
 		await safeAndEdit(user, ctx)
 		break
@@ -75,12 +75,12 @@ export default async function settingsChanger(ctx: Context<Update>, callback_que
 		try {
 			await user.save()
 		} catch (error) {
-			throw new Verror(error, 'Saving user after editing language')
+			throw new Werror(error, 'Saving user after editing language')
 		}
 		try {
 			await i18n.changeLanguage(lang)
 		} catch (error) {
-			throw new Verror(error, 'setting language for i18n, language: \'' + lang + '\'')
+			throw new Werror(error, 'setting language for i18n, language: \'' + lang + '\'')
 		}
 		await editLanguages(user, ctx)
 		break
@@ -131,6 +131,6 @@ async function editLanguages(user: User, ctx: Context) {
 			},
 		})
 	} catch (error) {
-		throw new Verror(error, 'Editing message with languages')
+		throw new Werror(error, 'Editing message with languages')
 	}
 }

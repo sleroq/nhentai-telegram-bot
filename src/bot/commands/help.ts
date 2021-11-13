@@ -1,9 +1,9 @@
+import Werror from '../../lib/error'
 import config from '../../../config'
-import i18n from '../../lib/i18n'
+import i18n   from '../../lib/i18n'
 
 import { InlineKeyboardButton} from 'telegraf/typings/core/types/typegram'
-import { Context } from 'telegraf'
-import Verror from 'verror'
+import { Context }             from 'telegraf'
 
 export default async function help(ctx: Context): Promise<void> {
 	const helpKeyboard: InlineKeyboardButton[][] = [
@@ -44,7 +44,7 @@ export default async function help(ctx: Context): Promise<void> {
 				},
 			})
 		} catch (error) {
-			throw new Verror(error, 'Editing help')
+			throw new Werror(error, 'Editing help')
 		}
 	} else {
 		try {
@@ -56,7 +56,7 @@ export default async function help(ctx: Context): Promise<void> {
 				},
 			})
 		} catch (error) {
-			throw new Verror(error, 'Replying with help')
+			throw new Werror(error, 'Replying with help')
 		}
 	}
 }
@@ -66,11 +66,11 @@ export async function searchTips(ctx: Context): Promise<void> {
 	const inlineKeyboard = [
 		[
 			{
-				text: i18n.t('back_button'),
+				text:          i18n.t('back_button'),
 				callback_data: 'helpsearchback',
 			},
 			{
-				text: i18n.t('search'),
+				text: i18n.t('search'), 
 				switch_inline_query_current_chat: '',
 			},
 		],
@@ -84,6 +84,6 @@ export async function searchTips(ctx: Context): Promise<void> {
 			},
 		})
 	} catch (error) {
-		throw new Verror(error, 'Editing help')
+		throw new Werror(error, 'Editing help')
 	}
 }

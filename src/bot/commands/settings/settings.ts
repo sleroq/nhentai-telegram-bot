@@ -1,4 +1,4 @@
-import Verror from 'verror'
+import Werror from '../../../lib/error'
 import i18n from '../../../lib/i18n'
 import saveAndGetUser from '../../../db/save_and_get_user'
 import { isSafeModeOn } from './safe_mode'
@@ -11,7 +11,7 @@ export default async function settings (ctx: Context): Promise<void> {
 	try {
 		user = await saveAndGetUser(ctx)
 	} catch (error) {
-		throw new Verror(error, 'Getting user')
+		throw new Werror(error, 'Getting user')
 	}
 	const search_type = user.search_type == 'article' ? i18n.t('article') : i18n.t('gallery')
 	let search_sorting: string
@@ -74,7 +74,7 @@ export default async function settings (ctx: Context): Promise<void> {
 				},
 			})
 		} catch (error) {
-			throw new Verror(error, 'Editing settings')
+			throw new Werror(error, 'Editing settings')
 		}
 	} else {
 		try {
@@ -85,7 +85,7 @@ export default async function settings (ctx: Context): Promise<void> {
 				},
 			})
 		} catch (error) {
-			throw new Verror(error, 'Replying settings')
+			throw new Werror(error, 'Replying settings')
 		}
 	}
 }

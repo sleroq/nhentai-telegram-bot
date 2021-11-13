@@ -1,7 +1,7 @@
 import Context from 'telegraf/typings/context'
 import config  from '../../../config'
 import i18n    from '../../lib/i18n'
-import Verror  from 'verror'
+import Werror from '../../lib/error'
 
 import { getMangaMessage, getMessageInline, sliceByHalf, tagString } from '../../lib/some_functions'
 
@@ -114,18 +114,18 @@ export default async function replyWithSearchInline(
 		searchResult = await nHentai.searchApi(inlineQuery, pageNumber, sortingParameter)
 		// nhentai`s api is not reliable (sometimes gives false 404) So fallback on webpage scraping
 	} catch (error) {
-		console.error(error.message)
+		console.error(error)
 		try {
 			searchResult = await nHentai.search(inlineQuery, pageNumber, sortingParameter)
 		} catch (err) {
-			throw new Verror(err, 'Searching inline')
+			throw new Werror(err, 'Searching inline')
 		}
 	}
 	if (searchResult.totalSearchResults === 0){
 		try {
 			await ctx.answerInlineQuery([nothingIsFoundResult])
 		} catch (error) {
-			throw new Verror(error, 'Answer Inline Nothing is found')
+			throw new Werror(error, 'Answer Inline Nothing is found')
 		}
 		return
 	}
@@ -138,7 +138,7 @@ export default async function replyWithSearchInline(
 		try {
 			await ctx.answerInlineQuery(results)
 		} catch (error){
-			throw new Verror(error, 'Answer Inline Favorites Photo')
+			throw new Werror(error, 'Answer Inline Favorites Photo')
 		}
 	} else {
 		const results: InlineQueryResult[] = await getResultsUniversal(user, searchResult.results, inlineQuery, isSearchModified, sortingParameter, pageNumber)
@@ -151,7 +151,7 @@ export default async function replyWithSearchInline(
 				is_personal: true,
 			})
 		} catch (error){
-			throw new Verror(error, 'Answer Inline Favorites Article')
+			throw new Werror(error, 'Answer Inline Favorites Article')
 		}
 	}
 }

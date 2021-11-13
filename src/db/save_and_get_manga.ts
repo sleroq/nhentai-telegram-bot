@@ -1,5 +1,3 @@
-import Verror from 'verror'
-
 import nhentai, { Doujin }    from '../lib/nhentai'
 import TelegraphUploadByUrls  from '../lib/telegraph.js'
 
@@ -7,6 +5,8 @@ import MangaModel,  { Manga } from '../models/manga.model.js'
 import { UserSchema }         from '../models/user.model'
 import getRandomMangaLocally  from '../db/get_manga_random_locally'
 import { getTitle }           from '../lib/some_functions'
+
+import Werror from '../lib/error'
 
 export default async function saveAndGetManga(user: UserSchema, id?: number): Promise<Manga> {
 	let savedManga: Manga | null = null
@@ -21,17 +21,17 @@ export default async function saveAndGetManga(user: UserSchema, id?: number): Pr
 					user.ignored_random_tags
 				)
 			} catch (error) {
-				throw new Verror(error, 'Getting doujin locally')
+				throw new Werror(error, 'Getting doujin locally')
 			}
 			if (savedManga === null) {
-				throw new Verror('Couldn\'t find manga with such tags')
+				throw new Werror('Couldn\'t find manga with such tags')
 			}
 		} else { // (not locally)
 			try {
 				newManga = await nhentai.getRandomDoujin()
 				images = newManga.pages
 			} catch (error) {
-				throw new Verror(error, 'Getting random doujin from nhentai')
+				throw new Werror(error, 'Getting random doujin from nhentai')
 			}
 			let sameMangaInDB: Manga | null = null
 			try {
@@ -45,7 +45,7 @@ export default async function saveAndGetManga(user: UserSchema, id?: number): Pr
 				try {
 					savedManga = await saveNewManga(newManga)
 				} catch (error) {
-					throw new Verror(error, 'Saving doujin')
+					throw new Werror(error, 'Saving doujin')
 				}
 			}
 		}
@@ -59,10 +59,10 @@ export default async function saveAndGetManga(user: UserSchema, id?: number): Pr
 			try {
 				newManga = await nhentai.getDoujin(id)
 			} catch (error) {
-				if(error.message === 'Not found'){
+				if(error instanceof Error && error.message === 'Not found'){
 					throw new Error('Not found')
 				}
-				throw new Verror(error, 'Getting doujin by id')
+				throw new Werror(error, 'Getting doujin by id')
 			}
 			images = newManga.pages
 			savedManga = await saveNewManga(newManga)
@@ -113,7 +113,7 @@ async function saveNewManga(manga: Doujin): Promise<Manga> {
 	try {
 		telegraphUrl = await TelegraphUploadByUrls(manga)
 	} catch (error) {
-		throw new Verror(error, 'Posting doujin to telegra.ph')
+		throw new Werror(error, 'Posting doujin to telegra.ph')
 	}
 
 	const mangaDB = new MangaModel({
@@ -142,10 +142,10 @@ async function updateTelegraphUrl(images: string[], savedManga: Manga) {
 		try {
 			mangaWithPages = await nhentai.getDoujin(savedManga.id)
 		} catch (error) {
-			if(error.message === 'Not found'){
+			if(error instanceof Error && error.message === 'Not found'){
 				throw new Error('Not found')
 			}
-			throw new Verror(error, 'Getting images to update manga without telegra.ph url')
+			throw new Werror(error, 'Getting images to update manga without telegra.ph url')
 		}
 		images = mangaWithPages.pages
 		console.log('Got pages to fix manga from DB')
@@ -153,7 +153,7 @@ async function updateTelegraphUrl(images: string[], savedManga: Manga) {
 	try {
 		savedManga.telegraph_url = await TelegraphUploadByUrls(savedManga, images)
 	} catch (error) {
-		throw new Verror(error, 'Posting doujin to telegra.ph to fix manga without telegra.pf url')
+		throw new Werror(error, 'Posting doujin to telegra.ph to fix manga without telegra.pf url')
 	}
 	try {
 		console.log('updated Telegraph Url for ' + savedManga.id)
@@ -169,10 +169,10 @@ async function addThumbnail(savedManga: Manga) {
 	try {
 		mangaWithThumbnail = await nhentai.getDoujin(savedManga.id)
 	} catch (error) {
-		if(error.message === 'Not found'){
+		if(error instanceof Error && error.message === 'Not found'){
 			throw new Error('Not found')
 		}
-		throw new Verror('Getting manga with thumbnail')
+		throw new Werror('Getting manga with thumbnail')
 	}
 	savedManga.thumbnail = mangaWithThumbnail.thumbnails[0]
 	savedManga.page0 = mangaWithThumbnail.pages[0]

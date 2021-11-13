@@ -1,5 +1,4 @@
 import i18n   from '../lib/i18n'
-import Verror from 'verror'
 
 import config from '../../config'
 
@@ -15,7 +14,7 @@ export default async function saveAndGetUser(ctx: Context): Promise<UserSchema &
 	const User = getUserModel()
 	
 	if (!ctx.from) {
-		throw new Verror('Saving user: !ctx.from')
+		throw new Error('Error saving user: no "ctx.from"')
 	}
 	let user: UserSchema & Document<any, any, UserSchema> | null = null
 	try {
