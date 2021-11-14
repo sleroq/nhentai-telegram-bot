@@ -80,7 +80,7 @@ async function fixInstantView(
 		}
 
 	}
-	const fixingKeyboardBack = await buildKeyboardBack(doujin.telegraph_url, doujin.id, callback_query, message)
+	const fixingKeyboardBack = await buildKeyboardBack(doujin.telegraph_url, doujinId, callback_query, message)
 
 	try {
 		await ctx.editMessageReplyMarkup({
@@ -297,7 +297,7 @@ async function buildKeyboardBack(
 	fixing_keyboard[0].unshift({
 		// button to try again:
 		text: i18n.t('try_again_later'),
-		callback_data: 'fixLater_' + id + '_' + new Date(),
+		callback_data: `fixLater_${id}_${new Date().getMinutes()}`,
 	})
 	// in case it happen not in inline search we should add buttons back:
 	if (callback_query.message) {
