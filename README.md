@@ -42,7 +42,7 @@ if you want an old version, then use the code from the latest javascript release
 - Create cluster on [Mongo database](https://docs.atlas.mongodb.com/getting-started/) (free)
 - Get bot token from [@BotFather](https://t.me/BotFather)
 
-On repl.it you may need to run `npm install node && npm install && npm build` before starting for the first time
+On repl.it you may need to run `npm install node && npm install && npm run build` before starting for the first time
 
 [![Run on Repl.it](https://repl.it/badge/github/iamdowner/nhentai-telegram-bot)](https://repl.it/github/iamdowner/nhentai-telegram-bot)
 
