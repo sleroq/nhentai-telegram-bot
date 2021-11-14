@@ -21,10 +21,9 @@ module.exports = {
 		'linebreak-style': ['error', 'unix'],
 		quotes:            ['error', 'single'],
 		semi:              ['error', 'never'],
-		'key-spacing':     ['warn', {
+		'key-spacing':     ['off', {
 			beforeColon: false,
 			afterColon:  true,
-			mode:        'strict',
 			align:       'value'
 		}],
 	}
