@@ -17,24 +17,39 @@ import i18n from '../../lib/i18n'
 import { Context } from 'telegraf'
 import { CallbackQuery, InlineKeyboardButton } from 'telegraf/typings/core/types/typegram'
 
-export default async function fixInstantView(
+export default async function fixInstantViewAsync(
 	ctx: Context,
 	callback_query: CallbackQuery.DataCallbackQuery
 ): Promise<void> {
+	try {
+		await fixInstantView(ctx, callback_query)
+	} catch (error) {
+		console.error(error)
+	}
+}
+
+async function fixInstantView(
+	ctx: Context,
+	callback_query: CallbackQuery.DataCallbackQuery
+): Promise<void> {
+	console.log('inside fixInstantView')
+
 	// Get doujin's id
-	const matchId = callback_query.data.match(/_[0-9]+/)
-	if (!matchId || !Number(matchId[0])) {
+	const matchId = callback_query.data.match(/_([0-9]+)/)
+	if (!matchId || !Number(matchId[1])) {
 		return
 	}
-	const doujinId = Number(matchId[0])
+	const doujinId = Number(matchId[1])
 
-	// Save user
+	// Get user
 	let user
 	try {
 		user = await saveAndGetUser(ctx)
 	} catch (error) {
 		throw new Werror(error, 'Getting user in callbackHandler')
 	}
+
+	console.log('got user')
 
 	let doujin
 	try {
@@ -51,6 +66,8 @@ export default async function fixInstantView(
 		throw new Werror(error, 'Can`t get doujin')
 	}
 
+	console.log('got doujin')
+
 	let message
 	if (callback_query.message) {
 		try {
@@ -61,12 +78,25 @@ export default async function fixInstantView(
 		} catch (error) {
 			throw new Werror(error, 'Getting message')
 		}
-	
+
 	}
+	const fixingKeyboardBack = await buildKeyboardBack(doujin.telegraph_url, doujin.id, callback_query, message)
+
+	try {
+		await ctx.editMessageReplyMarkup({
+			inline_keyboard: fixingKeyboardBack,
+		})
+	} catch (error) {
+		throw new Werror(error, 'editMessageReplyMarkup before fixing pages: ')
+	}
+
+	console.log('got message')
 
 	let fixedUrl = doujin.telegraph_fixed_url
 
 	if (!fixedUrl) {
+		console.log(' getting urls for images')
+
 		// getting urls for images
 		let pages
 		try {
@@ -81,6 +111,7 @@ export default async function fixInstantView(
 			}
 			throw new Werror(error, 'Getting pages to fix doujin')
 		}
+		console.log(' got urls for images')
 
 		// uploading each image to telegra.ph
 		let attemptsCnt = 0    // count retries
@@ -97,9 +128,7 @@ export default async function fixInstantView(
 			)
 		}
 
-		const fixingKeyboardBack = await buildKeyboardBack(doujin.telegraph_url, doujin.id, callback_query, message)
-
-		let current = 0
+		let current = pages.indexOf(notUploadedUrls[0])
 		while (notUploadedUrls.length > 0) {
 			// in case we were retrying after err 3 times - stop it
 			if (attemptsCnt > 2) {
@@ -114,14 +143,15 @@ export default async function fixInstantView(
 			}
 
 			try {
-				await fixPage(ctx, pages[current], doujin, current, pages.length)
+				await fixPage(ctx, notUploadedUrls[0], doujin, current, pages.length)
 			} catch (error) {
-				console.error('fixing page: ' + pages[current], error)
+				console.error('fixing page: ' + notUploadedUrls[0], error)
 				attemptsCnt++
 				await sleep(5000) // maybe will help
 				continue
 			}
-			notUploadedUrls.splice(current, 1)
+			console.log('uploaded ' + notUploadedUrls[0])
+			notUploadedUrls.splice(0, 1)
 			current++
 		}
 
