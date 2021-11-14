@@ -1,5 +1,5 @@
 import Werror from '../lib/error'
-import i18n   from '../lib/i18n'
+// import i18n   from '../lib/i18n'
 
 import { Context }               from 'telegraf'
 import { Update, CallbackQuery } from 'telegraf/typings/core/types/typegram'
