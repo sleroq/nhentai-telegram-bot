@@ -32,8 +32,6 @@ async function fixInstantView(
 	ctx: Context,
 	callback_query: CallbackQuery.DataCallbackQuery
 ): Promise<void> {
-	console.log('inside fixInstantView')
-
 	// Get doujin's id
 	const matchId = callback_query.data.match(/_([0-9]+)/)
 	if (!matchId || !Number(matchId[1])) {
@@ -49,8 +47,6 @@ async function fixInstantView(
 		throw new Werror(error, 'Getting user in callbackHandler')
 	}
 
-	console.log('got user')
-
 	let doujin
 	try {
 		doujin = await saveAndGetManga(user, doujinId)
@@ -65,8 +61,6 @@ async function fixInstantView(
 		}
 		throw new Werror(error, 'Can`t get doujin')
 	}
-
-	console.log('got doujin')
 
 	let message
 	if (callback_query.message) {
@@ -90,13 +84,9 @@ async function fixInstantView(
 		throw new Werror(error, 'editMessageReplyMarkup before fixing pages: ')
 	}
 
-	console.log('got message')
-
 	let fixedUrl = doujin.telegraph_fixed_url
 
 	if (!fixedUrl) {
-		console.log(' getting urls for images')
-
 		// getting urls for images
 		let pages
 		try {
@@ -111,7 +101,6 @@ async function fixInstantView(
 			}
 			throw new Werror(error, 'Getting pages to fix doujin')
 		}
-		console.log(' got urls for images')
 
 		// uploading each image to telegra.ph
 		let attemptsCnt = 0    // count retries
@@ -124,11 +113,12 @@ async function fixInstantView(
 			notUploadedUrls = notUploadedUrls.slice(uploadedUrls.length - 1) // slicing already uploaded
 
 			console.log(
-				'restored is ' + uploadedUrls.length + ' pages from previous try'
+				'restored ' + uploadedUrls.length + ' pages from previous try'
 			)
 		}
 
 		let current = pages.indexOf(notUploadedUrls[0])
+		const total = pages.length
 		while (notUploadedUrls.length > 0) {
 			// in case we were retrying after err 3 times - stop it
 			if (attemptsCnt > 2) {
@@ -143,14 +133,13 @@ async function fixInstantView(
 			}
 
 			try {
-				await fixPage(ctx, notUploadedUrls[0], doujin, current, pages.length)
+				await fixPage(ctx, notUploadedUrls[0], doujin, current, total)
 			} catch (error) {
 				console.error('fixing page: ' + notUploadedUrls[0], error)
 				attemptsCnt++
 				await sleep(5000) // maybe will help
 				continue
 			}
-			console.log('uploaded ' + notUploadedUrls[0])
 			notUploadedUrls.splice(0, 1)
 			current++
 		}
@@ -188,6 +177,8 @@ async function fixInstantView(
 		})
 	}
 
+	console.log(`Fixed ${doujin.id}\nNew url = ${fixedUrl}\nOld url: = ${doujin.telegraph_url}`)
+
 	try {
 		await ctx.editMessageText(messageText, {
 			parse_mode: 'HTML',
@@ -198,61 +189,6 @@ async function fixInstantView(
 	} catch (error) {
 		throw new Werror(error, 'Editing manga message after fix')
 	}
-
-
-
-
-	//   const heart = user.favorites.includes(doujin.id) ? config.like_button_true : config.like_button_false
-	//   const messageText = getMangaMessage(doujin, fixedUrl)
-	//   const inline_keyboard: InlineKeyboardButton[][] = [
-	// 	[
-	// 	  {
-	// 		text: 'Telegra.ph',
-	// 		url:  String(fixedUrl),
-	// 	  },
-	// 	  {text: heart, callback_data: 'like_' + doujin.id},
-	// 	],
-	//   ]
-	//   if (callback_query.message) {
-	// 	inline_keyboard.push([
-	// 	  {
-	// 		text: i18n.t('search_button'),
-	// 		switch_inline_query_current_chat: '',
-	// 	  },
-	// 	])
-	// 	inline_keyboard.push([
-	// 	  {
-	// 		text: i18n.t('next_button'),
-	// 		callback_data: 'r_prev' + doujin.id
-	// 	  },
-	// 	])
-
-	// 	const message = await Message.findOne({
-	// 	  message_id: callback_query.message.message_id,
-	// 	  chat_id: String(callback_query.message.from?.id),
-	// 	})
-	// 	if (message && message.current > 0) {
-	// 	  inline_keyboard[2].unshift({
-	// 		text: i18n.t('previous_button'),
-	// 		callback_data: 'prev_' + doujin.id,
-	// 	  })
-	// 	}
-	//   }
-	//   console.log('fixed pages! new url: ' + fixedUrl)
-	//   try {
-	// 	await ctx.editMessageText(messageText, {
-	// 	  parse_mode: 'HTML',
-	// 	  reply_markup: {
-	// 		inline_keyboard: inline_keyboard,
-	// 	  },
-	// 	})
-	//   } catch (error) {
-	// 	console.error('editing message with fixed doujin: ', error)
-	//   }
-	// }
-
-
-
 }
 
 function sleep(ms: number) {
