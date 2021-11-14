@@ -74,11 +74,25 @@ async function fixInstantView(
 		}
 
 	}
-	const fixingKeyboardBack = await buildKeyboardBack(doujin.telegraph_url, doujin.id, callback_query, message)
 
+	const fixingKeyboardBack = await buildKeyboardBack(doujin.telegraph_url, doujin.id, callback_query, message)
+	
+	const fixing_keyboard: InlineKeyboardButton[][] = [[]]
+	const telegraph_url = doujin.telegraph_url
+	// while manga is fixing you can still try to open broken one:
+	if (telegraph_url) {
+		fixing_keyboard[0].push({
+			text: 'Telegra.ph',
+			url: String(doujin.telegraph_url),
+		})
+	}
+	fixing_keyboard[0].unshift({
+		text: i18n.t('waitabit_button'),
+		callback_data: 'wait',
+	})
 	try {
 		await ctx.editMessageReplyMarkup({
-			inline_keyboard: fixingKeyboardBack,
+			inline_keyboard: fixing_keyboard,
 		})
 	} catch (error) {
 		throw new Werror(error, 'editMessageReplyMarkup before fixing pages: ')
