@@ -1,3 +1,6 @@
+
+import Werror from './error'
+
 import Telegraph         from 'telegra.ph'
 import config            from '../../config'
 import got, { Response } from 'got'
@@ -6,8 +9,6 @@ import { Doujin }      from './nhentai'
 import { Node, Page}   from 'telegra.ph/typings/telegraph'
 import { Manga }       from '../models/manga.model'
 import { getTitle }    from './some_functions'
-
-import Werror from './error'
 
 const token = process.env.TELEGRAPH_TOKEN
 
@@ -51,6 +52,7 @@ export async function telegraphCreatePage(
 		true
 	)
 }
+
 export default async function TelegraphUploadByUrls(
 	manga: Doujin | Manga,
 	images?: string[]

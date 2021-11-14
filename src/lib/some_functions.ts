@@ -16,6 +16,7 @@ export function getMangaMessage(
 		pages = Array.isArray(manga.pages) ? manga.pages.length : manga.pages,
 		id = 'id' in manga ? manga.id : manga._id,
 		mangaUrl = `https://nhentai.net/g/${id}/`
+	
 	let link: string | undefined = telegraphLink
 	if (!link) {
 		if ('telegraph_fixed_url' in manga && manga.telegraph_fixed_url) {
@@ -28,6 +29,7 @@ export function getMangaMessage(
 <a href="${link}">${title}</a> (${pages} ${pages_word})
 ${tags}\n<a href="${mangaUrl}">nhentai.net</a> | <code>${id}</code>`
 }
+
 export function tagString(
 	manga: Doujin | Manga | Favorite
 ): string {

@@ -1,10 +1,10 @@
 import dotenv from 'dotenv'
 dotenv.config()
 
-import connectToMongo			from './db/connect'
-import { createAccount }	from './lib/telegraph'
-import setupBot						from './bot/index'
-import startWithWebhook		from './express'
+import connectToMongo    from './db/connect'
+import { createAccount } from './lib/telegraph'
+import setupBot          from './bot/index'
+import startWithWebhook  from './express'
 
 import Werror from './lib/error'
 
