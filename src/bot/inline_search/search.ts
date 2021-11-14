@@ -1,7 +1,7 @@
 import Context from 'telegraf/typings/context'
 import config  from '../../../config'
 import i18n    from '../../lib/i18n'
-import Werror from '../../lib/error'
+import Werror  from '../../lib/error'
 
 import { getMangaMessage, getMessageInline, sliceByHalf, tagString } from '../../lib/some_functions'
 
@@ -186,12 +186,12 @@ async function getResultsUniversal(
 			id:    String(doujin.id),
 			type:  'photo',
 			title: title
-				.replace('<', '\\<')
-				.replace('>', '\\>')
+				.replace(/</g, '\\<')
+				.replace(/>/g, '\\>')
 				.trim(),
 			description: description
-				.replace('<', '\\<')
-				.replace('>', '\\>')
+				.replace(/</g, '\\<')
+				.replace(/>/g, '\\>')
 				.trim(),
 
 			thumb_url: thumbnail,

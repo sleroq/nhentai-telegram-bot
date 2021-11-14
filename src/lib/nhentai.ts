@@ -247,8 +247,8 @@ export default class nHentai {
 
 		const numberOfResults = Number(
 			$('#content h1').text()
-				.replace(',', '')
-				.replace(' results', '')
+				.replace(/,/g, '')
+				.replace(/\sresults/g, '')
 		)
 		const pagination = $('#content .pagination')
 		const lastPageMatch = pagination.children('.last').attr('href')?.match(/page=([0-9]+)/)

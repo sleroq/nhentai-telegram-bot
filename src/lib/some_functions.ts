@@ -44,7 +44,7 @@ export function tagString(
 	}
 	tagsArray.forEach((tag, index) => {
 		if (index !== tagsArray.length - 1) {
-			tags += '#' + tag.replace(/\s/, '_').replace(/-/, '_')
+			tags += '#' + tag.replace(/\s/g, '_').replace(/-/g, '_')
 		}
 		if (index < tagsArray.length - 2) {
 			tags += ', '
@@ -67,8 +67,8 @@ export function sliceByHalf(s: string): string {
 export function getMessageInline(manga: LightDoujin): string {
 	const link = 'https://nhentai.net/g/' + manga.id + '/',
 		title = manga.title ? manga.title
-			.replace('<', ']')
-			.replace('>', '[')
+			.replace(/</g, ']')
+			.replace(/>/g, '[')
 			.trim() : 'Some manga'
 	return `<a href="${link}">${title}</a>`
 }

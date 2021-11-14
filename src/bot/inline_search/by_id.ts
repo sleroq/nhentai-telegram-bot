@@ -107,12 +107,12 @@ async function getDoujinUniversal (
 		id:    String(doujin.id),
 		type:  'photo',
 		title: doujin.title
-			.replace('<', '\\<')
-			.replace('>', '\\>')
+			.replace(/</g, '\\<')
+			.replace(/>/g, '\\>')
 			.trim(),
 		description: description
-			.replace('<', '\\<')
-			.replace('>', '\\>')
+			.replace(/</g, '\\<')
+			.replace(/>/g, '\\>')
 			.trim(),
 		thumb_url:             String(doujin.thumbnail),
 		photo_url:             String(doujin.page0),

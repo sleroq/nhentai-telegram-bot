@@ -102,12 +102,12 @@ async function getHistoryUniversal(
 			id:    doujin._id,
 			type:  'article',
 			title: doujin.title
-				.replace('<', '\\<')
-				.replace('>', '\\>')
+				.replace(/</g, '\\<')
+				.replace(/>/g, '\\>')
 				.trim(),
 			description: description
-				.replace('<', '\\<')
-				.replace('>', '\\>')
+				.replace(/</g, '\\<')
+				.replace(/>/g, '\\>')
 				.trim(),
 			thumb_url: doujin.thumbnail,
 			input_message_content: {

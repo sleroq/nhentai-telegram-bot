@@ -1,7 +1,7 @@
 import Context from 'telegraf/typings/context'
 import config  from '../../../config'
 import i18n    from '../../lib/i18n'
-import Werror from '../../lib/error'
+import Werror  from '../../lib/error'
 
 import { getMangaMessage, sliceByHalf } from '../../lib/some_functions'
 
@@ -83,12 +83,12 @@ async function getFavoritesUniversal(
 			id:    favorite._id,
 			type:  'photo',
 			title: favorite.title
-				.replace('<', '\\<')
-				.replace('>', '\\>')
+				.replace(/</g, '\\<')
+				.replace(/>/g, '\\>')
 				.trim(),
 			description: description
-				.replace('<', '\\<')
-				.replace('>', '\\>')
+				.replace(/</g, '\\<')
+				.replace(/>/g, '\\>')
 				.trim(),
 
 			thumb_url: favorite.thumbnail,
