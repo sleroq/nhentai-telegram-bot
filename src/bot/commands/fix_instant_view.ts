@@ -80,7 +80,7 @@ async function fixInstantView(
 		}
 
 	}
-	const fixingKeyboardBack = await buildKeyboardBack(doujin.telegraph_url, doujinId, callback_query, message)
+	const fixingKeyboardBack = await buildKeyboardBack(doujin.telegraph_url, doujin.id, callback_query, message)
 
 	try {
 		await ctx.editMessageReplyMarkup({
