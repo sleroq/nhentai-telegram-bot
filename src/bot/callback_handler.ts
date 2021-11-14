@@ -9,6 +9,7 @@ import openInTelegraph      from './commands/open_in_telegraph'
 import likeDoujin           from './commands/like'
 import help, { searchTips } from './commands/help'
 import settingsChanger      from './commands/settings/buttons_handler'
+import fixInstantView       from './commands/fix_instant_view'
 
 export default async function callbackHandler(ctx: Context<Update>, callback_query: CallbackQuery.DataCallbackQuery): Promise<void> {
 	const data: string = callback_query.data
@@ -50,7 +51,8 @@ export default async function callbackHandler(ctx: Context<Update>, callback_que
 		}
 	} else if (data.startsWith('fix')) {
 		try {
-			await ctx.answerCbQuery(i18n.t('will_be_implemented_soon'))
+			await fixInstantView(ctx, callback_query)
+			// await ctx.answerCbQuery(i18n.t('will_be_implemented_soon'))
 		} catch (error) {
 			throw new Werror(error, 'Answering CbQuery will_be_implemented_soon')
 		}
