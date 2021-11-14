@@ -145,7 +145,7 @@ async function fixInstantView(
 		}
 
 		try {
-			fixedUrl = (await telegraphCreatePage(doujin, uploadedUrls)).url
+			fixedUrl = (await telegraphCreatePage(doujin, doujin.fixed_pages)).url
 		} catch (error) {
 			try {
 				await ctx.editMessageReplyMarkup({
