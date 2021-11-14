@@ -1,5 +1,4 @@
 import Werror from '../lib/error'
-// import i18n   from '../lib/i18n'
 
 import { Context }               from 'telegraf'
 import { Update, CallbackQuery } from 'telegraf/typings/core/types/typegram'
@@ -52,7 +51,6 @@ export default async function callbackHandler(ctx: Context<Update>, callback_que
 	} else if (data.startsWith('fix')) {
 		try {
 			fixInstantViewAsync(ctx, callback_query)
-			// await ctx.answerCbQuery(i18n.t('will_be_implemented_soon'))
 		} catch (error) {
 			throw new Werror(error, 'Answering CbQuery will_be_implemented_soon')
 		}

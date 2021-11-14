@@ -1,5 +1,6 @@
-import mongoose, { Connection } from 'mongoose'
 import Werror from '../lib/error'
+
+import mongoose, { Connection }   from 'mongoose'
 import userSchema, { UserSchema } from '../models/user.model'
 
 let connection2: Connection | undefined

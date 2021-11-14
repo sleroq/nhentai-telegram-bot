@@ -2,14 +2,14 @@ import Werror from '../../lib/error'
 
 import nhentai, { Doujin } from '../../lib/nhentai'
 
-import { uploadByUrl, uploadResult } from 'telegraph-uploader'
-import { telegraphCreatePage } from '../../lib/telegraph'
+import { uploadByUrl, uploadResult }         from 'telegraph-uploader'
+import { telegraphCreatePage }               from '../../lib/telegraph'
 import { assembleKeyboard, getMangaMessage } from '../../lib/some_functions'
 
 import { Manga } from '../../models/manga.model'
 import MessageRecord, { Message } from '../../models/message.model'
 
-import saveAndGetUser from '../../db/save_and_get_user'
+import saveAndGetUser  from '../../db/save_and_get_user'
 import saveAndGetManga from '../../db/save_and_get_manga'
 
 import i18n from '../../lib/i18n'

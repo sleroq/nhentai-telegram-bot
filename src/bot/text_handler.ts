@@ -1,11 +1,11 @@
 import Werror from '../lib/error'
 import config from '../../config'
-import i18n from '../lib/i18n'
+import i18n   from '../lib/i18n'
 
 import {
 	assembleKeyboard,
 	getMangaMessage
-} from '../lib/some_functions'
+}                      from '../lib/some_functions'
 import saveAndGetManga from '../db/save_and_get_manga'
 import saveAndGetUser  from '../db/save_and_get_user'
 

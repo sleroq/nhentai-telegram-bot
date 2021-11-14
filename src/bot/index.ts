@@ -1,8 +1,9 @@
 import { Telegraf } from 'telegraf'
 
+import Werror from '../lib/error'
+
 import saveAndGetUser from '../db/save_and_get_user'
 import i18n from '../lib/i18n'
-import Werror from '../lib/error'
 
 // Import all commands
 import callbackHandler from './callback_handler'

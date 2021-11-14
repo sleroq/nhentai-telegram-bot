@@ -5,7 +5,6 @@ import ru from '../locales/ru/ru'
 import es from '../locales/es/es'
 
 i18next
-// .use(Backend)
 	.init({
 		fallbackLng: 'en',
 		resources:   {
