@@ -1,6 +1,6 @@
 {
   "name": "nhentai-telegram-bot",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "A simple Nodejs telegram app built on millions of broken APIs, instantly up and running (not always).",
   "main": "src/server.js",
   "scripts": {
