@@ -1,5 +1,3 @@
-# nhentai telegram bot
-
 # Features:
 
 - <details>
@@ -22,11 +20,16 @@
   </details>
 - Discover new doujins with /rand command.
 - Open doujins using code or link, send multiple codes in one message.
-- Database - Bot works even if nhentai is down (more than 170k doujins are saved).
+- <details>
+    <summary>
+      Database - Bot works even if nhentai is down (more than 500k doujins are saved).
+    </summary>
+    <img src="https://i.imgur.com/eh69bTA.png" alt="Database screnshot">
+  </details>
 - <details>
     <summary>
       Translated into Russian and Spanish
-    </summary>
+    </summary>https://i.imgur.com/eh69bTA.png
     <img src="https://i.postimg.cc/7Zs7Y2hd/image.png" alt="Language selection">
   </details>
 
@@ -42,3 +45,32 @@ On repl.it you may need to run `npm install node && npm install && npm run build
 [![Run on Repl.it](https://repl.it/badge/github/iamdowner/nhentai-telegram-bot)](https://repl.it/github/iamdowner/nhentai-telegram-bot)
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/iamdowner/nhentai-telegram-bot)
+
+## Development progress:
+- [ ] User-related features
+	- [ ] ability to set filter and random only in specific tags
+	- [ ] ability to exclude tags from random in random
+	- [ ] button to delete all user data in settings
+	- [ ] button to clear history in settings
+	- [ ] redo settings
+	- [x] answerCallbackQuery to prevent infinite loading on buttons
+- [ ] instance features
+    - [ ] support for readonly connection with database
+    - [x] ability to connect to multiple databases
+    - [x] generate webhook urls automatically from built in env variables on [perl.it](http://perl.it) and [heroku](https://www.heroku.com/)
+- [ ] Tanslations
+	- [x] Finish translations in the search
+	- [ ] Indonesian
+	- [ ] German
+- [ ] add actual logging
+- [ ] proxy
+- [x] typescript!
+    - [x] inline search
+    - [x] random
+    - [x] text handler (by code)
+    - [x] likes
+    - [x] help & settings
+    - [x] "fix" button
+    - [x] /zip command
+- [ ] find alternative for [telegra.ph](http://telegra.ph) and implement as a fallback (for hosting images)
+- [ ] create new website with fancy stats
