@@ -42,18 +42,19 @@
 
 On repl.it you may need to run `npm install node && npm install && npm run build` before starting for the first time
 
-[![Run on Repl.it](https://repl.it/badge/github/iamdowner/nhentai-telegram-bot)](https://repl.it/github/iamdowner/nhentai-telegram-bot)
+[![Run on Repl.it](https://repl.it/badge/github/sleroq/nhentai-telegram-bot)](https://repl.it/github/sleroq/nhentai-telegram-bot)
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/iamdowner/nhentai-telegram-bot)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/sleroq/nhentai-telegram-bot)
 
 ## Development progress:
+
 - [ ] User-related features
 	- [ ] ability to set filter and random only in specific tags
-	- [ ] ability to exclude tags from random in random
+	- [ ] ability to exclude tags from random
 	- [ ] button to delete all user data in settings
 	- [ ] button to clear history in settings
-	- [ ] redo settings
-	- [x] answerCallbackQuery to prevent infinite loading on buttons
+	- [ ] redesign settings
+	- [x] add answerCallbackQuery() to prevent infinite loading on buttons
 - [ ] instance features
     - [ ] support for readonly connection with database
     - [x] ability to connect to multiple databases
@@ -64,6 +65,7 @@ On repl.it you may need to run `npm install node && npm install && npm run build
 	- [ ] German
 - [ ] add actual logging
 - [ ] proxy
+- [ ] switch from [telegraf](https://github.com/telegraf/telegraf) to [grammy](https://grammy.dev/)
 - [x] typescript!
     - [x] inline search
     - [x] random
