@@ -13,6 +13,11 @@
       "value": "mongodb+srv://<username>:<password>@<cluster-name>.mongodb.net/<db-name>?retryWrites=true&w=majority",
       "required": true
     },
+    "DATABASE2_URL": {
+      "description": "URL to your second database if you want to store users separately",
+      "value": "mongodb+srv://<username>:<password>@<cluster-name>.mongodb.net/<db-name>?retryWrites=true&w=majority",
+      "required": false
+    },
     "IGNORED_TAGS": {
       "description": "Tags that will be ignored by default for all users, divided by ', '",
       "value": "torture, shotacon",
