@@ -3,9 +3,6 @@
   "description": "A simple Nodejs telegram bot for reading doujings from nhentai, instantly up and running (not always).",
   "repository": "https://github.com/iamdowner/nhentai-telegram-bot",
   "keywords": ["Nodejs", "Heroku", "Telegram"],
-  "scripts": {
-    "postdeploy": "npm run build"
-  },
   "env": {
     "BOT_TOKEN": {
       "description": "Your bot token from https://t.me/BotFather",
