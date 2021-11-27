@@ -4,6 +4,10 @@
   "repository": "https://github.com/iamdowner/nhentai-telegram-bot",
   "keywords": ["Nodejs", "Heroku", "Telegram"],
   "env": {
+    "HEROKU_APP_NAME": {
+      "description": "App name again (should be the same)",
+      "required": true
+    },
     "BOT_TOKEN": {
       "description": "Your bot token from https://t.me/BotFather",
       "required": true
