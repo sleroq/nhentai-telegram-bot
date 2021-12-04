@@ -26,10 +26,15 @@ import Werror from './lib/error'
 	const bot = await setupBot(process.env.BOT_TOKEN)
 
 	// Set webhook if url is provided
-	if (process.env.REPL_OWNER && process.env.REPL_SLUG || process.env.HEROKU_APP_NAME) {
+	if (process.env.REPL_OWNER && process.env.REPL_SLUG	// repl
+		|| process.env.HEROKU_APP_NAME                    // heroku
+		|| process.env.PROJECT_NAME                       // glitch
+	) {
 		let webhookUrl: string | undefined
 		if (process.env.HEROKU_APP_NAME) {
 			webhookUrl = `https://${process.env.HEROKU_APP_NAME}.herokuapp.com`
+		} else if (process.env.PROJECT_NAME) {
+			webhookUrl = `https://${process.env.PROJECT_NAME}.glitch.me`
 		} else {
 			webhookUrl = `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER?.toLowerCase()}.repl.co`
 		}
