@@ -7,8 +7,9 @@ export default {
 
 	donation_wallets: [
 		{
-			name:		 'Monero',
-			address: '85DLifC32dN3cYSBjF8ShgSYn6KD7WPAoSXEATyEVnQZW5mFxJDnMNacBvJ1qLHgVxjKQUXikb7cU4WXzp1Zc4gwMWDgMB8'}
+			name:	 'Monero',
+			address: '85DLifC32dN3cYSBjF8ShgSYn6KD7WPAoSXEATyEVnQZW5mFxJDnMNacBvJ1qLHgVxjKQUXikb7cU4WXzp1Zc4gwMWDgMB8',
+		}
 	],
 	// Add donation message to /help command with donation_wallets,
 
