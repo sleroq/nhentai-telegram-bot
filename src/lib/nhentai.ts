@@ -387,8 +387,8 @@ function assembleDoujin(response: Response<string>): Doujin {
 		}
 		if (thumbnailUrl) {
 			const complete = thumbnailUrl
-				.replace(/(\/[0-9]+)t./, '$1.')
-				.replace(/(https:\/\/)t./, '$1i.')
+				.replace(/(\/[0-9]+)t\./, '$1.')
+				.replace(/(https:\/\/)t/, '$1i')
 			pages.push(complete)
 		}
 	})
