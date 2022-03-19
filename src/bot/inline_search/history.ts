@@ -99,7 +99,7 @@ async function getHistoryUniversal(
 			})
 		}
 		results.push({
-			id:    doujin._id,
+			id:    String(Math.floor(Math.random() * (10000000 - 1 + 1) + 1)),
 			type:  'article',
 			title: doujin.title
 				.replace(/</g, '\\<')
