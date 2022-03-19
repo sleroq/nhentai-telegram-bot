@@ -8,7 +8,7 @@ import openInTelegraph      from './commands/open_in_telegraph'
 import likeDoujin           from './commands/like'
 import help, { searchTips } from './commands/help'
 import settingsChanger      from './commands/settings/buttons_handler'
-import fixInstantViewAsync       from './commands/fix_instant_view'
+import fixInstantViewAsync  from './commands/fix_instant_view'
 
 export default async function callbackHandler(ctx: Context<Update>, callback_query: CallbackQuery.DataCallbackQuery): Promise<void> {
 	const data: string = callback_query.data
