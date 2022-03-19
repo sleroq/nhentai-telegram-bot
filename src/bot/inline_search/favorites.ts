@@ -80,7 +80,7 @@ async function getFavoritesUniversal(
 			]
 		}
 		results.push({
-			id:    favorite._id,
+			id:    String(Math.floor(Math.random() * (10000000 - 1 + 1) + 1)),
 			type:  'photo',
 			title: favorite.title
 				.replace(/</g, '\\<')
