@@ -67,6 +67,7 @@ export default async function textHandler(ctx: Context): Promise<void> {
 				} catch (error) {
 					console.error('Replying \'failed_to_get\'' + error)
 				}
+				console.error(error)
 			}
 			continue
 		}
