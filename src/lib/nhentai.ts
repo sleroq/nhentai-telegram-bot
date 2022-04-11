@@ -382,6 +382,7 @@ function assembleDoujin(response: Response<string>): Doujin {
 	$('.thumb-container').each((index, element) => {
 		const thumbnailElement = $(element).children('a')
 		const thumbnailUrl = thumbnailElement.children('img').attr('data-src')
+
 		if (thumbnailUrl) {
 			thumbnails.push(thumbnailUrl)
 		}
@@ -389,6 +390,7 @@ function assembleDoujin(response: Response<string>): Doujin {
 			const complete = thumbnailUrl
 				.replace(/(\/[0-9]+)t\./, '$1.')
 				.replace(/(https:\/\/)t/, '$1i')
+
 			pages.push(complete)
 		}
 	})
