@@ -85,7 +85,7 @@ async function getHistoryUniversal(
 			doujin.telegraph_url,
 		)
 		const description = sliceByHalf(doujin.title)
-		const heart = user.favorites.findIndex(item => item._id === doujin._id) ? config.like_button_true : config.like_button_false
+		const heart = user.favorites.findIndex(item => item._id === String(doujin._id)) ? config.like_button_true : config.like_button_false
 		const inline_keyboard = [
 			[
 				{ text: 'Telegra.ph', url: String(doujin.telegraph_url) },
