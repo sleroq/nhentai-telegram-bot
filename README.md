@@ -34,15 +34,15 @@
   </details>
 
 ## One-Click Deploy Button
-### Pre-reqs for deploying this project to Heroku or Repl.it:
+### Pre-reqs for deploying this project to Heroku or replit.com:
 
 - Create [Heroku](https://signup.heroku.com/) or [Replit](https://replit.com/signup) account (free)
 - Create cluster on [Mongo database](https://docs.atlas.mongodb.com/getting-started/) (free)
 - Get bot token from [@BotFather](https://t.me/BotFather)
 
-On repl.it you may need to run `npm install node && npm install && npm run build` before starting for the first time
+On replit.com you may need to run `npm install node && npm install && npm run build` before starting for the first time
 
-[![Run on Repl.it](https://repl.it/badge/github/sleroq/nhentai-telegram-bot)](https://repl.it/github/sleroq/nhentai-telegram-bot)
+[![Run on replit.com](https://replit.com/badge/github/sleroq/nhentai-telegram-bot)](https://replit.com/github/sleroq/nhentai-telegram-bot)
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/sleroq/nhentai-telegram-bot)
 
