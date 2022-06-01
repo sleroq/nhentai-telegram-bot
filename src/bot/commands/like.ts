@@ -13,13 +13,15 @@ import i18n   from '../../lib/i18n'
 import saveAndGetUser  from '../../db/save_and_get_user'
 import saveAndGetManga from '../../db/save_and_get_manga'
 
-export default async function likeDoujin (ctx: Context, query: CallbackQuery.DataCallbackQuery): Promise<void> {
+export default async function likeDoujin (ctx: Context, query: CallbackQuery): Promise<void> {
 	let user: User | undefined
 	try {
 		user = await saveAndGetUser(ctx)
 	} catch (error) {
 		throw new Werror(error, 'Getting user in callbackHandler')
 	}
+
+	query.data = query.data || ''
 
 	const doujinId = Number(query.data.split('_')[1])
 	if(!doujinId){
