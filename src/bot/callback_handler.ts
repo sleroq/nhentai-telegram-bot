@@ -10,8 +10,8 @@ import help, { searchTips } from './commands/help'
 import settingsChanger      from './commands/settings/buttons_handler'
 import fixInstantViewAsync  from './commands/fix_instant_view'
 
-export default async function callbackHandler(ctx: Context<Update>, callback_query: CallbackQuery.DataCallbackQuery): Promise<void> {
-	const data: string = callback_query.data
+export default async function callbackHandler(ctx: Context<Update>, callback_query: CallbackQuery): Promise<void> {
+	const data: string = callback_query.data || ''
 	if (data === 'r'){
 		try {
 			await makeRandom(ctx,'next')

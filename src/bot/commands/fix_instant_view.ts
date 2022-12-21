@@ -19,7 +19,7 @@ import { CallbackQuery, InlineKeyboardButton } from 'telegraf/typings/core/types
 
 export default async function fixInstantViewAsync(
 	ctx: Context,
-	callback_query: CallbackQuery.DataCallbackQuery
+	callback_query: CallbackQuery
 ): Promise<void> {
 	try {
 		await fixInstantView(ctx, callback_query)
@@ -30,8 +30,10 @@ export default async function fixInstantViewAsync(
 
 async function fixInstantView(
 	ctx: Context,
-	callback_query: CallbackQuery.DataCallbackQuery
+	callback_query: CallbackQuery
 ): Promise<void> {
+	callback_query.data = callback_query.data || ''
+
 	// Get doujin's id
 	const matchId = callback_query.data.match(/_([0-9]+)/)
 	if (!matchId || !Number(matchId[1])) {
@@ -232,7 +234,7 @@ async function getPages(id: number | string): Promise<string[]> {
 async function buildKeyboardBack(
 	telegraph_url: string | undefined,
 	id: string,
-	callback_query: CallbackQuery.DataCallbackQuery,
+	callback_query: CallbackQuery,
 	message: Message | undefined | null
 ): Promise<InlineKeyboardButton[][]> {
 	const fixing_keyboard: InlineKeyboardButton[][] = [[]]
