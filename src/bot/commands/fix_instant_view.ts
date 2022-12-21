@@ -30,12 +30,17 @@ export default async function fixInstantViewAsync(
 
 async function fixInstantView(
 	ctx: Context,
-	callback_query: CallbackQuery
+	query: CallbackQuery
 ): Promise<void> {
-	callback_query.data = callback_query.data || ''
+	if (!('data' in query)
+		|| !query.data
+		|| !ctx.from) {
+		return
+	}
+	query.data = query.data
 
 	// Get doujin's id
-	const matchId = callback_query.data.match(/_([0-9]+)/)
+	const matchId = query.data.match(/_([0-9]+)/)
 	if (!matchId || !Number(matchId[1])) {
 		return
 	}
@@ -65,11 +70,11 @@ async function fixInstantView(
 	}
 
 	let message
-	if (callback_query.message) {
+	if (query.message) {
 		try {
 			message = await MessageRecord.findOne({
-				message_id: callback_query.message.message_id,
-				chat_id: String(callback_query.message.from?.id),
+				message_id: query.message.message_id,
+				chat_id: String(query.message.from?.id),
 			})
 		} catch (error) {
 			throw new Werror(error, 'Getting message')
@@ -77,7 +82,7 @@ async function fixInstantView(
 
 	}
 
-	const fixingKeyboardBack = await buildKeyboardBack(doujin.telegraph_url, doujin.id, callback_query, message)
+	const fixingKeyboardBack = await buildKeyboardBack(doujin.telegraph_url, doujin.id, query, message)
 	
 	const fixing_keyboard: InlineKeyboardButton[][] = [[]]
 	const telegraph_url = doujin.telegraph_url

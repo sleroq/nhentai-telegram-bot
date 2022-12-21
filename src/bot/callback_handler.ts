@@ -10,8 +10,13 @@ import help, { searchTips } from './commands/help'
 import settingsChanger      from './commands/settings/buttons_handler'
 import fixInstantViewAsync  from './commands/fix_instant_view'
 
-export default async function callbackHandler(ctx: Context<Update>, callback_query: CallbackQuery): Promise<void> {
-	const data: string = callback_query.data || ''
+export default async function callbackHandler(ctx: Context<Update>, query: CallbackQuery): Promise<void> {
+	if (!('data' in query)
+		|| !query.data
+		|| !ctx.from) {
+		return
+	}
+	const data: string = query.data
 	if (data === 'r'){
 		try {
 			await makeRandom(ctx,'next')
@@ -32,7 +37,7 @@ export default async function callbackHandler(ctx: Context<Update>, callback_que
 		}
 	} else if (data.match('like_')){
 		try {
-			await likeDoujin(ctx, callback_query)
+			await likeDoujin(ctx, query)
 		} catch (error) {
 			throw new Werror(error, 'Handling like')
 		}
@@ -50,13 +55,13 @@ export default async function callbackHandler(ctx: Context<Update>, callback_que
 		}
 	} else if (data.startsWith('fix')) {
 		try {
-			fixInstantViewAsync(ctx, callback_query)
+			fixInstantViewAsync(ctx, query)
 		} catch (error) {
 			throw new Werror(error, 'Answering CbQuery will_be_implemented_soon')
 		}
 	} else if (data.startsWith('sttgs_')) {
 		try {
-			await settingsChanger(ctx, callback_query)
+			await settingsChanger(ctx, query)
 		} catch (error) {
 			throw new Werror(error, 'Editing settings')
 		}
