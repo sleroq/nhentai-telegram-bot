@@ -1,7 +1,7 @@
 import { Schema, model, Document } from 'mongoose'
 
 export interface MangaSchema {
-	id:                   number
+	id:                   string
 	title:                string
 	description?:         string
 	tags?:                string[]
@@ -15,7 +15,7 @@ export interface MangaSchema {
 	updatedAt?:           Date
 }
 const mangaSchema = new Schema({
-	id:                  { type: Number, required: true },
+	id:                  { type: String, required: true },
 	title:               String,
 	description:         String,
 	tags:                [String],
