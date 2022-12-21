@@ -90,14 +90,8 @@ export default async function setupBot(token: string) {
 	})
 
 	bot.on('callback_query', async (ctx) => {
-		if (!('data' in ctx.update.callback_query)
-			|| !ctx.update.callback_query.data
-			|| !ctx.from) {
-			return
-		}
-		const callback_query = ctx.update.callback_query
 		try {
-			await callbackHandler(ctx, callback_query)
+			await callbackHandler(ctx, ctx.update.callback_query)
 		} catch (error) {
 			throw new Werror(error, 'Handling callback_query')
 		}

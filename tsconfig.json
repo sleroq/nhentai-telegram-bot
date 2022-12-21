@@ -21,7 +21,7 @@
     "noImplicitOverride": true,
     "esModuleInterop": true,
     // "allowSyntheticDefaultImports": true,
-    // "skipLibCheck": true,
+    "skipLibCheck": true, // fix for https://github.com/telegraf/telegraf/issues/1751
     "forceConsistentCasingInFileNames": true
   },
   "include": ["src", "config.json"],

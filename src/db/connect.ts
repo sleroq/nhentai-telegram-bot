@@ -2,8 +2,10 @@ import Werror from '../lib/error'
 
 import mongoose, { Connection }   from 'mongoose'
 import userSchema, { UserSchema } from '../models/user.model'
+mongoose.set('strictQuery', false)
 
 let connection2: Connection | undefined
+
 
 export default async function connectToMongo(database1: string, database2?: string) {
 	try {
@@ -14,7 +16,7 @@ export default async function connectToMongo(database1: string, database2?: stri
 
 	if (database2) {
 		try {
-			connection2 = await mongoose.createConnection(database2)
+			connection2 = mongoose.createConnection(database2)
 		} catch (error) {
 			throw new Werror(error, 'Unable to connect to second database :(')
 		}

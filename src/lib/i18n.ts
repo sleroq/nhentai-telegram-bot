@@ -19,6 +19,7 @@ i18next
 			}
 		},
 		load: 'all',
+		returnNull: false,
 	})
 
 export default i18next

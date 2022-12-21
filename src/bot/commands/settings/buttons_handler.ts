@@ -23,14 +23,19 @@ async function safeAndEdit(user: User, ctx: Context) {
 		throw new Werror(error, 'Editing message after changing settings')
 	}
 }
-export default async function settingsChanger(ctx: Context<Update>, callback_query: CallbackQuery): Promise<void> {
+export default async function settingsChanger(ctx: Context<Update>, query: CallbackQuery): Promise<void> {
+	if (!('data' in query)
+		|| !query.data
+		|| !ctx.from) {
+		return
+	}
 	let user: User | undefined
 	try {
 		user = await saveAndGetUser(ctx)
 	} catch (error) {
 		throw new Werror(error, 'Getting user in settings')
 	}
-	const data = callback_query.data || ''
+	const data = query.data
 	const setting = data.split('_')[1]
 	switch (setting) {
 	case 'search-type': {

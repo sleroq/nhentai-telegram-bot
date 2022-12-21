@@ -14,6 +14,11 @@ import saveAndGetUser  from '../../db/save_and_get_user'
 import saveAndGetManga from '../../db/save_and_get_manga'
 
 export default async function likeDoujin (ctx: Context, query: CallbackQuery): Promise<void> {
+	if (!('data' in query)
+		|| !query.data
+		|| !ctx.from) {
+		return
+	}
 	let user: User | undefined
 	try {
 		user = await saveAndGetUser(ctx)
