@@ -1,31 +1,32 @@
-import { Schema, model, Document } from 'mongoose'
+import { Schema, model } from 'mongoose'
 
-export interface MangaSchema {
-	id:                   string
-	title:                string
-	description?:         string
-	tags?:                string[]
-	pages:                number
-	page0?:               string
-	thumbnail?:           string
-	telegraph_url?:       string
-	telegraph_fixed_url?: string
-	fixed_pages:          string[]
-	createdAt?:           Date
-	updatedAt?:           Date
+export interface MangaI {
+  id: string // <source>_<id>
+  title?: string
+  description?: string
+  tags?: string[]
+  pages?: number
+  thumbnail?: string
+  previews?: {
+    telegraph_url?: string
+    fixed_pages?: string[]
+  }
+  createdAt: Date
+  updatedAt: Date
 }
-const mangaSchema = new Schema({
-	id:                  { type: String, required: true },
-	title:               String,
-	description:         String,
-	tags:                [String],
-	pages:               Number,
-	page0:               String,
-	thumbnail:           String,
-	telegraph_url:       String,
-	telegraph_fixed_url: String,
-	fixed_pages:         [String],
+export const mangaSchema: Schema<MangaI> = new Schema({
+	id: { type: String, required: true }, // <source>_<id>
+	title: String,
+	description: String,
+	tags: [String],
+	pages: Number,
+	thumbnail: String,
+	previews: {
+		telegraph_url: String,
+		fixed_pages: [String],
+	},
 }, { timestamps: true })
 
-export type Manga = MangaSchema & Document<any, any, MangaSchema>
-export default model<MangaSchema>('Manga', mangaSchema)
+export const Manga = model<MangaI>('Manga', mangaSchema)
+// export type Manga = MangaSchema & Document<any, any, MangaSchema>
+export default model<MangaI>('Manga', mangaSchema)

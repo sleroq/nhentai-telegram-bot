@@ -1,20 +1,21 @@
-import { Schema, model, Document } from 'mongoose'
+import { Schema, model, Types } from 'mongoose'
 
-export interface MessageSchema {
-	chat_id:    string
+export interface MessageI {
+	chat_id: string
 	message_id: number
-	current:    number
-	history:    number[]
-	createdAt?: Date
-	updatedAt?: Date
+  current?: number
+  history: Types.ObjectId[]
+	createdAt: Date
+	updatedAt: Date
 }
 
-const messageSchema = new Schema({
+const messageSchema = new Schema<MessageI>({
 	chat_id:    { type: String, required: true },
 	message_id: { type: Number, required: true },
 	current:    Number,
-	history:    [Number],
+	history:    [{ type: Schema.Types, ref: 'Manga' }],
 }, { timestamps: true })
 
-export type Message = MessageSchema & Document<any, any, MessageSchema>
-export default model<MessageSchema>('Message', messageSchema)
+export const Message = model<MessageI>('Message', messageSchema)
+// export type Message = MessageI & Document<any, any, MessageI>
+export default model<MessageI>('Message', messageSchema)
