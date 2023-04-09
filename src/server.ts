@@ -1,51 +1,27 @@
+import mongoose from 'mongoose'
+import { pino } from 'pino'
+import Werror from './lib/error.js'
+import start from './bot/index.js'
 import dotenv from 'dotenv'
+
 dotenv.config()
+mongoose.set('strictQuery', false)
+const logger = pino()
 
-import connectToMongo    from './db/connect'
-import { createAccount } from './lib/telegraph'
-import setupBot          from './bot/index'
-import startWithWebhook  from './express'
+const {
+	DATABASE_URL,
+	BOT_TOKEN,
+} = process.env
 
-import Werror from './lib/error'
+if (!DATABASE_URL
+  || !BOT_TOKEN)
+	throw new Error('DATABASE_URL and BOT_TOKEN are required')
 
-(async() => {
-	// get telegra.ph token
-	if (!process.env.TELEGRAPH_TOKEN) {
-		process.env.TELEGRAPH_TOKEN = await createAccount()
-	}
-	if (!process.env.BOT_TOKEN) {
-		throw new Error('No BOT_TOKEN in env')
-	}
-	if (!process.env.DATABASE_URL) {
-		throw new Error('No DATABASE_URL in env')
-	}
-	
-	// Connect to the mongo database
-	await connectToMongo(process.env.DATABASE_URL, process.env.DATABASE2_URL)
+try {
+	await mongoose.connect(DATABASE_URL)
+} catch (err) {
+	throw new Werror(err, 'Failed to connect to the database')
+}
+logger.info('Database connection established')
 
-	const bot = await setupBot(process.env.BOT_TOKEN)
-
-	// Set webhook if url is provided
-	if (process.env.REPL_OWNER && process.env.REPL_SLUG	// repl
-		|| process.env.HEROKU_APP_NAME                    // heroku
-		|| process.env.PROJECT_NAME                       // glitch
-	) {
-		let webhookUrl: string | undefined
-		if (process.env.HEROKU_APP_NAME) {
-			webhookUrl = `https://${process.env.HEROKU_APP_NAME}.herokuapp.com`
-		} else if (process.env.PROJECT_NAME) {
-			webhookUrl = `https://${process.env.PROJECT_NAME}.glitch.me`
-		} else {
-			webhookUrl = `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER?.toLowerCase()}.repl.co`
-		}
-		try {
-			await startWithWebhook(bot, webhookUrl)
-		} catch (error) {
-			throw new Werror(error, 'Starting bot with webhook')
-		}
-		console.log('Bot is started webhook!')
-	} else {
-		await bot.launch({ dropPendingUpdates: true })
-		console.log('Bot is started polling!')
-	}
-})()
+await start(BOT_TOKEN, logger)
