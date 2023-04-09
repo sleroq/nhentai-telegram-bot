@@ -1,4 +1,4 @@
-import { Schema, Types, model } from 'mongoose'
+import { Schema, Types, model, Document } from 'mongoose'
 
 export interface UserI {
   _id: string
@@ -27,7 +27,7 @@ export interface UserI {
   updatedAt: Date
 }
 
-const userSchema = new Schema<UserI>({
+export const userSchema = new Schema<UserI>({
 	_id: { type: String, required: true },
 	username: String,
 	first_name: String,
@@ -52,6 +52,6 @@ const userSchema = new Schema<UserI>({
 	search_history: [String],
 }, { timestamps: true })
 
-export const User = model<UserI>('User', userSchema)
-// export type User = UserI & Document<any, any, UserI>
-export default userSchema
+// eslint-disable-next-line
+export type User = UserI & Document<any, any, UserI>
+export default model<UserI>('User', userSchema)
