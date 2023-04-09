@@ -1,34 +1,13 @@
-import Werror from '../lib/error'
-
-import mongoose, { Connection }   from 'mongoose'
-import userSchema, { UserSchema } from '../models/user.model'
+import Werror from '../lib/error.js'
+import mongoose   from 'mongoose'
 mongoose.set('strictQuery', false)
 
-let connection2: Connection | undefined
-
-
-export default async function connectToMongo(database1: string, database2?: string) {
+export default async function connectToMongo(db: string) {
 	try {
-		await mongoose.connect(database1)
+		await mongoose.connect(db)
 	} catch (error) {
-		throw new Werror(error, 'Unable to connect to second database :(')
+		throw new Werror(error, 'Unable to connect to database :(')
 	}
 
-	if (database2) {
-		try {
-			connection2 = mongoose.createConnection(database2)
-		} catch (error) {
-			throw new Werror(error, 'Unable to connect to second database :(')
-		}
-		console.log('Second db is connected!')
-	}
 	console.log('Mongoose is connected!')
-}
-
-export function getUserModel() {
-	if (connection2) {
-		return connection2.model<UserSchema>('User', userSchema)
-	} else {
-		return mongoose.model<UserSchema>('User', userSchema)
-	}
 }
