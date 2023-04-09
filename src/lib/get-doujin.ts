@@ -41,11 +41,11 @@ export default async function getDoujin(id: string) {
 		}
 	})
 
-	// try {
-	// 	await doujin.save()
-	// } catch (err) {
-	// 	throw new Werror(err, 'Error saving doujin to database')
-	// }
+	try {
+		await doujin.save()
+	} catch (err) {
+		throw new Werror(err, 'Error saving doujin to database')
+	}
 
 	return doujin
 }
