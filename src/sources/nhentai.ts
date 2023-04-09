@@ -1,5 +1,5 @@
 import got, { Response } from 'got'
-import cheerio from 'cheerio'
+import * as cheerio from 'cheerio'
 // import { Element } from 'cheerio'
 import Doujin, { Tag, Title } from './doujin.js'
 import { Source } from './index.js'
