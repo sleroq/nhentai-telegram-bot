@@ -3,10 +3,13 @@
   "version": "1.0.0",
   "description": "A simple Nodejs telegram app built on millions of broken APIs, instantly up and running (not always).",
   "type": "module",
-  "exports": "built/src/server.js",
+  "exports": "./src/server.js",
   "scripts": {
+    "test": "ava",
     "build": "tsc",
     "start": "node built/server",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "preview": "tsc && node built/server"
   },
   "engines": {
@@ -23,16 +26,31 @@
     "telegram",
     "bot"
   ],
+  "ava": {
+    "typescript": {
+      "rewritePaths": {
+        "src/": "built/src/"
+      },
+      "compile": "tsc"
+    },
+    "concurrency": 5,
+    "files": [
+      "src/**/*.test.ts"
+    ]
+  },
   "devDependencies": {
+    "@ava/typescript": "^4.0.0",
     "@sindresorhus/tsconfig": "^3.0.1",
     "@types/adm-zip": "^0.5.0",
     "@types/archiver": "^5.3.1",
     "@types/cors": "^2.8.12",
     "@types/express": "^4.17.17",
+    "@types/html-escaper": "^3.0.0",
     "@types/i18n": "^0.13.2",
     "@types/tough-cookie": "^4.0.2",
     "@typescript-eslint/eslint-plugin": "^5.51.0",
     "@typescript-eslint/parser": "^5.51.0",
+    "ava": "^5.2.0",
     "eslint": "^8.34.0",
     "typescript": "^4.9.5"
   },
@@ -43,10 +61,12 @@
     "dotenv": "^16.0.2",
     "express": "^4.17.3",
     "got": "^12.5.3",
+    "grammy": "^1.14.1",
+    "html-escaper": "^3.0.3",
     "i18next": "^22.4.9",
     "isomorphic-fetch": "^3.0.0",
     "mongoose": "^6.9.1",
-    "telegraf": "^4.9.1",
+    "pino": "^8.10.0",
     "telegraph-uploader": "^2.0.0",
     "tough-cookie": "^4.1.2"
   }
