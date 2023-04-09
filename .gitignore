@@ -1,6 +1,6 @@
 .env
-*.db
-*.sh
 package-lock.json
-node_modules/
-built/
+/node_modules/
+/built/
+/built/*
+/.idea/
