@@ -13,7 +13,27 @@ export default async function startBot(token: string, logger: pino.Logger) {
 		logger.error(err)
 	})
 
-	bot.command('start', (ctx) => ctx.reply('Welcome! Up and running.'))
+	bot.command('start', ctx => {
+		let message = 'Welcome!\n'
+		message += '/rand - random doijin\n'
+		message += '<code>123123</code> - doujin by id\n\n'
+		message += '<a href="https://github.com/sleroq/nhentai-telegram-bot">GitHub</a> - help with development\n'
+
+		return ctx.reply(message, {
+			parse_mode: 'HTML',
+			disable_web_page_preview: true,
+			reply_markup: {
+				inline_keyboard: [
+					[
+						{
+							text: 'Search',
+							switch_inline_query_current_chat: '',
+						}
+					],
+				],
+			}
+		})
+	})
 
 	bot.command('id', async (ctx) => {
 		await ctx.reply('Just send me the id, no need to type /id command')
@@ -75,40 +95,12 @@ export default async function startBot(token: string, logger: pino.Logger) {
 // 	bot.catch((error) => {
 // 		console.error(error)
 // 	})
-//
-// 	// commands that always work (without nhentai/telegraph connections)
-// 	bot.start(async (ctx) => {
-// 		await saveAndGetUser(ctx)
-// 		const message = i18n.t('greeting', { name: ctx.from.first_name })
-// 		try {
-// 			await ctx.reply(message, {
-// 				parse_mode: 'HTML',
-// 				reply_markup: {
-// 					inline_keyboard: [
-// 						[{
-// 							text: i18n.t('random_button'),
-// 							callback_data: 'r'
-// 						}],
-// 					],
-// 				},
-// 			})
-// 		} catch (error) {
-// 			throw new Werror(error, 'Replying greetings')
-// 		}
-// 	})
-//
+
 // 	bot.help(async (ctx) => {
 // 		try {
 // 			await help(ctx)
 // 		} catch (error) {
 // 			throw new Werror(error, 'Handling \'/help\' command')
-// 		}
-// 	})
-// 	bot.command('code', async (ctx) => {
-// 		try {
-// 			await ctx.reply(i18n.t('just_send_me_a_code'))
-// 		} catch (error) {
-// 			throw new Werror(error, 'Replying on \'/code\' command')
 // 		}
 // 	})
 //
@@ -120,43 +112,10 @@ export default async function startBot(token: string, logger: pino.Logger) {
 // 		}
 // 	})
 //
-// 	bot.command('id', async (ctx) => {
-// 		try {
-// 			await ctx.reply('`' + ctx.from.id + '`', { parse_mode: 'Markdown' })
-// 		} catch (error) {
-// 			throw new Werror(error, 'Replying on \'/id\' command')
-// 		}
-// 	})
-//
-// 	// commands with nhentai
-// 	bot.command('rand', async (ctx) => {
-// 		try {
-// 			await makeRandom(ctx, 'next')
-// 		} catch (error) {
-// 			throw new Werror(error, 'Handling \'/rand\' command')
-// 		}
-// 	})
-//
 // 	bot.command('zip', async (ctx) => {
 // 		try {
 // 			await dlZip(ctx)
 // 		} catch (error) {
 // 			throw new Werror(error, 'Handling \'/zip\' command')
-// 		}
-// 	})
-//
-// 	bot.on('callback_query', async (ctx) => {
-// 		try {
-// 			await callbackHandler(ctx, ctx.update.callback_query)
-// 		} catch (error) {
-// 			throw new Werror(error, 'Handling callback_query')
-// 		}
-// 	})
-//
-// 	bot.on('inline_query', async (ctx) => {
-// 		try {
-// 			await inlineSearch(ctx)
-// 		} catch (error) {
-// 			throw new Werror(error, 'Handling inline_query')
 // 		}
 // 	})
