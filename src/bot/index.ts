@@ -3,6 +3,7 @@ import { pino } from 'pino'
 import handleIDs from './cmds/by-ids.js'
 import Werror from '../lib/error.js'
 import search from './search.js'
+import opener from './buttons/open.js'
 
 export default async function startBot(token: string, logger: pino.Logger) {
 	const bot = new Bot(token)
@@ -27,6 +28,8 @@ export default async function startBot(token: string, logger: pino.Logger) {
 	})
 
 	bot.on('message', async (ctx) => {
+		if (ctx.msg.via_bot?.id === bot.botInfo.id) return
+
 		const ids = ctx.msg.text?.match(/\d+/gm)
 		if (ids && ids.length) {
 			if (ids.length > 20) {
@@ -44,6 +47,7 @@ export default async function startBot(token: string, logger: pino.Logger) {
 	})
 
 	bot.use(search)
+	bot.use(opener)
 
 	void bot.start()
 }

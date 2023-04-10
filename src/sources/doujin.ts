@@ -20,6 +20,13 @@ export default interface Doujin {
 	};
 }
 
+export interface LightDoujin {
+	id: string;
+	url: string;
+	thumbnail: string;
+	caption: string;
+}
+
 export interface Source {
 	name: string;
 	id: string;

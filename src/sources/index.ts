@@ -1,7 +1,12 @@
 import chooseSource from './choose-sources.js'
-import Doujin from './doujin.js'
+import Doujin, {LightDoujin} from './doujin.js'
 import { CookieJar } from 'tough-cookie'
 import { IncomingHttpHeaders } from 'http'
+
+export interface searchResult {
+	results: LightDoujin[],
+	total: number
+}
 
 export abstract class Source {
 	baseUrl: string
@@ -20,6 +25,7 @@ export abstract class Source {
 
   abstract doujin: (id: string) => Promise<Doujin>;
   abstract randomDoujin: (id: string) => Promise<Doujin>;
+  abstract search: (query: string, page?: number) => Promise<searchResult>;
 }
 
 export class NotFoundError extends Error {
@@ -41,5 +47,9 @@ export default class HentaiAPI {
 
 	async randomDoujin(id: string): Promise<Doujin> {
 		return this.source.randomDoujin(id)
+	}
+
+	async search(query: string, page?: number): Promise<searchResult> {
+		return this.source.search(query, page)
 	}
 }

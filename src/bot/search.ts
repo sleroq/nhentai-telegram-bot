@@ -1,7 +1,7 @@
 import { Composer } from 'grammy'
 import getDoujin from '../lib/get-doujin.js'
 import Werror from '../lib/error.js'
-import { NotFoundError } from '../sources/index.js'
+import HentaiAPI, { NotFoundError } from '../sources/index.js'
 import { InlineQueryResult } from 'grammy/types'
 import config from '../../config.js'
 
@@ -53,7 +53,47 @@ composer.on('inline_query', async (ctx) => {
 		return ctx.answerInlineQuery([result])
 	}
 
-	return ctx.answerInlineQuery([])
+	const page = ctx.inlineQuery.query.match(/\/p(\d+)/)?.[1] ?? '1'
+
+	const hentaiAPI = new HentaiAPI()
+	const searchResult = await hentaiAPI.search(ctx.inlineQuery.query, parseInt(page, 10))
+
+	const results: InlineQueryResult[] = []
+
+	for (const doujin of searchResult.results) {
+		const previewURL = new URL('https://t.me/iv?rhash=cadd02903410b2')
+		previewURL.searchParams.set('url', doujin.url)
+		let message = `<a href="${previewURL.toString()}">${doujin.caption[0]}</a>`
+		message += `<a href="${doujin.url}">${doujin.caption.slice(1)}</a>`
+
+		results.push({
+			id: doujin.id,
+			type: 'article',
+			title: doujin.caption,
+			description: doujin.caption,
+			thumbnail_url: doujin.thumbnail,
+			input_message_content: {
+				message_text: message,
+				parse_mode: 'HTML',
+			},
+			reply_markup: {
+				inline_keyboard: [
+					[
+						{
+							text: 'Load info',
+							callback_data: 'open_' + doujin.id,
+						},
+						{
+							text: 'Preview',
+							url: previewURL.toString(),
+						}
+					],
+				],
+			}
+		})
+	}
+
+	return ctx.answerInlineQuery(results)
 })
 
 export default composer

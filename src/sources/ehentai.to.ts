@@ -1,4 +1,4 @@
-import { NotFoundError, Source } from './index.js'
+import {NotFoundError, searchResult, Source} from './index.js'
 import { CookieJar } from 'tough-cookie'
 import { IncomingHttpHeaders } from 'http'
 import Doujin from './doujin.js'
@@ -43,8 +43,33 @@ export default class eHentai implements Source {
 
 		return doujin
 	}
+
 	async randomDoujin(): Promise<Doujin> {
 		throw new Error('Not implemented')
+	}
+
+	async search(query: string, page = 0): Promise<searchResult> {
+		const url = new URL('/search/', this.baseUrl)
+		url.searchParams.set('q', query)
+		if (page > 1) {
+			url.searchParams.set('page', page.toString())
+		}
+
+		let response: Response<string>
+		try {
+			response = await got(url.toString())
+		} catch (err) {
+			throw new Werror(err, 'Making search request')
+		}
+
+		let result: searchResult
+		try {
+			result = this.parseSearchResults(response.body)
+		} catch (err) {
+			throw new Werror(err, 'Parsing search results')
+		}
+
+		return result
 	}
 
 	private parseDoujin(id: string, body: string): Doujin {
@@ -161,6 +186,44 @@ export default class eHentai implements Source {
 			details: details,
 			pages,
 			thumbnail,
+		}
+	}
+
+	parseSearchResults(page: string): searchResult {
+		const $ = cheerio.load(page)
+		const total = parseInt($('body h2').text())
+
+		const doujins = $('.container > .gallery a').map((_, a) => {
+			const el = $(a)
+			const href = el.attr('href')
+			if (!href) {
+				throw new Werror('Could not find href in doujin')
+			}
+			const url = new URL(href, this.baseUrl).toString()
+
+			const id = href.replace(/^\/g\/(\d+)\/$/, '$1')
+
+			const caption = el.find('.caption').text().trim()
+			if (!caption) {
+				throw new Werror('Could not find title in doujin')
+			}
+
+			const thumbnail = el.find('img').attr('data-src')
+			if (!thumbnail) {
+				throw new Werror('Could not find thumbnail in doujin')
+			}
+
+			return {
+				id,
+				url,
+				caption,
+				thumbnail,
+			}
+		})
+
+		return {
+			results: doujins.toArray(),
+			total,
 		}
 	}
 }
