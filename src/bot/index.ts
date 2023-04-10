@@ -1,48 +1,60 @@
 import { Bot, BotError } from 'grammy'
-import getDoujin from '../lib/get-doujin.js'
+import { pino } from 'pino'
+import handleIDs from './cmds/by-ids.js'
 import Werror from '../lib/error.js'
-import {NotFoundError} from '../sources/index.js'
-import {pino} from 'pino'
+import search from './search.js'
 
 export default async function startBot(token: string, logger: pino.Logger) {
 	const bot = new Bot(token)
 
-	bot.catch((err: BotError) => { logger.error(err) })
+	bot.catch((err: BotError) => {
+		logger.error(err)
+	})
 
 	bot.command('start', (ctx) => ctx.reply('Welcome! Up and running.'))
 
 	bot.command('id', async (ctx) => {
+		await ctx.reply('Just send me the id, no need to type /id command')
+
 		const id = ctx.msg.text.split(' ')[1]?.trim()
-		if (!id) return ctx.reply('Please provide an id')
+		if (!id) return
 
-		let doujin
 		try {
-			doujin = await getDoujin(id)
+			await handleIDs([id], ctx, logger)
 		} catch (err) {
-			if (err instanceof Werror && err.cause instanceof NotFoundError) {
-				return ctx.reply('Doujin not found')
-			}
-			void ctx.reply('Error getting doujin')
-			throw new Werror(err, 'Error getting doujin')
+			throw new Werror(err, 'Error handling doujin id')
 		}
-
-		return ctx.reply(doujin.description, {
-			parse_mode: 'HTML',
-		})
 	})
 
-	bot.on('message', (ctx) => ctx.reply('Got another message!'))
+	bot.on('message', async (ctx) => {
+		const ids = ctx.msg.text?.match(/\d+/gm)
+		if (ids && ids.length) {
+			if (ids.length > 20) {
+				return ctx.reply('Please provide at most 20 ids')
+			}
+
+			try {
+				await handleIDs(ids, ctx, logger)
+			} catch (err) {
+				throw new Werror(err, 'Error handling doujin ids')
+			}
+		}
+
+		return
+	})
+
+	bot.use(search)
 
 	void bot.start()
 }
 
 // import { Telegraf } from 'telegraf'
-// 
+//
 // import Werror from '../lib/error.ts'
-// 
+//
 // import saveAndGetUser from '../db/save_and_get_user'
 // import i18n from '../lib/i18n'
-// 
+//
 // // Import all commands
 // import callbackHandler from './callback_handler'
 // import makeRandom from './commands/random'
@@ -51,13 +63,13 @@ export default async function startBot(token: string, logger: pino.Logger) {
 // import help from './commands/help'
 // import settings from './commands/settings/settings'
 // import dlZip from './commands/dlzip'
-// 
+//
 // export default async function setupBot(token: string) {
 // 	const bot = new Telegraf(token)
 // 	bot.catch((error) => {
 // 		console.error(error)
 // 	})
-// 
+//
 // 	// commands that always work (without nhentai/telegraph connections)
 // 	bot.start(async (ctx) => {
 // 		await saveAndGetUser(ctx)
@@ -78,7 +90,7 @@ export default async function startBot(token: string, logger: pino.Logger) {
 // 			throw new Werror(error, 'Replying greetings')
 // 		}
 // 	})
-// 
+//
 // 	bot.help(async (ctx) => {
 // 		try {
 // 			await help(ctx)
@@ -93,7 +105,7 @@ export default async function startBot(token: string, logger: pino.Logger) {
 // 			throw new Werror(error, 'Replying on \'/code\' command')
 // 		}
 // 	})
-// 
+//
 // 	bot.command('settings', async (ctx) => {
 // 		try {
 // 			await settings(ctx)
@@ -101,7 +113,7 @@ export default async function startBot(token: string, logger: pino.Logger) {
 // 			throw new Werror(error, 'Handling settings')
 // 		}
 // 	})
-// 
+//
 // 	bot.command('id', async (ctx) => {
 // 		try {
 // 			await ctx.reply('`' + ctx.from.id + '`', { parse_mode: 'Markdown' })
@@ -109,7 +121,7 @@ export default async function startBot(token: string, logger: pino.Logger) {
 // 			throw new Werror(error, 'Replying on \'/id\' command')
 // 		}
 // 	})
-// 
+//
 // 	// commands with nhentai
 // 	bot.command('rand', async (ctx) => {
 // 		try {
@@ -118,7 +130,7 @@ export default async function startBot(token: string, logger: pino.Logger) {
 // 			throw new Werror(error, 'Handling \'/rand\' command')
 // 		}
 // 	})
-// 
+//
 // 	bot.command('zip', async (ctx) => {
 // 		try {
 // 			await dlZip(ctx)
@@ -126,7 +138,7 @@ export default async function startBot(token: string, logger: pino.Logger) {
 // 			throw new Werror(error, 'Handling \'/zip\' command')
 // 		}
 // 	})
-// 
+//
 // 	bot.on('callback_query', async (ctx) => {
 // 		try {
 // 			await callbackHandler(ctx, ctx.update.callback_query)
@@ -134,7 +146,7 @@ export default async function startBot(token: string, logger: pino.Logger) {
 // 			throw new Werror(error, 'Handling callback_query')
 // 		}
 // 	})
-// 
+//
 // 	bot.on('inline_query', async (ctx) => {
 // 		try {
 // 			await inlineSearch(ctx)
@@ -142,14 +154,3 @@ export default async function startBot(token: string, logger: pino.Logger) {
 // 			throw new Werror(error, 'Handling inline_query')
 // 		}
 // 	})
-// 
-// 	bot.on('text', async (ctx) => {
-// 		try {
-// 			await textHandler(ctx)
-// 		} catch (error) {
-// 			throw new Werror(error, 'Handling text')
-// 		}
-// 	})
-// 
-// 	return bot
-// }
