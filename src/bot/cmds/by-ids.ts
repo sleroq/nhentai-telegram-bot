@@ -30,6 +30,16 @@ export default async function handleIDs<T extends Context>(
 
 		await ctx.reply(doujin.description, {
 			parse_mode: 'HTML',
+			reply_markup: {
+				inline_keyboard: [
+					[
+						{
+							text: 'Search',
+							switch_inline_query_current_chat: '',
+						},
+					],
+				],
+			},
 		})
 	}
 }

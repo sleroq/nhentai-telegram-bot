@@ -10,6 +10,16 @@ composer.callbackQuery(/open_.+/gm, async ctx => {
 	const doujin = await getDoujin(id)
 	await ctx.editMessageText(doujin.description, {
 		parse_mode: 'HTML',
+		reply_markup: {
+			inline_keyboard: [
+				[
+					{
+						text: 'Search',
+						switch_inline_query_current_chat: '',
+					},
+				],
+			]
+		}
 	})
 })
 
