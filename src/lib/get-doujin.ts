@@ -1,4 +1,4 @@
-import MangaModel, {Manga, MangaI} from '../models/manga.model.js'
+import MangaModel, { Manga, MangaI } from '../models/manga.model.js'
 import Werror from './error.js'
 import Doujin from '../sources/doujin.js'
 import HentaiAPI from '../sources/index.js'
@@ -38,7 +38,7 @@ export default async function getDoujin(id: string) {
 		description: generateDescription(fetchedDoujin, previewURL.toString()),
 		previews: {
 			telegraph_url: previewURL.toString(),
-		}
+		},
 	})
 
 	try {
@@ -52,25 +52,33 @@ export default async function getDoujin(id: string) {
 
 // This	function generates description for manga
 function generateDescription(doujin: Doujin, previewURL: string) {
-	const {title, details, url} = doujin
-	const {tags, pages, categories, characters, artists} = details
+	const { title, details, url } = doujin
+	const { tags, pages, categories, characters, artists } = details
 
 	const categoriesArray = categories.map((category) => category.name)
 
 	let description = ''
 
 	description += `<a href="${previewURL}">${title.translated.pretty[0]}</a>`
-	description += `<a href="${url}">${escape(title.translated.pretty.slice(1))}</a>\n`
+	description += `<a href="${url}">${escape(
+		title.translated.pretty.slice(1)
+	)}</a>\n`
 	description += `<b>Pages:</b> ${escape(pages.toString())}\n`
 
 	if (categoriesArray.length > 0)
 		description += `<b>Categories:</b> ${escape(categoriesArray.join(', '))}\n`
 	if (characters.length > 0)
-		description += `<b>Characters:</b> ${escape(characters.map((character) => character.name).join(', '))}\n`
+		description += `<b>Characters:</b> ${escape(
+			characters.map((character) => character.name).join(', ')
+		)}\n`
 	if (tags.length > 0)
-		description += `<b>Tags:</b> #${escape(tags.map((tag) => tag.name.replace(' ', '_')).join(' #'))}\n`
+		description += `<b>Tags:</b> #${escape(
+			tags.map((tag) => tag.name.replace(' ', '_')).join(' #')
+		)}\n`
 	if (artists.length > 0)
-		description += `<b>Artists:</b> ${escape(artists.map((artist) => artist.name).join(', '))}\n`
+		description += `<b>Artists:</b> ${escape(
+			artists.map((artist) => artist.name).join(', ')
+		)}\n`
 
 	return description
 }

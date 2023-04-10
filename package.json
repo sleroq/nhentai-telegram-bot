@@ -7,10 +7,10 @@
   "scripts": {
     "test": "ava",
     "build": "tsc",
-    "start": "node built/server",
+    "start": "node built/src/server",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "preview": "tsc && node built/server"
+    "preview": "tsc && node built/src/server"
   },
   "engines": {
     "node": ">=14.x"

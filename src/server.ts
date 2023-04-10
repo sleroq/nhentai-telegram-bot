@@ -8,13 +8,9 @@ dotenv.config()
 mongoose.set('strictQuery', false)
 const logger = pino()
 
-const {
-	DATABASE_URL,
-	BOT_TOKEN,
-} = process.env
+const { DATABASE_URL, BOT_TOKEN } = process.env
 
-if (!DATABASE_URL
-  || !BOT_TOKEN)
+if (!DATABASE_URL || !BOT_TOKEN)
 	throw new Error('DATABASE_URL and BOT_TOKEN are required')
 
 try {

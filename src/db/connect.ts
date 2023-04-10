@@ -1,5 +1,5 @@
 import Werror from '../lib/error.js'
-import mongoose   from 'mongoose'
+import mongoose from 'mongoose'
 mongoose.set('strictQuery', false)
 
 export default async function connectToMongo(db: string) {

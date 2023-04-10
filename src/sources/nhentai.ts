@@ -1,43 +1,42 @@
 import got, { Response } from 'got'
 import * as cheerio from 'cheerio'
-// import { Element } from 'cheerio'
 import Doujin, { Tag, Title } from './doujin.js'
 import { Source } from './index.js'
 import { IncomingHttpHeaders } from 'http'
 import { CookieJar } from 'tough-cookie'
 
-export type SortingType = 'popular' | 'popular-today' | 'popular-week' | ''
+export type SortingType = 'popular' | 'popular-today' | 'popular-week' | '';
 
 export interface ApiSearchResponse {
-  result: ApiSearchResult[]
-  num_pages: number
-  per_page: number
+	result: ApiSearchResult[];
+	num_pages: number;
+	per_page: number;
 }
 
 export interface ApiSearchResult {
-  id: string
-  media_id: string
-  title: {
-    english: string | null
-    japanese: string | null
-    pretty: string | null
-  }
-  images: {
-    pages: ApiPage[]
-    cover: ApiPage
-    thumbnail: ApiPage
-  }
-  scanlator: string
-  upload_date: number
-  tags: Tag[]
-  num_pages: number
-  num_favorites: number
+	id: string;
+	media_id: string;
+	title: {
+		english: string | null;
+		japanese: string | null;
+		pretty: string | null;
+	};
+	images: {
+		pages: ApiPage[];
+		cover: ApiPage;
+		thumbnail: ApiPage;
+	};
+	scanlator: string;
+	upload_date: number;
+	tags: Tag[];
+	num_pages: number;
+	num_favorites: number;
 }
 
 export interface ApiPage {
-  t: 'j' | 'p' | 'g'
-  w: number
-  h: number
+	t: 'j' | 'p' | 'g';
+	w: number;
+	h: number;
 }
 
 export default class nHentai implements Source {
@@ -45,7 +44,11 @@ export default class nHentai implements Source {
 	cookieJar: CookieJar
 	headers: IncomingHttpHeaders
 
-	constructor(baseUrl?: string, cookieJar?: CookieJar, headers?: IncomingHttpHeaders) {
+	constructor(
+		baseUrl?: string,
+		cookieJar?: CookieJar,
+		headers?: IncomingHttpHeaders
+	) {
 		this.baseUrl = baseUrl || 'htts://nhentai.net'
 		this.cookieJar = cookieJar || new CookieJar()
 		this.headers = headers || {}
@@ -93,19 +96,19 @@ export default class nHentai implements Source {
 	// 			&& sort !== '') {
 	// 			throw Error('Wrong sorting')
 	// 		}
-	// 
+	//
 	// 		const response = await got('https://nhentai.net/api/galleries/search', {
 	// 			searchParams: { query, page, sort }
 	// 		})
-	// 
+	//
 	// 		const body: ApiSearchResponse = JSON.parse(response.body)
-	// 
+	//
 	// 		const searchResult: SearchResult<Doujin> = {
 	// 			results:            [],
 	// 			totalSearchResults: body.num_pages * body.per_page,
 	// 			lastPage:           body.num_pages,
 	// 		}
-	// 
+	//
 	// 		body.result.map((result) => {
 	// 			const tags = result.tags.filter((tag) => tag.type === 'tag')
 	// 			const parodies = result.tags.filter((tag) => tag.type === 'parody')
@@ -114,7 +117,7 @@ export default class nHentai implements Source {
 	// 			const groups = result.tags.filter((tag) => tag.type === 'group')
 	// 			const categories = result.tags.filter((tag) => tag.type === 'category')
 	// 			const languages = result.tags.filter((tag) => tag.type === 'language')
-	// 
+	//
 	// 			const pages: string[] = []
 	// 			result.images.pages.forEach((page, index) => {
 	// 				pages.push(`https://i.nhentai.net//galleries/${result.media_id}/${index + 1}.${extention[page.t]}`)
@@ -123,7 +126,7 @@ export default class nHentai implements Source {
 	// 			result.images.pages.forEach((page, index) => {
 	// 				thumbnails.push(`https://t.nhentai.net/galleries/${result.media_id}/${index + 1}t.${extention[page.t]}`)
 	// 			})
-	// 
+	//
 	// 			searchResult.results.push({
 	// 				id:    Number(result.id),
 	// 				url:   `https://nhentai.net/g/${result.id}/`,
@@ -154,7 +157,7 @@ export default class nHentai implements Source {
 	// 		})
 	// 		return searchResult
 	// 	}
-	// 
+	//
 	// 	static async search(query: string, page = 1, sort: SortingType = ''): Promise<SearchResult<LightDoujin>> {
 	// 		if (!query) {
 	// 			throw Error('No search query')
@@ -165,7 +168,7 @@ export default class nHentai implements Source {
 	// 			&& sort !== '') {
 	// 			throw Error('Wrong sorting')
 	// 		}
-	// 
+	//
 	// 		const response = await got('https://nhentai.net/search/', {
 	// 			searchParams: {
 	// 				q: query,
@@ -173,9 +176,9 @@ export default class nHentai implements Source {
 	// 				sort
 	// 			}
 	// 		})
-	// 
+	//
 	// 		const $ = cheerio.load(response.body)
-	// 
+	//
 	// 		const numberOfResults = Number(
 	// 			$('#content h1').text()
 	// 				.replace(/,/g, '')
@@ -191,14 +194,14 @@ export default class nHentai implements Source {
 	// 			totalSearchResults: numberOfResults,
 	// 			lastPage:           lastPage,
 	// 		}
-	// 
+	//
 	// 		$('.container.index-container .gallery').each((index, element) => {
 	// 			const doujin = getLightDoujin($, element)
 	// 			searchResult.results.push(doujin)
 	// 		})
 	// 		return searchResult
 	// 	}
-	// 
+	//
 }
 
 // const extention = {
@@ -210,9 +213,11 @@ export default class nHentai implements Source {
 export function getIdFromUrl(url: string): string {
 	const numberRegexp = /\/g\/(\d+)\/?.*/
 	const matchNumbers = url.match(numberRegexp)
-	if (!matchNumbers
-    || !matchNumbers[1]
-    || Number.isNaN(Number(matchNumbers[1]))) {
+	if (
+		!matchNumbers ||
+    !matchNumbers[1] ||
+    Number.isNaN(Number(matchNumbers[1]))
+	) {
 		throw new Error('No id in this url')
 	}
 	return matchNumbers[1]
@@ -249,7 +254,9 @@ export function getIdFromUrl(url: string): string {
 
 function assembleDoujin(response: Response<string>): Doujin {
 	// TODO: Make it better
-	const url = response.redirectUrls[response.redirectUrls.length - 1]?.toString() || response.url
+	const url =
+    response.redirectUrls[response.redirectUrls.length - 1]?.toString() ||
+    response.url
 	const id = getIdFromUrl(url)
 	const $ = cheerio.load(response.body)
 	const doujinInfo = $('#info')
@@ -257,7 +264,8 @@ function assembleDoujin(response: Response<string>): Doujin {
 	const translated = doujinInfo.children('.title').first()
 	const original = doujinInfo.children('.title').last()
 
-	const title: Title = { // FIXME: full title
+	const title: Title = {
+		// FIXME: full title
 		translated: {
 			pretty: translated.children('.pretty').text(),
 			full: translated.children('.pretty').text(),
@@ -265,12 +273,14 @@ function assembleDoujin(response: Response<string>): Doujin {
 		original: {
 			pretty: original.children('.pretty').text(),
 			full: original.children('.pretty').text(),
-		}
+		},
 	}
 
 	const tagsElement = doujinInfo.children('#tags')
 	function getTag(title: string): Tag[] {
-		const tagsContainer = tagsElement.children(`.tag-container:contains(${title})`).children('.tags')
+		const tagsContainer = tagsElement
+			.children(`.tag-container:contains(${title})`)
+			.children('.tags')
 		const tags: Tag[] = []
 		tagsContainer.children('a').each((_, element) => {
 			tags.push({
@@ -284,7 +294,9 @@ function assembleDoujin(response: Response<string>): Doujin {
 		return []
 	}
 	function getUploaded(title: string): Doujin['details']['uploaded'] {
-		const tagsContainer = tagsElement.children(`.tag-container:contains(${title})`).children('.tags')
+		const tagsContainer = tagsElement
+			.children(`.tag-container:contains(${title})`)
+			.children('.tags')
 		const datetimeElement = tagsContainer.children('time').attr('datetime')
 		if (!datetimeElement) {
 			throw new Error('no date element')
@@ -324,7 +336,7 @@ function assembleDoujin(response: Response<string>): Doujin {
 		languages: getTag('Languages:'),
 		categories: getTag('Categories:'),
 		pages: pages.length,
-		uploaded: getUploaded('Uploaded:')
+		uploaded: getUploaded('Uploaded:'),
 	}
 
 	return {

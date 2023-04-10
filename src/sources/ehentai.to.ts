@@ -1,8 +1,8 @@
-import {NotFoundError, Source} from './index.js'
-import {CookieJar} from 'tough-cookie'
-import {IncomingHttpHeaders} from 'http'
+import { NotFoundError, Source } from './index.js'
+import { CookieJar } from 'tough-cookie'
+import { IncomingHttpHeaders } from 'http'
 import Doujin from './doujin.js'
-import got, {HTTPError, Response} from 'got'
+import got, { HTTPError, Response } from 'got'
 import Werror from '../lib/error.js'
 import * as cheerio from 'cheerio'
 
@@ -11,7 +11,11 @@ export default class eHentai implements Source {
 	cookieJar: CookieJar
 	headers: IncomingHttpHeaders
 
-	constructor(baseUrl?: string, cookieJar?: CookieJar, headers?: IncomingHttpHeaders) {
+	constructor(
+		baseUrl?: string,
+		cookieJar?: CookieJar,
+		headers?: IncomingHttpHeaders
+	) {
 		this.baseUrl = baseUrl || 'https://ehentai.to'
 		this.cookieJar = cookieJar || new CookieJar()
 		this.headers = headers || {}
@@ -48,15 +52,20 @@ export default class eHentai implements Source {
 
 		const titleTranslated = $('#info h1').text()
 		const titleOriginal = $('#info h2').text()
-		const numberOfPages = parseInt($('#info > div:contains("pages")').text().trim(), 10)
+		const numberOfPages = parseInt(
+			$('#info > div:contains("pages")').text().trim(),
+			10
+		)
 
-		const thumbnails = $('#thumbnail-container a.gallerythumb img').map((_, a) => {
-			const url = a.attribs['data-src']
-			if (!url) {
-				throw new Werror('Could not find href in thumbnail')
+		const thumbnails = $('#thumbnail-container a.gallerythumb img').map(
+			(_, a) => {
+				const url = a.attribs['data-src']
+				if (!url) {
+					throw new Werror('Could not find href in thumbnail')
+				}
+				return url
 			}
-			return url
-		})
+		)
 		const thumbnail = thumbnails[0]
 		if (!thumbnail) {
 			throw new Werror('Could not find cover thumbnail')
@@ -70,16 +79,22 @@ export default class eHentai implements Source {
 		})
 
 		const details: Doujin['details'] = {
-			parodies: [], characters: [], tags: [], artists: [], groups: [], languages: [], categories: [],
+			parodies: [],
+			characters: [],
+			tags: [],
+			artists: [],
+			groups: [],
+			languages: [],
+			categories: [],
 			pages: numberOfPages,
 			uploaded: {
 				datetime: new Date(),
 				pretty: new Date().toLocaleString(),
-			}
+			},
 		}
 		const tagContainers = $('#tags > .tag-container')
 		for (const container of tagContainers) {
-			const name = container.children.find(c => c.type === 'text')
+			const name = container.children.find((c) => c.type === 'text')
 			if (!name || !('data' in name)) {
 				throw new Werror('Could not find name in tag container')
 			}
@@ -149,4 +164,3 @@ export default class eHentai implements Source {
 		}
 	}
 }
-
