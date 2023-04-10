@@ -24,7 +24,7 @@ export abstract class Source {
 	}
 
   abstract doujin: (id: string) => Promise<Doujin>;
-  abstract randomDoujin: (id: string) => Promise<Doujin>;
+  abstract random: () => Promise<Doujin>;
   abstract search: (query: string, page?: number) => Promise<searchResult>;
 }
 
@@ -45,8 +45,8 @@ export default class HentaiAPI {
 		return this.source.doujin(id)
 	}
 
-	async randomDoujin(id: string): Promise<Doujin> {
-		return this.source.randomDoujin(id)
+	async random(): Promise<Doujin> {
+		return this.source.random()
 	}
 
 	async search(query: string, page?: number): Promise<searchResult> {

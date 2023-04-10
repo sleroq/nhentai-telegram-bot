@@ -4,6 +4,7 @@ import handleIDs from './cmds/by-ids.js'
 import Werror from '../lib/error.js'
 import search from './search.js'
 import opener from './buttons/open.js'
+import rand from './cmds/rand.js'
 
 export default async function startBot(token: string, logger: pino.Logger) {
 	const bot = new Bot(token)
@@ -27,6 +28,10 @@ export default async function startBot(token: string, logger: pino.Logger) {
 		}
 	})
 
+	bot.use(search)
+	bot.use(opener)
+	bot.use(rand)
+
 	bot.on('message', async (ctx) => {
 		if (ctx.msg.via_bot?.id === bot.botInfo.id) return
 
@@ -45,9 +50,6 @@ export default async function startBot(token: string, logger: pino.Logger) {
 
 		return
 	})
-
-	bot.use(search)
-	bot.use(opener)
 
 	void bot.start()
 }

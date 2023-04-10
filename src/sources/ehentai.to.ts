@@ -44,8 +44,32 @@ export default class eHentai implements Source {
 		return doujin
 	}
 
-	async randomDoujin(): Promise<Doujin> {
-		throw new Error('Not implemented')
+	async random(): Promise<Doujin> {
+		let response: Response<string>
+		try {
+			response = await got(this.baseUrl + '/random/')
+		} catch (error) {
+			if (error instanceof HTTPError) {
+				if (error.response.statusCode === 404) {
+					throw new NotFoundError()
+				}
+			}
+			throw new Werror(error, 'Making request')
+		}
+
+		const id = new URL(response.url).pathname.split('/')[2]
+		if (!id) {
+			throw new Werror('Could not find id in url')
+		}
+
+		let doujin: Doujin
+		try {
+			doujin = this.parseDoujin(id, response.body)
+		} catch (error) {
+			throw new Werror(error, 'Parsing doujin')
+		}
+
+		return doujin
 	}
 
 	async search(query: string, page = 0): Promise<searchResult> {

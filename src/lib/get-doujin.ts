@@ -29,20 +29,8 @@ export default async function getDoujin(id: string) {
 	const previewURL = new URL('https://t.me/iv?rhash=cadd02903410b2')
 	previewURL.searchParams.set('url', fetchedDoujin.url)
 
-	doujin = new MangaModel<MangaI>({
-		id: databaseID,
-		title: fetchedDoujin.title.translated.pretty,
-		tags: fetchedDoujin.details.tags.map((tag) => tag.name),
-		pages: fetchedDoujin.details.pages,
-		thumbnail: fetchedDoujin.thumbnail,
-		description: generateDescription(fetchedDoujin, previewURL.toString()),
-		previews: {
-			telegraph_url: previewURL.toString(),
-		},
-	})
-
 	try {
-		await doujin.save()
+		doujin = await saveDoujin(fetchedDoujin, databaseID, previewURL.toString())
 	} catch (err) {
 		throw new Werror(err, 'Error saving doujin to database')
 	}
@@ -50,7 +38,28 @@ export default async function getDoujin(id: string) {
 	return doujin
 }
 
-// This	function generates description for manga
+export async function saveDoujin(doujin: Doujin, databaseID: string, previewURL: string) {
+	const manga = new MangaModel<MangaI>({
+		id: databaseID,
+		title: doujin.title.translated.pretty,
+		tags: doujin.details.tags.map((tag) => tag.name),
+		pages: doujin.details.pages,
+		thumbnail: doujin.thumbnail,
+		description: generateDescription(doujin, previewURL.toString()),
+		previews: {
+			telegraph_url: previewURL.toString(),
+		},
+	})
+
+	try {
+		await manga.save()
+	} catch (err) {
+		throw new Werror(err, 'Error saving doujin to database')
+	}
+
+	return manga
+}
+
 function generateDescription(doujin: Doujin, previewURL: string) {
 	const { title, details, url } = doujin
 	const { tags, pages, categories, characters, artists } = details
