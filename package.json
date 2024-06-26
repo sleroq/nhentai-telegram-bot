@@ -65,7 +65,7 @@
     "html-escaper": "^3.0.3",
     "i18next": "^22.4.9",
     "isomorphic-fetch": "^3.0.0",
-    "mongoose": "^6.9.1",
+    "mongoose": "^6.11.3",
     "pino": "^8.10.0",
     "tough-cookie": "^4.1.3"
   }
