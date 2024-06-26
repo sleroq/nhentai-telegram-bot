@@ -59,7 +59,7 @@
     "cheerio": "^1.0.0-rc.12",
     "cors": "^2.8.5",
     "dotenv": "^16.0.2",
-    "express": "^4.17.3",
+    "express": "^4.19.2",
     "got": "^12.5.3",
     "grammy": "^1.14.1",
     "html-escaper": "^3.0.3",
