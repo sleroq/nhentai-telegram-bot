@@ -1,81 +1,100 @@
-# Features:
+# nhentai Telegram Bot
+
+A self-hosted Telegram bot for searching, reading, and saving manga — directly inside Telegram.
+
+## Features
 
 - <details>
-    <summary>
-      Inline search - search manga in any chat.
-    </summary>
+    <summary>Inline search — search manga in any chat</summary>
     <img src="https://i.postimg.cc/N0pMD78j/image.png" alt="Search">
   </details>
 - <details>
-    <summary>
-      Favorites - like the manga so you can easily open or share it.
-    </summary>
+    <summary>Favorites — like titles to quickly reopen or share</summary>
     <img src="https://i.postimg.cc/Hk0ZyCCj/Screenshot-from-2020-11-22-21-05-13.png" alt="Favorites">
   </details>
 - <details>
-    <summary>
-      Read manga directly in the telegram app, no need to open a browser.
-    </summary>
+    <summary>In-app reading — read manga inside Telegram, no browser needed</summary>
     <img src="https://i.postimg.cc/G36TNCVw/image.png" alt="Instant preview">
   </details>
-- Discover new doujins with /rand command.
-- Open doujins using code or link, send multiple codes in one message.
 - <details>
-    <summary>
-      Database - Bot works even if nhentai is down (more than 500k doujins are saved).
-    </summary>
-    <img src="https://i.imgur.com/eh69bTA.png" alt="Database screnshot">
-  </details>
-- <details>
-    <summary>
-      Translated into Russian and Spanish
-    </summary>https://i.imgur.com/eh69bTA.png
+    <summary>Multilingual — available in English, Russian, and Spanish</summary>
     <img src="https://i.postimg.cc/7Zs7Y2hd/image.png" alt="Language selection">
   </details>
+- Random discovery — use `/rand` to find something new
+- Flexible lookup — open titles by code or link, send multiple codes in one message
+- Proxy support — optional FlareSolverr integration to bypass Cloudflare protection
 
-## One-Click Deploy Button
-### Pre-reqs for deploying this project to replit.com:
+## Prerequisites
 
-- Create [Replit](https://replit.com/signup) account (free)
-- Configure a writable path for the SQLite database file (default: `./data/bot.sqlite`)
-- Get bot token from [@BotFather](https://t.me/BotFather)
+- [Bun](https://bun.sh) (for local development)
+- A Telegram bot token from [@BotFather](https://t.me/BotFather)
+- A writable path for the SQLite database (default: `./data/bot.sqlite`)
+- Docker (optional, for FlareSolverr proxy support)
 
-## Local development (Bun)
+## Installation & Setup
 
+### Local Development
 ```bash
+# 1. Clone the repository
+git clone https://github.com/sleroq/nhentai-telegram-bot.git
+cd nhentai-telegram-bot
+
+# 2. Install dependencies
 bun install
+
+# 3. Copy and fill in environment variables
+cp .env.example .env
+
+# 4. Start the bot
 bun run preview
 ```
 
-## Proxy Support (Optional)
-
-All manga sources support optional proxy via [FlareSolverr](https://github.com/FlareSolverr/FlareSolverr) to bypass Cloudflare protection.
-
-### Environment Variables
-
-| Variable | Description |
-|----------|-------------|
-| `SOURCE_FLARESOLVERR_URL` | FlareSolverr endpoint (e.g., `http://127.0.0.1:8191`). Falls back to `FLARESOLVERR_URL`. |
-| `SOURCE_PROXY_URL` | Optional upstream proxy for FlareSolverr (e.g., `http://127.0.0.1:8888`). |
-| `SOURCE_MAX_TIMEOUT_MS` | Max timeout for FlareSolverr requests (default: `60000`). |
-
-### Running with FlareSolverr
-
-```bash
-# Start FlareSolverr (Docker)
-docker run -d --name flaresolverr -p 8191:8191 ghcr.io/flaresolverr/flaresolverr:latest
-
-# Run the bot with proxy enabled
-SOURCE_FLARESOLVERR_URL=http://127.0.0.1:8191 bun run preview
-```
-
-Without these variables set, sources make direct HTTP requests (no proxy).
-
-On replit.com you may need to run `npm install node && npm install && npm run build` before starting for the first time
+### Deploy to Replit
 
 [![Run on replit.com](https://replit.com/badge/github/sleroq/nhentai-telegram-bot)](https://replit.com/github/sleroq/nhentai-telegram-bot)
 
-## Development progress:
+1. Create a free [Replit](https://replit.com/signup) account
+2. Fork or import this repository into Replit
+3. Set your environment variables in the Replit Secrets panel (see table below)
+4. Run the following command once before starting:
+```bash
+   npm install node && npm install && npm run build
+```
+5. Click Run
+
+## Environment Variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `BOT_TOKEN` | ✅ | Your Telegram bot token from @BotFather |
+| `DATABASE_PATH` | ✅ | Path to the SQLite database file (default: `./data/bot.sqlite`) |
+| `SOURCE_FLARESOLVERR_URL` | ☐ | FlareSolverr endpoint (e.g. `http://127.0.0.1:8191`). Falls back to `FLARESOLVERR_URL`. |
+| `SOURCE_PROXY_URL` | ☐ | Upstream proxy passed to FlareSolverr (e.g. `http://127.0.0.1:8888`) |
+| `SOURCE_MAX_TIMEOUT_MS` | ☐ | Max timeout for FlareSolverr requests in ms (default: `60000`) |
+
+> Without the FlareSolverr variables set, the bot makes direct HTTP requests to manga sources.
+
+### Running with FlareSolverr (Optional)
+```bash
+# Start FlareSolverr via Docker
+docker run -d --name flaresolverr -p 8191:8191 ghcr.io/flaresolverr/flaresolverr:latest
+
+# Start the bot with FlareSolverr enabled
+SOURCE_FLARESOLVERR_URL=http://127.0.0.1:8191 bun run preview
+```
+
+## Contributing
+
+Contributions are welcome. To get started:
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feat/your-feature`
+3. Commit your changes: `git commit -m "feat: add your feature"`
+4. Push and open a pull request
+
+Please keep PRs focused and include a clear description of what was changed and why.
+
+## Development Progress
 
 - [ ] User-related features
 	- [ ] ability to set filter and random only in specific tags
@@ -88,7 +107,7 @@ On replit.com you may need to run `npm install node && npm install && npm run bu
     - [ ] support for readonly connection with database
     - [x] ability to connect to multiple databases
     - [x] generate webhook urls automatically from built in env variables on [perl.it](http://perl.it)
-- [ ] Tanslations
+- [ ] Translations
 	- [x] Finish translations in the search
 	- [ ] Indonesian
 	- [ ] German
@@ -103,5 +122,9 @@ On replit.com you may need to run `npm install node && npm install && npm run bu
     - [x] help & settings
     - [x] "fix" button
     - [x] /zip command
-- [ ] find alternative for [telegra.ph](http://telegra.ph) and implement as a fallback (for hosting images)
+- [ ] find alternative for [telegra.ph](http://telegra.ph) and implement as a fallback
 - [ ] create new website with fancy stats
+
+## License
+
+This project is open source. See [LICENSE](./LICENSE) for details.
